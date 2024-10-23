@@ -109,7 +109,7 @@ class Message:
             self.chat.id, file, file_name, caption, msg_id
         )
         self.id = response.data.get("idMessage")
-        self.text = text
+        self.text = caption
         self.user.id = self.w_id
         self.user.name = None
         return self

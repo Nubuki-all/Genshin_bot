@@ -50,7 +50,7 @@ async def enka_handler(event, args):
         if not (card or prof):
             return await event.reply(f"```{enka_handler.__doc__}```")
         if arg.t not in ("1", "2"):
-            arg.t = 2
+            arg.t = 1
         profile, error = await get_enka_profile(args)
         if error:
             return
