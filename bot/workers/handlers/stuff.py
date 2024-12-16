@@ -10,7 +10,7 @@ from bot.utils.bot_utils import get_json
 from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
     clean_reply,
-    download_replied_image,
+    download_replied_media,
     pm_is_allowed,
     user_is_allowed,
     user_is_owner,
@@ -209,11 +209,15 @@ async def stickerize_image(event, args, client):
         if not user_is_allowed(user):
             return
     try:
-        if not event.quoted.quotedMessage.imageMessage.URL:
-            return await event.reply("*Replied message is not an image.*")
+        m_type = "image"
+        quoted_msg = event.quoted.quotedMessage
+        if not quoted_msg.imageMessage.URL:
+            if not quoted_msg.videoMessage.URL:
+                return await event.reply("*Replied message is not an image.*")
+            m_type = "video"
 
         await event.send_typing_status()
-        file = await download_replied_image(event.quoted)
+        file = await download_replied_media(event.quoted, mtype=m_type)
         me = await bot.client.get_me()
         return await event.reply_sticker(
             file,

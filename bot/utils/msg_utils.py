@@ -225,15 +225,19 @@ class Event:
         return construct_event(msg, False)
 
 
-async def download_replied_image(quoted) -> bytes:
-    image = quoted.quotedMessage.imageMessage
-    direct_path = image.directPath
-    enc_file_hash = image.fileEncSHA256
-    file_hash = image.fileSHA256
-    media_key = image.mediaKey
-    file_length = image.fileLength
-    media_type = MediaType.MediaImage
-    mms_type = "image"
+async def download_replied_media(quoted, mtype="image") -> bytes:
+    if mtype == "image":
+        item = quoted.quotedMessage.imageMessage
+        media_type = MediaType.MediaImage
+    elif mtype == "video":
+        item = quoted.quotedMessage.videoMessage
+        media_type = MediaType.MediaVideo
+    direct_path = item.directPath
+    enc_file_hash = item.fileEncSHA256
+    file_hash = item.fileSHA256
+    media_key = item.mediaKey
+    file_length = item.fileLength
+    mms_type = mtype
     return await bot.client.download_media_with_path(
         direct_path,
         enc_file_hash,
