@@ -131,6 +131,7 @@ class Event:
                 reply_privately=reply_privately,
             )
         except httpx.HTTPStatusError:
+            await logger(Exception)
             response = await self.client.reply_message(
                 text,
                 self.message,
