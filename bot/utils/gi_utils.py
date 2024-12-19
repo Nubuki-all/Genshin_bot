@@ -401,9 +401,7 @@ async def get_challenge_image(
             (0, 0), bottom_text, font=challengers_font
         )
         challengers_text_width = challengers_text_bbox[2] - challengers_text_bbox[0]
-        challengers_text_x = (
-            background_blurred.width - challengers_text_width
-        ) // 2
+        challengers_text_x = (background_blurred.width - challengers_text_width) // 2
         challengers_text_y = dark_bg_y + dark_bg_height - 160
         if bottom_text:
             draw_main.text(
