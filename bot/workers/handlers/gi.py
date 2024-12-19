@@ -588,7 +588,7 @@ async def random_challenge(event, args, client):
             return
         func_list = []
         await status.edit(
-            f"*Generating random challenge:*\nFetching random boss: *{boss['name']}*\nFetching random characters images…"
+            f"*Generating random challenge:*\nFetching random boss: *{boss_name}*\nFetching random characters images…"
         )
         for character in characters:
             image = character["images"]["filename_icon"]
