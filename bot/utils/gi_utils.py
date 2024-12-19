@@ -2,7 +2,7 @@ import io
 import random
 
 import aiohttp
-from aiohttp_retry import RandomRetry, RetryClient
+from aiohttp_retry import ExponentialRetry, RetryClient
 from bs4 import BeautifulSoup
 from encard import encard, update_namecard
 from encard.src.tools import pill
@@ -38,7 +38,7 @@ async def get_gi_info(
 
 
 async def async_dl(url):
-    retry_options = RandomRetry(attempts=10)
+    retry_options = ExponentialRetry(attempts=10)
     client_session = aiohttp.ClientSession()
     retry_requests = RetryClient(client_session)
     async with retry_requests.get(url, retry_options=retry_options) as result:
@@ -304,7 +304,7 @@ async def get_challenge_image(
         image_path = io.BytesIO(raw)
         background_url = "https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png"
         if background:
-            background_url = f"https://api.hakush.in/gi/UI/{background}.webp"
+            background_url = f"https://gi.yatta.moe/assets/UI/tutorial/{background}.png"
         raw = await async_dl(background_url)
         background_path = io.BytesIO(raw)
         # Open the original image

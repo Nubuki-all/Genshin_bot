@@ -614,6 +614,9 @@ async def random_challenge(event, args, client):
         final_img = await get_challenge_image(
             icon, tutorial_img, characters_img, boss_name, bottom_text="Challengers"
         )
+        if not final_img:
+            e = "Couldn't generate card"
+            return
 
         caption = f"*Boss name:* {boss_name}"
         caption += f"\n*{boss_spec}*"
