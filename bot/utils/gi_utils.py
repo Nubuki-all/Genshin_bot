@@ -25,7 +25,7 @@ async def get_gi_info(
         direct = True
         url = get
     field = "stats" if stats else "result"
-    retry_options = RandomRetry(attempts=10)
+    retry_options = ExponentialRetry(attempts=10)
     client_session = aiohttp.ClientSession()
     retry_requests = RetryClient(client_session)
     async with retry_requests.get(url, retry_options=retry_options) as result:
@@ -38,7 +38,7 @@ async def get_gi_info(
 
 
 async def async_dl(url):
-    retry_options = ExponentialRetry(attempts=10)
+    retry_options = ExponentialRetry(attempts=20)
     client_session = aiohttp.ClientSession()
     retry_requests = RetryClient(client_session)
     async with retry_requests.get(url, retry_options=retry_options) as result:
