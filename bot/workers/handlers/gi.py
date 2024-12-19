@@ -594,7 +594,8 @@ async def random_challenge(event, args, client):
             image = character["images"]["filename_icon"]
             text = character["name"]
             rarity = character["rarity"]
-            func = get_character_image(image, text, rarity)
+            element = character["elementText"] if character["elementText"] != "None" else None
+            func = get_character_image(image, text, rarity, element=element)
             func_list.append(func)
         characters_img = await asyncio.gather(*func_list)
         await status.edit(f"*Generating random challenge card…*")

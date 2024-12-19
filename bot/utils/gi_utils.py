@@ -128,7 +128,7 @@ async def fetch_random_boss():
 
 async def fetch_random_character(amount=4):
     try:
-        character_list_url = "https://genshin-db-api.vercel.app/api/v5/characters?query=boss&matchCategories=true&verboseCategories=true"
+        character_list_url = "https://genshin-db-api.vercel.app/api/v5/characters?query=name&matchCategories=true&verboseCategories=true"
         characters = await get_gi_info(get=character_list_url)
         return random.sample(characters, amount)
     except Exception:
