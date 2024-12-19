@@ -233,7 +233,7 @@ async def get_character_image(
     gap_color: tuple = (200, 200, 200),
     text_color: tuple = (0, 0, 0),
     font_path: str = None,
-    font_size: int = 20,
+    font_size: int = 25,
     element: str = None,
     additional_image_size: tuple = (90, 90),
 ):

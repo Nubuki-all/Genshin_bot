@@ -620,13 +620,13 @@ async def random_challenge(event, args, client):
 
         caption = f"*Boss name:* {boss_name}"
         caption += f"\n*{boss_spec}*"
-        caption += f"*Boss type:* {boss_type}"
+        caption += f"\n*Boss type:* {boss_type.rstrip('s')}"
         if tutorial_desc:
             caption += f"\n{tutorial_desc}"
         caption += f"\n\n"
         caption += f"*Allowed characters:*"
         for character in characters:
-            caption += f"*⁍* {character['name']}\n"
+            caption += f"\n*⁍* {character['name']}"
         caption += "\n*Good luck!*"
         await clean_reply(event, reply, "reply_photo", photo=final_img, caption=caption)
     except Exception:
