@@ -106,7 +106,7 @@ async def getcmds(event, args, client):
 {pre}events - *Get current and upcoming events*
 {pre}sanitize - *Sanitize link or message*
 {pre}sticker - *Turns images to stickers*
-{pre}rchallenge - *Generates a random boss challenge card*
+{pre}rchallenge - *Get a random boss challenge card*
 {pre}bash - *[Dev.] Run bash commands*
 {pre}eval - *[Dev.] Evaluate python commands*
 {pre}rss - *[Owner] Setup bot to auto post RSS feeds*
