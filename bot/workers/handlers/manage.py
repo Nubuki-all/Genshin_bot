@@ -379,7 +379,9 @@ async def rss_sub(event, args, client):
         if arg.chat:
             _default = False
             for chat_ in arg.chat.split():
-                chat_ = f"{event.chat.id}:{event.chat.server}" if chat_ == "." else chat_
+                chat_ = (
+                    f"{event.chat.id}:{event.chat.server}" if chat_ == "." else chat_
+                )
                 if chat_.casefold() != "default":
                     chat.append(chat_)
                 else:

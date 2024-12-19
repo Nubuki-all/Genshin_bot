@@ -1,4 +1,3 @@
-import asyncio
 import io
 import random
 
@@ -8,7 +7,7 @@ from bs4 import BeautifulSoup
 from encard import encard, update_namecard
 from encard.src.tools import pill
 from enkacard import enc_error, encbanner
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 from .log_utils import logger
 
@@ -115,6 +114,7 @@ async def get_enka_card2(uid, char_id, huid=False):
     finally:
         return result, error
 
+
 async def fetch_random_boss():
     try:
         boss_list_url = "https://genshin-db-api.vercel.app/api/v5/enemies?query=boss&matchCategories=true&verboseCategories=true"
@@ -186,12 +186,13 @@ async def fetch_weapon_detail(weapon: dict, weapon_stats: dict) -> tuple:
 
 
 color = {
-        1: (126, 126, 128, 255),
-        2: (78, 126, 110, 255),
-        3: (84, 134, 169, 255),
-        4: (127, 103, 161, 255),
-        5: (176, 112, 48, 255),
-    }
+    1: (126, 126, 128, 255),
+    2: (78, 126, 110, 255),
+    3: (84, 134, 169, 255),
+    4: (127, 103, 161, 255),
+    5: (176, 112, 48, 255),
+}
+
 
 async def add_background(image_suf: str, rarity: int, name: str = "weapon"):
     """Fetches image and adds a background.
@@ -235,7 +236,7 @@ async def get_character_image(
     font_size: int = 20,
     element: str = None,
     additional_image_size: tuple = (90, 90),
-    ):
+):
     try:
         image_url = f"https://api.hakush.in/gi/UI/{image}.webp"
         raw = await async_dl(image_url)
@@ -269,7 +270,11 @@ async def get_character_image(
         draw_base.rectangle([(0, gap_top), (rect_width, gap_bottom)], fill=gap_color)
 
         # Add text centered on the gap
-        font = ImageFont.truetype(font_path, font_size) if font_path else await pill.get_font(font_size)
+        font = (
+            ImageFont.truetype(font_path, font_size)
+            if font_path
+            else await pill.get_font(font_size)
+        )
         text_width = draw_base.textlength(text, font=font)
         text_x = (rect_width - text_width) // 2
         text_y = gap_top + (gap_bottom - gap_top - font_size) // 2
@@ -280,7 +285,7 @@ async def get_character_image(
         base.save(output, format="png")
         output.name = f"{text}.png"
         return output
-    except Exception as e:
+    except Exception:
         await logger(Exception)
 
 
@@ -291,8 +296,8 @@ async def get_challenge_image(
     text: str,
     bottom_text: str,
     font_path: str = None,
-    font_size: int = 17
-    ):
+    font_size: int = 17,
+):
     try:
         image_url = f"https://api.hakush.in/gi/UI/{image}.webp"
         raw = await async_dl(image_url)
@@ -301,12 +306,12 @@ async def get_challenge_image(
         raw = await async_dl(background_url)
         background_path = io.BytesIO(raw)
         # Open the original image
-        img = Image.open(image_path).convert('RGBA')
+        img = Image.open(image_path).convert("RGBA")
 
         # Open the background image
         background = Image.open(background_path)
-        if background.mode != 'RGBA':
-            background = background.convert('RGBA')
+        if background.mode != "RGBA":
+            background = background.convert("RGBA")
 
         # Resize and blur the main background image
         background = background.resize((800, 600))  # Fixed size canvas
@@ -319,41 +324,46 @@ async def get_challenge_image(
         # Position the dark blurred background
         dark_bg_x = (background_blurred.width - dark_bg_width) // 2
         dark_bg_y = (background_blurred.height - dark_bg_height) // 2
-        
+
         # Create a new background layer for the dark blurred effect
         dark_bg = Image.new("RGBA", (dark_bg_width, dark_bg_height), (0, 0, 0, 0))
-        # Copy and crop the corresponding region from the main blurred background
+        # Copy and crop the corresponding region from the main blurred
+        # background
         cropped_bg = background_blurred.crop(
-            (dark_bg_x, dark_bg_y, dark_bg_x + dark_bg_width, dark_bg_y + dark_bg_height)
+            (
+                dark_bg_x,
+                dark_bg_y,
+                dark_bg_x + dark_bg_width,
+                dark_bg_y + dark_bg_height,
+            )
         )
-        
+
         # Apply an additional blur to this cropped region
         cropped_bg_blurred = cropped_bg.filter(ImageFilter.GaussianBlur(radius=52))
-        
+
         # Create a mask for rounded corners
         mask = Image.new("L", (dark_bg_width, dark_bg_height), 0)
         draw_mask = ImageDraw.Draw(mask)
         draw_mask.rounded_rectangle(
-            [(0, 0), (dark_bg_width, dark_bg_height)],
-            radius=corner_radius,
-            fill=180
+            [(0, 0), (dark_bg_width, dark_bg_height)], radius=corner_radius, fill=180
         )
-        
+
         # Create the darkened version of the blurred region
         cropped_bg_blurred.paste(cropped_bg_blurred, (0, 0), mask)
-        
-        # Paste the darkened, blurred, rounded background back onto the main background
+
+        # Paste the darkened, blurred, rounded background back onto the main
+        # background
         background_blurred.paste(cropped_bg_blurred, (dark_bg_x, dark_bg_y), mask)
-		
+
         # Resize and mask the profile image into a circle
         profile_size = 150
         img_resized = img.resize((profile_size, profile_size))
 
-        mask = Image.new('L', (profile_size, profile_size), 0)
+        mask = Image.new("L", (profile_size, profile_size), 0)
         draw = ImageDraw.Draw(mask)
         draw.ellipse((0, 0, profile_size, profile_size), fill=255)
 
-        img_masked = Image.new('RGBA', (profile_size, profile_size))
+        img_masked = Image.new("RGBA", (profile_size, profile_size))
         img_masked.paste(img_resized, (0, 0), mask=mask)
 
         # Paste the circular profile onto the dark blurred background
@@ -364,7 +374,11 @@ async def get_challenge_image(
         # Add text below the circular profile
         if text:
             draw_main = ImageDraw.Draw(background_blurred)
-            font = ImageFont.truetype(font_path, font_size) if font_path else await pill.get_font(font_size)
+            font = (
+                ImageFont.truetype(font_path, font_size)
+                if font_path
+                else await pill.get_font(font_size)
+            )
 
             text_bbox = draw_main.textbbox((0, 0), text, font=font)
             text_width = text_bbox[2] - text_bbox[0]
@@ -376,14 +390,27 @@ async def get_challenge_image(
         if bottom_text:
             draw_main = ImageDraw.Draw(background_blurred)
             challengers_font_size = font_size + 5
-            challengers_font = ImageFont.truetype(font_path, challengers_font_size) if font_path else await pill.get_font(font_size)
+            challengers_font = (
+                ImageFont.truetype(font_path, challengers_font_size)
+                if font_path
+                else await pill.get_font(font_size)
+            )
 
-            challengers_text_bbox = draw_main.textbbox((0, 0), bottom_text, font=challengers_font)
+            challengers_text_bbox = draw_main.textbbox(
+                (0, 0), bottom_text, font=challengers_font
+            )
             challengers_text_width = challengers_text_bbox[2] - challengers_text_bbox[0]
-            challengers_text_x = (background_blurred.width - challengers_text_width) // 2
+            challengers_text_x = (
+                background_blurred.width - challengers_text_width
+            ) // 2
             challengers_text_y = dark_bg_y + dark_bg_height - 160
 
-            draw_main.text((challengers_text_x, challengers_text_y), bottom_text, fill=(255, 255, 255), font=challengers_font)
+            draw_main.text(
+                (challengers_text_x, challengers_text_y),
+                bottom_text,
+                fill=(255, 255, 255),
+                font=challengers_font,
+            )
 
         # Add extra images with rounded corners, preserving aspect ratio
         small_image_height = 120
@@ -392,17 +419,19 @@ async def get_challenge_image(
 
         resized_images = []
         for extra_image_path in extra_images_paths[:4]:
-            extra_img = Image.open(extra_image_path).convert('RGBA')
+            extra_img = Image.open(extra_image_path).convert("RGBA")
             aspect_ratio = extra_img.width / extra_img.height
             resized_width = int(small_image_height * aspect_ratio)
             resized_img = extra_img.resize((resized_width, small_image_height))
 
-            mask = Image.new('L', resized_img.size, 0)
+            mask = Image.new("L", resized_img.size, 0)
             draw = ImageDraw.Draw(mask)
             corner_radius = 15
-            draw.rounded_rectangle([(0, 0), resized_img.size], radius=corner_radius, fill=255)
+            draw.rounded_rectangle(
+                [(0, 0), resized_img.size], radius=corner_radius, fill=255
+            )
 
-            rounded_img = Image.new('RGBA', resized_img.size)
+            rounded_img = Image.new("RGBA", resized_img.size)
             rounded_img.paste(resized_img, (0, 0), mask)
             resized_images.append(rounded_img)
             total_width += resized_width
@@ -420,6 +449,5 @@ async def get_challenge_image(
         background_blurred.save(output, format="png")
         output.name = f"{image}.png"
         return output.getvalue()
-    except Exception as e:
+    except Exception:
         await logger(Exception)
-

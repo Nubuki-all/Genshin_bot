@@ -17,7 +17,13 @@ from .startup.after import on_startup
 from .utils.msg_utils import Event, event_handler, on_message
 from .utils.os_utils import re_x, s_remove
 from .workers.handlers.dev import bash, eval_message, get_logs
-from .workers.handlers.gi import enka_handler, get_events, getgiftcodes, random_challenge, weapon_handler
+from .workers.handlers.gi import (
+    enka_handler,
+    get_events,
+    getgiftcodes,
+    random_challenge,
+    weapon_handler,
+)
 from .workers.handlers.manage import (
     pause_handler,
     restart_handler,

@@ -1,9 +1,7 @@
 import asyncio
-import itertools
 import time
 
 from bs4 import BeautifulSoup
-from PIL import Image
 
 from bot.config import bot
 from bot.utils.bot_utils import (
@@ -15,8 +13,6 @@ from bot.utils.bot_utils import (
 )
 from bot.utils.db_utils import save2db2
 from bot.utils.gi_utils import (
-    add_background,
-    async_dl,
     enka_update,
     fetch_random_boss,
     fetch_random_character,
@@ -28,7 +24,6 @@ from bot.utils.gi_utils import (
     get_enka_profile,
     get_enka_profile2,
     get_gi_info,
-    place_profile_pic,
 )
 from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
@@ -276,7 +271,6 @@ async def weapon_handler(event, args, client):
         if status:
             await asyncio.sleep(5)
             await status.delete()
-
 
 
 async def manage_autogift_chat(event, args, client):
@@ -577,18 +571,24 @@ async def random_challenge(event, args, client):
             return
     try:
         reply = event.reply_to_message
-        status = await event.reply("*Generating random challenge:*\nFetching random boss…")
+        status = await event.reply(
+            "*Generating random challenge:*\nFetching random boss…"
+        )
         boss = await fetch_random_boss()
         if not boss:
             e = "Couldn't fetch boss"
             return
-        await status.edit(f"*Generating random challenge:*\nFetching random boss: *{boss['name']}*\nFetching random characters…")
+        await status.edit(
+            f"*Generating random challenge:*\nFetching random boss: *{boss['name']}*\nFetching random characters…"
+        )
         characters = await fetch_random_character()
         if not characters:
             e = "Couldn't fetch characters"
             return
         func_list = []
-        await status.edit(f"*Generating random challenge:*\nFetching random boss: *{boss['name']}*\nFetching random characters images…")
+        await status.edit(
+            f"*Generating random challenge:*\nFetching random boss: *{boss['name']}*\nFetching random characters images…"
+        )
         for character in characters:
             image = character["images"]["filename_icon"]
             text = character["name"]
@@ -604,9 +604,10 @@ async def random_challenge(event, args, client):
         tutorial_desc = list(boss["data"]["tips"].values())["description"]
         tutorial_desc = sanitize_text(tutorial_desc, truncate=False)
         tutorial_img = list(boss["data"]["tips"].values())["images"][0]
-        final_img = await get_challenge_image(icon, tutorial_img, characters_img, boss_name)
+        final_img = await get_challenge_image(
+            icon, tutorial_img, characters_img, boss_name
+        )
 
-        
         caption = f"*Boss name:* {boss_name}"
         caption += f"\n*{boss_spec}*"
         caption += f"*Boss type:* {boss_type}"
