@@ -620,7 +620,7 @@ async def random_challenge(event, args, client):
 
         caption = f"*Boss name:* {boss_name}"
         caption += f"\n*{boss_spec}*"
-        caption += f"\n*Boss type:* {boss_type.rstrip('s')}"
+        caption += f"\n*Boss type:* {boss_type.rstrip('s') if not boss_type.endswith('ss') else boss_type}"
         if tutorial_desc:
             caption += f"\n{tutorial_desc}"
         caption += f"\n\n"
