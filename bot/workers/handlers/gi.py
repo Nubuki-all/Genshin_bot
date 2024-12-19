@@ -627,6 +627,9 @@ async def random_challenge(event, args, client):
         caption += f"*Allowed characters:*"
         for character in characters:
             caption += f"\n*⁍* {character['name']}"
+        caption += "\n\n*Rules:*"
+        caption += "\n*1.* Characters can only be substituted for another when you don't have that character."
+        caption += "\n*2.* Only a character can be substituted. if you don't have two or more of the randomized characters, try again."
         caption += "\n*Good luck!*"
         await clean_reply(event, reply, "reply_photo", photo=final_img, caption=caption)
     except Exception:
