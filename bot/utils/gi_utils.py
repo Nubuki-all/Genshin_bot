@@ -118,7 +118,7 @@ async def get_enka_card2(uid, char_id, huid=False):
 async def fetch_random_boss():
     try:
         boss_list_url = "https://genshin-db-api.vercel.app/api/v5/enemies?query=boss&matchCategories=true&verboseCategories=true"
-        monster_list_url = "https://gi.yatta.moe/api/v2/en/monster{}"
+        monster_list_url = "https://gi.yatta.moe/api/v2/en/monster/{}"
         bosses = await get_gi_info(get=boss_list_url)
         boss = random.choice(bosses)
         return await get_gi_info(get=monster_list_url.format(boss.get("id")))
