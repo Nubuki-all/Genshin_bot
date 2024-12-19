@@ -235,13 +235,7 @@ async def rss_editor(event, args, client):
         return await event.reply(f"Could not find rss with title - {args}.")
     if not (arg.l or arg.exf or arg.inf or arg.p or arg.r or arg.chat):
         return await event.reply("Please supply at least one additional arguement.")
-    if arg.chat:
-        for chat in arg.chat.split():
-            chat = chat.split(":")[0]
-            if not (chat.lstrip("-").isdigit() or chat.casefold() in ("default", ".")):
-                return await event.reply(
-                    f"Chat must be a Telegram chat id (with -100 if a group or channel) or default\nNot '{chat}'",
-                )
+
     if arg.l:
         data["link"] = arg.l
     if arg.chat:
@@ -347,13 +341,6 @@ async def rss_sub(event, args, client):
     feed_link = args
     title = arg.t
 
-    if arg.chat:
-        for chat in arg.chat.split():
-            chat = chat.split(":")[0]
-            if not (chat.lstrip("-").isdigit() or chat.casefold() in ("default", ".")):
-                return await event.reply(
-                    f"Chat must be a Telegram chat id (with -100 if a group or channel)\nNot '{chat}'",
-                )
     if bot.rss_dict.get(title):
         return await event.reply(
             f"This title *{title}* has already been subscribed!. *Please choose another title!*",
@@ -392,7 +379,7 @@ async def rss_sub(event, args, client):
         if arg.chat:
             _default = False
             for chat_ in arg.chat.split():
-                chat_ = event.chat.id if chat_ == "." else chat_
+                chat_ = f"{event.chat.id}:{event.chat.server}" if chat_ == "." else chat_
                 if chat_.casefold() != "default":
                     chat.append(chat_)
                 else:

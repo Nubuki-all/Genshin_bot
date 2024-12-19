@@ -1,5 +1,4 @@
 import asyncio
-import io
 import itertools
 import time
 
@@ -16,13 +15,20 @@ from bot.utils.bot_utils import (
 )
 from bot.utils.db_utils import save2db2
 from bot.utils.gi_utils import (
+    add_background,
     async_dl,
     enka_update,
+    fetch_random_boss,
+    fetch_random_character,
+    fetch_weapon_detail,
+    get_challenge_image,
+    get_character_image,
     get_enka_card,
     get_enka_card2,
     get_enka_profile,
     get_enka_profile2,
     get_gi_info,
+    place_profile_pic,
 )
 from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
@@ -30,6 +36,7 @@ from bot.utils.msg_utils import (
     get_args,
     get_msg_from_codes,
     pm_is_allowed,
+    sanitize_text,
     user_is_allowed,
     user_is_owner,
 )
@@ -270,94 +277,6 @@ async def weapon_handler(event, args, client):
             await asyncio.sleep(5)
             await status.delete()
 
-
-async def fetch_weapon_detail(weapon: dict, weapon_stats: dict) -> tuple:
-    name = weapon.get("name")
-    des = weapon.get("description")
-    rarity = weapon.get("rarity")
-    max_level = "90" if rarity > 2 else "70"
-    typ = weapon.get("weaponText")
-    base_atk = round(weapon.get("baseAtkValue"))
-    main_stat = weapon.get("mainStatText", str())
-    base_stat = weapon.get("baseStatText", str())
-    effect_name = weapon.get("effectName", str())
-    effects = weapon.get("effectTemplateRaw", str())
-    if effects:
-        effects = BeautifulSoup(effects, "html.parser").text
-        r1 = weapon["r1"]["values"] if weapon.get("r1") else []
-        r2 = weapon["r2"]["values"] if weapon.get("r2") else []
-        r3 = weapon["r3"]["values"] if weapon.get("r3") else []
-        r4 = weapon["r4"]["values"] if weapon.get("r4") else []
-        r5 = weapon["r5"]["values"] if weapon.get("r5") else []
-        key = [
-            f'*{f"{a}/{b}/{c}/{d}/{e}".split("/None", maxsplit=1)[0]}*'
-            for a, b, c, d, e in itertools.zip_longest(r1, r2, r3, r4, r5)
-        ]
-        effects = effects.format(*key)
-    img_suf = weapon["images"]["filename_gacha"]
-    img = await add_background(img_suf, rarity, name)
-    max_stats = weapon_stats[max_level]
-    max_base_atk = round(max_stats.get("attack"))
-    max_main_stat = max_stats.get("specialized")
-    if main_stat:
-        if max_main_stat > 1:
-            max_main_stat = round(max_main_stat)
-        else:
-            max_main_stat = f"{round(max_main_stat * 100)}%"
-    caption = f"*{name}*\n"
-    caption += f"{'⭐' * rarity}\n\n"
-    caption += f"*Rarity:* *{'★' * rarity}*\n"
-    caption += f"*Type:* *{typ}*\n"
-    caption += f"*Base ATK:* *{base_atk}* ➜ *{max_base_atk}* _(Lvl {max_level})_\n"
-    if main_stat:
-        caption += (
-            f"*{main_stat}:* *{base_stat}* ➜ *{max_main_stat}* _(Lvl {max_level})_\n"
-        )
-    caption += f"```{(des[:2000] + '…') if len(des) > 2000 else des}```\n\n"
-    if effects:
-        caption += f"*{effect_name}* +\n"
-        caption += f"{effects}"
-
-    return img, caption
-
-
-async def add_background(image_suf: str, rarity: int, name: str = "weapon"):
-    """Fetches image and adds a background.
-
-    Args:
-        image_suf: identifier for image.
-        rarity: rarity of item
-    """
-    # Dict for associating rarity with background color
-    color = {
-        1: (126, 126, 128, 255),
-        2: (78, 126, 110, 255),
-        3: (84, 134, 169, 255),
-        4: (127, 103, 161, 255),
-        5: (176, 112, 48, 255),
-    }
-
-    # Download the image
-    image_url = f"https://api.hakush.in/gi/UI/{image_suf}.webp"
-
-    raw = await async_dl(image_url)
-
-    # Create an Image object from the downloaded content
-    img = io.BytesIO(raw)
-    img = Image.open(img)
-
-    # Create a gold/purple/blue/green/white background image with the same
-    # size as the input image
-    background = Image.new("RGBA", img.size, color.get(rarity))  # color with alpha
-
-    # Paste the input image onto the background
-    background.paste(img, (0, 0), img)
-
-    # Save the output image
-    output = io.BytesIO()
-    background.save(output, format="png")
-    output.name = f"{name}.png"
-    return output.getvalue()
 
 
 async def manage_autogift_chat(event, args, client):
@@ -641,3 +560,68 @@ def get_rewards(rewards):
         msg += f" x {reward['amount']}" if reward["amount"] else str()
         msg += ", "
     return msg.strip(", ")
+
+
+async def random_challenge(event, args, client):
+    """
+    Generates a completely random boss challenge;
+    No arguments are required
+    """
+    e = None
+    status = None
+    user = event.from_user.id
+    if not user_is_owner(user):
+        if not pm_is_allowed(event):
+            return
+        if not user_is_allowed(user):
+            return
+    try:
+        reply = event.reply_to_message
+        status = await event.reply("*Generating random challenge:*\nFetching random boss…")
+        boss = await fetch_random_boss()
+        if not boss:
+            e = "Couldn't fetch boss"
+            return
+        await status.edit(f"*Generating random challenge:*\nFetching random boss: *{boss['name']}*\nFetching random characters…")
+        characters = await fetch_random_character()
+        if not characters:
+            e = "Couldn't fetch characters"
+            return
+        func_list = []
+        await status.edit(f"*Generating random challenge:*\nFetching random boss: *{boss['name']}*\nFetching random characters images…")
+        for character in characters:
+            image = character["images"]["filename_icon"]
+            text = character["name"]
+            rarity = character["rarity"]
+            func = get_character_image(image, text, rarity)
+            func_list.append(func)
+        characters_img = await asyncio.gather(*func_list)
+        await status.edit(f"*Generating random challenge card…*")
+        boss_name = boss["data"]["name"]
+        boss_type = boss["data"]["type"]
+        icon = boss["data"]["icon"]
+        boss_spec = boss["data"]["specialName"]
+        tutorial_desc = list(boss["data"]["tips"].values())["description"]
+        tutorial_desc = sanitize_text(tutorial_desc, truncate=False)
+        tutorial_img = list(boss["data"]["tips"].values())["images"][0]
+        final_img = await get_challenge_image(icon, tutorial_img, characters_img, boss_name)
+
+        
+        caption = f"*Boss name:* {boss_name}"
+        caption += f"\n*{boss_spec}*"
+        caption += f"*Boss type:* {boss_type}"
+        caption += f"\n{tutorial_desc}"
+        caption += f"\n\n"
+        caption += f"*Allowed characters:*"
+        for character in characters:
+            caption += f"*⁍* {character['name']}\n"
+        caption += "\n*Good luck!*"
+        await clean_reply(event, reply, "reply_photo", photo=final_img, caption=caption)
+    except Exception:
+        await logger(Exception)
+        if e:
+            await event.reply(e)
+    finally:
+        if status:
+            await asyncio.sleep(3)
+            await status.delete()
