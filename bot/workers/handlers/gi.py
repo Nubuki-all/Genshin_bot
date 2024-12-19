@@ -612,7 +612,7 @@ async def random_challenge(event, args, client):
             tutorial_desc = None
             tutorial_img = None
         final_img = await get_challenge_image(
-            icon, tutorial_img, characters_img, boss_name
+            icon, tutorial_img, characters_img, boss_name, bottom_text="Challengers"
         )
 
         caption = f"*Boss name:* {boss_name}"
