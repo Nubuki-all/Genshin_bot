@@ -604,9 +604,13 @@ async def random_challenge(event, args, client):
         boss_type = boss["data"]["type"]
         icon = boss["data"]["icon"]
         boss_spec = boss["data"]["specialName"]
-        tutorial_desc = list(boss["data"]["tips"].values())[0]["description"]
-        tutorial_desc = sanitize_text(tutorial_desc, truncate=False)
-        tutorial_img = list(boss["data"]["tips"].values())[0]["images"][0]
+        if boss["data"]["tips"]:
+            tutorial_desc = list(boss["data"]["tips"].values())[0]["description"]
+            tutorial_desc = sanitize_text(tutorial_desc, truncate=False)
+            tutorial_img = list(boss["data"]["tips"].values())[0]["images"][0]
+        else:
+            tutorial_desc = None
+            tutorial_img = None
         final_img = await get_challenge_image(
             icon, tutorial_img, characters_img, boss_name
         )
@@ -614,7 +618,8 @@ async def random_challenge(event, args, client):
         caption = f"*Boss name:* {boss_name}"
         caption += f"\n*{boss_spec}*"
         caption += f"*Boss type:* {boss_type}"
-        caption += f"\n{tutorial_desc}"
+        if tutorial_desc:
+            caption += f"\n{tutorial_desc}"
         caption += f"\n\n"
         caption += f"*Allowed characters:*"
         for character in characters:

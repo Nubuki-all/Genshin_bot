@@ -294,7 +294,7 @@ async def get_challenge_image(
     background: str,
     extra_images_paths: list,
     text: str,
-    bottom_text: str,
+    bottom_text: str = None,
     font_path: str = None,
     font_size: int = 17,
 ):
@@ -302,7 +302,9 @@ async def get_challenge_image(
         image_url = f"https://api.hakush.in/gi/UI/{image}.webp"
         raw = await async_dl(image_url)
         image_path = io.BytesIO(raw)
-        background_url = f"https://api.hakush.in/gi/UI/{background}.webp"
+        background_url = "https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png"
+        if background:
+            background_url = f"https://api.hakush.in/gi/UI/{background}.webp"
         raw = await async_dl(background_url)
         background_path = io.BytesIO(raw)
         # Open the original image
