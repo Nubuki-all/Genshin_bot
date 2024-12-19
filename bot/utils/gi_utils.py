@@ -238,7 +238,8 @@ async def get_character_image(
     additional_image_size: tuple = (90, 90),
 ):
     try:
-        image_url = f"https://api.hakush.in/gi/UI/{image}.webp"
+        #image_url = f"https://api.hakush.in/gi/UI/{image}.webp"
+        image_url = f"https://gi.yatta.moe/assets/UI/{image}.png"
         raw = await async_dl(image_url)
         image_path = io.BytesIO(raw)
         element_url = f"https://api.hakush.in/gi/UI/{element}.webp"
