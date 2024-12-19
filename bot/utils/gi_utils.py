@@ -389,24 +389,23 @@ async def get_challenge_image(
             draw_main.text((text_x, text_y), text, fill=(255, 255, 255), font=font)
 
         # Add "Challengers" text above extra images
+        draw_main = ImageDraw.Draw(background_blurred)
+        challengers_font_size = font_size + 5
+        challengers_font = (
+            ImageFont.truetype(font_path, challengers_font_size)
+            if font_path
+            else await pill.get_font(font_size)
+        )
+
+        challengers_text_bbox = draw_main.textbbox(
+            (0, 0), bottom_text, font=challengers_font
+        )
+        challengers_text_width = challengers_text_bbox[2] - challengers_text_bbox[0]
+        challengers_text_x = (
+            background_blurred.width - challengers_text_width
+        ) // 2
+        challengers_text_y = dark_bg_y + dark_bg_height - 160
         if bottom_text:
-            draw_main = ImageDraw.Draw(background_blurred)
-            challengers_font_size = font_size + 5
-            challengers_font = (
-                ImageFont.truetype(font_path, challengers_font_size)
-                if font_path
-                else await pill.get_font(font_size)
-            )
-
-            challengers_text_bbox = draw_main.textbbox(
-                (0, 0), bottom_text, font=challengers_font
-            )
-            challengers_text_width = challengers_text_bbox[2] - challengers_text_bbox[0]
-            challengers_text_x = (
-                background_blurred.width - challengers_text_width
-            ) // 2
-            challengers_text_y = dark_bg_y + dark_bg_height - 160
-
             draw_main.text(
                 (challengers_text_x, challengers_text_y),
                 bottom_text,
