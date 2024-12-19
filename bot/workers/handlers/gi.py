@@ -578,8 +578,9 @@ async def random_challenge(event, args, client):
         if not boss:
             e = "Couldn't fetch boss"
             return
+        boss_name = boss["data"]["name"]
         await status.edit(
-            f"*Generating random challenge:*\nFetching random boss: *{boss['name']}*\nFetching random characters…"
+            f"*Generating random challenge:*\nFetching random boss: *{boss_name}*\nFetching random characters…"
         )
         characters = await fetch_random_character()
         if not characters:
@@ -597,7 +598,6 @@ async def random_challenge(event, args, client):
             func_list.append(func)
         characters_img = await asyncio.gather(*func_list)
         await status.edit(f"*Generating random challenge card…*")
-        boss_name = boss["data"]["name"]
         boss_type = boss["data"]["type"]
         icon = boss["data"]["icon"]
         boss_spec = boss["data"]["specialName"]
