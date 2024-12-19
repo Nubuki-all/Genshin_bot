@@ -242,6 +242,9 @@ async def get_character_image(
         image_url = f"https://gi.yatta.moe/assets/UI/{image}.png"
         raw = await async_dl(image_url)
         image_path = io.BytesIO(raw)
+        elm_list = ["Geo", "Cryo", "Pyro", "Anemo", "Dendro", "Hydro", "Electro"]
+        if not element:
+            element = random.choice(elm_list)
         element_url = f"https://api.hakush.in/gi/UI/{element}.webp"
         raw = await async_dl(element_url)
         element_path = io.BytesIO(raw)
