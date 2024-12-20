@@ -306,7 +306,7 @@ async def get_challenge_image(
         image_url = f"https://api.hakush.in/gi/UI/{image}.webp"
         raw = await async_dl(image_url)
         image_path = io.BytesIO(raw)
-        background_url = "https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png"
+        background_url = f"https://api.hakush.in/gi/UI/UI_Codex_Monster_{image.split('_', maxsplit=2)[2]}.webp"
         if background:
             background_url = f"https://gi.yatta.moe/assets/UI/tutorial/{background}.png"
         raw = await async_dl(background_url)
