@@ -1,4 +1,5 @@
 import io
+import itertools
 import random
 
 import aiohttp
