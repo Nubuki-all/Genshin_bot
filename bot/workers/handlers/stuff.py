@@ -234,7 +234,7 @@ async def stickerize_image(event, args, client):
             m_type = "video"
             if (seconds := quoted_msg.videoMessage.seconds) > 6:
                 rate = max_sticker_filesize // 6
-                trim = True if not forced else False
+                trim = True if forced else False
             else:
                 rate = max_sticker_filesize // seconds
             rate = f"{rate}k"
