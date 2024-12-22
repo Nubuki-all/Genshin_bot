@@ -11,6 +11,7 @@ from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
     clean_reply,
     download_replied_media,
+    get_args,
     pm_is_allowed,
     user_is_allowed,
     user_is_owner,
@@ -206,6 +207,7 @@ async def stickerize_image(event, args, client):
     Args:
         Name of sticker
     """
+    max_sticker_filesize = 512000
     user = event.from_user.id
     if not user_is_owner(user):
         if not pm_is_allowed(event):
@@ -213,13 +215,29 @@ async def stickerize_image(event, args, client):
         if not user_is_allowed(user):
             return
     try:
+        if args:
+            arg, _ = get_args(
+                ["-f", "store_false"],
+                to_parse=args,
+                get_unknown=True,
+            )
+            forced = arg.f
+        else:
+            forced = True
+        rate = ""
+        trim = False
         m_type = "image"
         quoted_msg = event.quoted.quotedMessage
         if not quoted_msg.imageMessage.URL:
             if not quoted_msg.videoMessage.URL:
                 return await event.reply("*Replied message is not an image.*")
             m_type = "video"
-
+            if (seconds := quoted_msg.videoMessage.seconds) > 6:
+                rate = max_sticker_filesize // 6
+                trim = True if not forced else False
+            else:
+                rate = max_sticker_filesize // seconds
+            rate = f"{rate}k"
         await event.send_typing_status()
         file = await download_replied_media(event.quoted, mtype=m_type)
         me = await bot.client.get_me()
@@ -228,6 +246,9 @@ async def stickerize_image(event, args, client):
             quote=True,
             name=(args or random.choice((enquip(), enquip4()))),
             packname=me.PushName,
+            animated=trim,
+            bitrate=rate,
+            enforce_not_broken=forced,
         )
         await event.send_typing_status(False)
     except Exception:
