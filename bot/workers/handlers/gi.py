@@ -59,7 +59,7 @@ async def enka_handler(event, args, client):
     Examples:
     123454697855 -c "Hu tao" -v2 --hide_uid
         - retrieves the current build for Hu tao from the given uid with uid hidden while using the new template
-    123456789 -p -v2 
+    123456789 -p -v2
         - retrieves profile card using the new template for the given uid
     12345678900 -c xq
         - retrieves the current build for whatever matches the character name provided; in this case Xingqui
