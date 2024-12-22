@@ -38,12 +38,20 @@ async def get_gi_info(
     return info
 
 
-async def async_dl(url):
+async def async_dl(url, retries=5):
     retry_options = ExponentialRetry(attempts=20)
     client_session = aiohttp.ClientSession()
     retry_requests = RetryClient(client_session)
     async with retry_requests.get(url, retry_options=retry_options) as result:
-        assert result.status == 200
+        try:
+            assert result.status == 200
+        except AssertionError as e:
+            if not retries:
+                raise e from None
+            retries -= 1
+            await client_session.close()
+            await asyncio.sleep(5)
+            return await async_dl(url, retries)
         raw = await result.content.read()
     await client_session.close()
     return raw

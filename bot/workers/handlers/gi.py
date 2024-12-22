@@ -57,10 +57,10 @@ async def enka_handler(event, args, client):
     --update: update library
 
     Examples:
-    123454697855 -c "Hu tao" -t 2 --hide_uid
-        - retrieves the current build for Hu tao from the given uid with uid hidden while using the second template
-    123456789 -p -t 2
-        - retrieves profile card using the second template for the given uid
+    123454697855 -c "Hu tao" -v2 --hide_uid
+        - retrieves the current build for Hu tao from the given uid with uid hidden while using the new template
+    123456789 -p -v2 
+        - retrieves profile card using the new template for the given uid
     12345678900 -c xq
         - retrieves the current build for whatever matches the character name provided; in this case Xingqui
     """
@@ -265,8 +265,10 @@ async def weapon_handler(event, args, client):
         await status.edit(f"*Building weapon card for {weapon.get('name')}…*")
         pic, caption = await fetch_weapon_detail(weapon, weapon_stats)
         await clean_reply(event, reply, "reply_photo", photo=pic, caption=caption)
-    except Exception:
+    except Exception as e:
         await logger(Exception)
+        await status.edit(f"*Error:*\n{e}")
+        status = None
     finally:
         if status:
             await asyncio.sleep(5)
@@ -533,6 +535,8 @@ async def get_events(event, args, client):
         await event.reply(msg)
     except Exception:
         await logger(Exception)
+        await status.edit(f"*Error:*\n{e}")
+        status = None
     finally:
         if status:
             await asyncio.sleep(3)
