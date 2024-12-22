@@ -637,10 +637,13 @@ async def random_challenge(event, args, client):
         caption += "\n*3.* The substitute must share the same element and the same or lower rarity as the substituted character."
         caption += "\n*Good luck!*"
         await clean_reply(event, reply, "reply_photo", photo=final_img, caption=caption)
-    except Exception:
+    except Exception as err:
         await logger(Exception)
         if e:
             await event.reply(e)
+        else:
+            await status.edit(f"*Error:*\n{err}")
+            status = None
     finally:
         if status:
             await asyncio.sleep(3)
