@@ -216,7 +216,7 @@ async def stickerize_image(event, args, client):
             return
     try:
         if args:
-            arg, _ = get_args(
+            arg, args = get_args(
                 ["-f", "store_false"],
                 to_parse=args,
                 get_unknown=True,
