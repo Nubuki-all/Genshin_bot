@@ -183,7 +183,14 @@ class Event:
         return construct_event(msg)
 
     async def reply_sticker(
-        self, file: str | bytes, quote: bool = True, name: str = "", packname: str = "", animated: bool = False, bitrate: str = "", enforce_not_broken: bool = False
+        self,
+        file: str | bytes,
+        quote: bool = True,
+        name: str = "",
+        packname: str = "",
+        animated: bool = False,
+        bitrate: str = "",
+        enforce_not_broken: bool = False,
     ):
         quoted = self.message if quote else None
         response = await self.client.send_sticker(
