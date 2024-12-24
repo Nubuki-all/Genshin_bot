@@ -8,10 +8,9 @@ from aiohttp_retry import ExponentialRetry, RetryClient
 from bs4 import BeautifulSoup
 from encard import encard, update_namecard
 from encard.src.tools import pill
+from enka_card.generator import generate_image
 from enkacard import enc_error, encbanner
 from enkanetwork import EnkaNetworkAPI, Language
-
-from enka_card.generator import generate_image
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 from .log_utils import logger
@@ -151,6 +150,7 @@ async def get_enka_card3(uid, char_id):
         await logger(Exception)
     finally:
         return result, error
+
 
 class Card:
     def __init__(self, name, card):

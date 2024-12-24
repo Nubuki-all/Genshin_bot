@@ -143,10 +143,8 @@ async def enka_handler(event, args, client):
             elif arg.v3:
                 result, error = await get_enka_card3(args, char_id)
             else:
-                result, error = (
-                    await get_enka_card(
-                        args, char_id, akasha=akasha, huid=arg.hide_uid, template=arg.t
-                    )
+                result, error = await get_enka_card(
+                    args, char_id, akasha=akasha, huid=arg.hide_uid, template=arg.t
                 )
             if error:
                 return
@@ -187,10 +185,8 @@ async def enka_handler(event, args, client):
             elif arg.v3:
                 result, error = await get_enka_card3(args, ids)
             else:
-                result, error  = (
-                    await get_enka_card(
-                        args, ids, akasha=akasha, huid=arg.hide_uid, template=arg.t
-                    )
+                result, error = await get_enka_card(
+                    args, ids, akasha=akasha, huid=arg.hide_uid, template=arg.t
                 )
             if error:
                 return
@@ -213,10 +209,8 @@ async def enka_handler(event, args, client):
             elif arg.v3:
                 result, error = await get_enka_card2(args, str())
             else:
-                result, error = (
-                    await get_enka_card(
-                        args, None, akasha=akasha, huid=arg.hide_uid, template=arg.t
-                    )
+                result, error = await get_enka_card(
+                    args, None, akasha=akasha, huid=arg.hide_uid, template=arg.t
                 )
             if error:
                 return
@@ -233,7 +227,7 @@ async def enka_handler(event, args, client):
 async def send_multi_cards(event, reply, results, profile):
     chain = event
     for card in results.card:
-        #print(card.name)  # best debugger?
+        # print(card.name)  # best debugger?
         caption = f"{profile.player.name}'s current {card.name} build"
         file_name = caption + ".png"
         path = "enka/" + file_name
