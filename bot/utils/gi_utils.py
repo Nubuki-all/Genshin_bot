@@ -125,7 +125,7 @@ async def get_enka_card2(uid, char_id, huid=False):
         result = e
         await logger(Exception)
     finally:
-        return result, error"
+        return result, error
 
 
 async def get_enka_card3(uid, char_id):
