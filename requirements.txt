@@ -12,6 +12,7 @@ urlextract
 w3lib
 git+https://github.com/Nubuki-all/EnkaCard
 git+https://github.com/Nubuki-all/ENCard
+git+https://github.com/Nubuki-all/enka-card
 git+https://github.com/Nubuki-all/neonize@patch-1
 #Snyk pins 
 certifi>=2023.7.22 # not directly required, pinned by Snyk to avoid a vulnerability
