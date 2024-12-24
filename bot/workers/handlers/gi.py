@@ -207,7 +207,7 @@ async def enka_handler(event, args, client):
             if arg.v2:
                 result, error = await get_enka_card2(args, str(), huid=arg.hide_uid)
             elif arg.v3:
-                result, error = await get_enka_card2(args, str())
+                result, error = await get_enka_card3(args, str())
             else:
                 result, error = await get_enka_card(
                     args, None, akasha=akasha, huid=arg.hide_uid, template=arg.t

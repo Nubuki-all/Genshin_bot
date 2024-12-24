@@ -138,7 +138,7 @@ async def get_enka_card3(uid, char_id):
             data = await client.fetch_user(uid)
             for character in data.characters:
                 character_name.append(character.name)
-                if char_id and character.id not in char_id.split(","):
+                if char_id and str(character.id) not in char_id.split(","):
                     continue
                 card = generate_image(data, character, client.lang)
                 card = Card(character.name, card)
