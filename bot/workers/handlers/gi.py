@@ -41,29 +41,31 @@ from bot.utils.os_utils import s_remove
 
 async def enka_handler(event, args, client):
     """
-    Get a players's character build card from enka
-    Requires character build for the specified uid to be public
+Get a players's character build card from enka
+Requires character build for the specified uid to be public
 
-    Arguments:
-    uid: {genshin player uid} (Required)
-    -c or --card {character name}: use quotes if the name has spaces eg:- "Hu tao"; Also supports lookups
-    -cs or --cards {characters} same as -c but for multiple characters; delimited by commas
-    -t <int> {template}: card generation template; currently only two templates exist; default 1
-    Flags:
-    -v2: Get cards in new template
-    -d or --dump: Dump all character build from the given uid
-    -p or --profile: To get player card instead
-    --hide_uid: Hide uid in card
-    --no_top: Remove akasha ranking from card
-    --update: update library
+Arguments:
+uid: {genshin player uid} (Required)
+-c or --card or --character {character name}: use quotes if the name has spaces eg:- "Hu tao"; Also supports lookups
+-cs or --cards or --characters {characters} same as -c but for multiple characters; delimited by commas
+-t <int> {template}: card generation template; currently only two templates exist; default 1
+Flags:
+-v2: Get cards in new template
+-v3: Get cards in (another) new template
+-d or --dump: Dump all character build from the given uid
+-ls or --list: List all currently showcased characters 
+-p or --profile: To get player card instead (v3 not supported)
+--hide_uid: Hide uid in card
+--no_top: Remove akasha ranking from card
+--update: update library
 
-    Examples:
-    123454697855 -c "Hu tao" -v2 --hide_uid
-        - retrieves the current build for Hu tao from the given uid with uid hidden while using the new template
-    123456789 -p -v2
-        - retrieves profile card using the new template for the given uid
-    12345678900 -c xq
-        - retrieves the current build for whatever matches the character name provided; in this case Xingqui
+Examples:
+123454697855 -c "Hu tao" -v2 --hide_uid
+    - retrieves the current build for Hu tao from the given uid with uid hidden while using the new template
+123456789 -p -v3
+    - retrieves profile card using the new template for the given uid
+12345678900 -c xq
+    - retrieves the current build for whatever matches the character name provided; in this case Xingqui
     """
     error = None
     status = None
@@ -90,6 +92,8 @@ async def enka_handler(event, args, client):
             ["--profile", "store_true"],
             ["-v2", "store_true"],
             ["-v3", "store_true"],
+            ["-ls", "store_true"],
+            ["--list", "store_true"],
             "-t",
             to_parse=args,
             get_unknown=True,
@@ -97,6 +101,7 @@ async def enka_handler(event, args, client):
         card = arg.c or arg.card or arg.character
         cards = arg.cs or arg.cards or arg.characters
         dump = arg.d or arg.dump
+        list_ = arg.ls or arg.list
         prof = arg.p or arg.profile
         akasha = arg.no_top
         reply = event.reply_to_message
@@ -106,7 +111,7 @@ async def enka_handler(event, args, client):
             if not (card or cards or dump or prof):
                 return await u_reply.edit("Updated enka assets.")
             await u_reply.delete()
-        if not (card or cards or dump or prof):
+        if not (card or cards or dump or prof or list_):
             return await event.reply(f"```{enka_handler.__doc__}```")
         if arg.t not in ("1", "2"):
             arg.t = 1
@@ -115,6 +120,11 @@ async def enka_handler(event, args, client):
             result = profile
             return
         status = await event.reply("*Fetching card(s), Please Wait…*")
+        if list_:
+            characters = (
+                    list_characters(profile.characters.character_name)
+                )
+            await event.reply(charcters)
         if prof:
             cprofile, error = (
                 await get_enka_profile(args, card=True, template=arg.t)
@@ -154,7 +164,7 @@ async def enka_handler(event, args, client):
             if not result.card:
                 error = True
                 characters = (
-                    list_charcters(result.character_name) if not arg.v2 else str()
+                    list_characters(profile.characters.character_name)
                 )
                 result = f"*{card} not found in showcase!*"
                 result += f"\n\n{characters}" if characters else str()
@@ -197,7 +207,7 @@ async def enka_handler(event, args, client):
             if not result.card:
                 error = True
                 characters = (
-                    list_charcters(result.character_name) if not arg.v2 else str()
+                    list_characters(profile.characters.character_name)
                 )
                 result = f"*{cards} not found in showcase!*"
                 result += f"\n\n{characters}" if characters else str()
@@ -240,7 +250,7 @@ async def send_multi_cards(event, reply, results, profile):
         s_remove(path)
 
 
-def list_charcters(characters):
+def list_characters(characters):
     msg = "*List of Characters in Showcase:*\n"
     for character in characters:
         msg += f"*⁍* {character}\n"
