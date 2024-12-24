@@ -122,6 +122,8 @@ async def enka_handler(event, args, client):
         if list_:
             characters = list_characters(profile.characters.character_name)
             await event.reply(characters)
+            if not (card or cards or dump or prof):
+                return
         status = await event.reply("*Fetching card(s), Please Wait…*")
         if prof:
             cprofile, error = (
