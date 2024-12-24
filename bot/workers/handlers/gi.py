@@ -41,31 +41,31 @@ from bot.utils.os_utils import s_remove
 
 async def enka_handler(event, args, client):
     """
-Get a players's character build card from enka
-Requires character build for the specified uid to be public
+    Get a players's character build card from enka
+    Requires character build for the specified uid to be public
 
-Arguments:
-uid: {genshin player uid} (Required)
--c or --card or --character {character name}: use quotes if the name has spaces eg:- "Hu tao"; Also supports lookups
--cs or --cards or --characters {characters} same as -c but for multiple characters; delimited by commas
--t <int> {template}: card generation template; currently only two templates exist; default 1
-Flags:
--v2: Get cards in new template
--v3: Get cards in (another) new template
--d or --dump: Dump all character build from the given uid
--ls or --list: List all currently showcased characters 
--p or --profile: To get player card instead (v3 not supported)
---hide_uid: Hide uid in card
---no_top: Remove akasha ranking from card
---update: update library
+    Arguments:
+    uid: {genshin player uid} (Required)
+    -c or --card or --character {character name}: use quotes if the name has spaces eg:- "Hu tao"; Also supports lookups
+    -cs or --cards or --characters {characters} same as -c but for multiple characters; delimited by commas
+    -t <int> {template}: card generation template; currently only two templates exist; default 1
+    Flags:
+    -v2: Get cards in new template
+    -v3: Get cards in (another) new template
+    -d or --dump: Dump all character build from the given uid
+    -ls or --list: List all currently showcased characters
+    -p or --profile: To get player card instead (v3 not supported)
+    --hide_uid: Hide uid in card
+    --no_top: Remove akasha ranking from card
+    --update: update library
 
-Examples:
-123454697855 -c "Hu tao" -v2 --hide_uid
-    - retrieves the current build for Hu tao from the given uid with uid hidden while using the new template
-123456789 -p -v3
-    - retrieves profile card using the new template for the given uid
-12345678900 -c xq
-    - retrieves the current build for whatever matches the character name provided; in this case Xingqui
+    Examples:
+    123454697855 -c "Hu tao" -v2 --hide_uid
+        - retrieves the current build for Hu tao from the given uid with uid hidden while using the new template
+    123456789 -p -v3
+        - retrieves profile card using the new template for the given uid
+    12345678900 -c xq
+        - retrieves the current build for whatever matches the character name provided; in this case Xingqui
     """
     error = None
     status = None
@@ -121,9 +121,7 @@ Examples:
             return
         status = await event.reply("*Fetching card(s), Please Wait…*")
         if list_:
-            characters = (
-                    list_characters(profile.characters.character_name)
-                )
+            characters = list_characters(profile.characters.character_name)
             await event.reply(charcters)
         if prof:
             cprofile, error = (
@@ -163,9 +161,7 @@ Examples:
             path = "enka/" + file_name
             if not result.card:
                 error = True
-                characters = (
-                    list_characters(profile.characters.character_name)
-                )
+                characters = list_characters(profile.characters.character_name)
                 result = f"*{card} not found in showcase!*"
                 result += f"\n\n{characters}" if characters else str()
                 return
@@ -206,9 +202,7 @@ Examples:
 
             if not result.card:
                 error = True
-                characters = (
-                    list_characters(profile.characters.character_name)
-                )
+                characters = list_characters(profile.characters.character_name)
                 result = f"*{cards} not found in showcase!*"
                 result += f"\n\n{characters}" if characters else str()
                 return
