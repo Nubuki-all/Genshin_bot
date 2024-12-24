@@ -9,6 +9,9 @@ from bs4 import BeautifulSoup
 from encard import encard, update_namecard
 from encard.src.tools import pill
 from enkacard import enc_error, encbanner
+from enkanetwork import EnkaNetworkAPI, Language
+
+from enka_card.generator import generate_image
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 from .log_utils import logger
@@ -120,9 +123,45 @@ async def get_enka_card2(uid, char_id, huid=False):
     except Exception as e:
         error = True
         result = e
+        "await logger(Exception)
+    finally:
+        return result, error"
+
+
+async def get_enka_card3(uid, char_id):
+    error = result = None
+    try:
+        client = EnkaNetworkAPI(lang=Language.EN)
+        cards = []
+        char_id = str(char_id)
+        character_name = []
+        async with client:
+            data = await client.fetch_user(uid)
+            for character in data.characters:
+                character_name.append(character.name)
+                if char_id and character.id not in char_id.split(","):
+                    continue
+                card = generate_image(data, character, client.lang)
+                card = Card(character.name, card)
+                cards.append(card)
+            result = Result(character_name, cards)
+    except Exception as e:
+        error = True
+        result = e
         await logger(Exception)
     finally:
         return result, error
+
+class Card:
+    def __init__(self, name, card):
+        self.name = name
+        self.card = card
+
+
+class Result:
+    def __init__(self, name, card):
+        self.character_name = name
+        self.card = card
 
 
 async def fetch_random_boss():
@@ -252,7 +291,7 @@ async def get_character_image(
         image_url = f"https://gi.yatta.moe/assets/UI/{image}.png"
         raw = await async_dl(image_url)
         image_path = io.BytesIO(raw)
-        elm_list = ["Geo", "Cryo", "Pyro", "Anemo", "Dendro", "Hydro", "Electro"]
+        elm_list = ["Geo", "Pyro", "Anemo", "Dendro", "Hydro", "Electro"]
         if not element:
             element = random.choice(elm_list)
         element_url = f"https://api.hakush.in/gi/UI/{element}.webp"

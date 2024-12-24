@@ -21,6 +21,7 @@ from bot.utils.gi_utils import (
     get_character_image,
     get_enka_card,
     get_enka_card2,
+    get_enka_card3,
     get_enka_profile,
     get_enka_profile2,
     get_gi_info,
@@ -81,17 +82,20 @@ async def enka_handler(event, args, client):
             "-cs",
             "--card",
             "--cards",
+            "--character",
+            "--characters",
             ["-d", "store_true"],
             ["--dump", "store_true"],
             ["-p", "store_true"],
             ["--profile", "store_true"],
             ["-v2", "store_true"],
+            ["-v3", "store_true"],
             "-t",
             to_parse=args,
             get_unknown=True,
         )
-        card = arg.c or arg.card
-        cards = arg.cs or arg.cards
+        card = arg.c or arg.card or arg.character
+        cards = arg.cs or arg.cards or arg.characters
         dump = arg.d or arg.dump
         prof = arg.p or arg.profile
         akasha = arg.no_top
@@ -134,13 +138,16 @@ async def enka_handler(event, args, client):
                     f"*Character not found.*\nYou searched for {card}.\nNot what you searched for?\nTry again with double quotes"
                 )
             char_id = info.get("id")
-            result, error = (
-                await get_enka_card(
-                    args, char_id, akasha=akasha, huid=arg.hide_uid, template=arg.t
+            if arg.v2:
+                result, error = await get_enka_card2(args, char_id, arg.hide_uid)
+            elif arg.v3:
+                result, error = await get_enka_card3(args, char_id)
+            else:
+                result, error = (
+                    await get_enka_card(
+                        args, char_id, akasha=akasha, huid=arg.hide_uid, template=arg.t
+                    )
                 )
-                if not arg.v2
-                else await get_enka_card2(args, char_id, arg.hide_uid)
-            )
             if error:
                 return
             caption = f"{profile.player.name}'s current {info.get('name')} build"
@@ -175,13 +182,16 @@ async def enka_handler(event, args, client):
             if not ids:
                 return await event.reply(error_txt)
             ids = ids.strip(",")
-            result, error = (
-                await get_enka_card(
-                    args, ids, akasha=akasha, huid=arg.hide_uid, template=arg.t
+            if arg.v2:
+                result, error = await get_enka_card2(args, ids, huid=arg.hide_uid)
+            elif arg.v3:
+                result, error = await get_enka_card3(args, ids)
+            else:
+                result, error  = (
+                    await get_enka_card(
+                        args, ids, akasha=akasha, huid=arg.hide_uid, template=arg.t
+                    )
                 )
-                if not arg.v2
-                else await get_enka_card2(args, ids, huid=arg.hide_uid)
-            )
             if error:
                 return
 
@@ -198,13 +208,16 @@ async def enka_handler(event, args, client):
                 return
             return await send_multi_cards(event, reply, result, profile)
         if dump:
-            result, error = (
-                await get_enka_card(
-                    args, None, akasha=akasha, huid=arg.hide_uid, template=arg.t
+            if arg.v2:
+                result, error = await get_enka_card2(args, str(), huid=arg.hide_uid)
+            elif arg.v3:
+                result, error = await get_enka_card2(args, str())
+            else:
+                result, error = (
+                    await get_enka_card(
+                        args, None, akasha=akasha, huid=arg.hide_uid, template=arg.t
+                    )
                 )
-                if not arg.v2
-                else await get_enka_card2(args, str(), huid=arg.hide_uid)
-            )
             if error:
                 return
             return await send_multi_cards(event, reply, result, profile)
@@ -220,7 +233,7 @@ async def enka_handler(event, args, client):
 async def send_multi_cards(event, reply, results, profile):
     chain = event
     for card in results.card:
-        print(card.name)  # best debugger?
+        #print(card.name)  # best debugger?
         caption = f"{profile.player.name}'s current {card.name} build"
         file_name = caption + ".png"
         path = "enka/" + file_name
