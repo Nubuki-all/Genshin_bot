@@ -174,8 +174,15 @@ class Event:
         caption: str = None,
         quote: bool = True,
         viewonce: bool = False,
+        as_gif: bool = True,
     ):
-        return await self.reply_video(gif, caption, quote, viewonce, True)
+        quoted = self.message if quote else None
+        response = await self.client.send_video(
+            self.chat.jid, gif, caption, quoted=quoted, viewonce=viewonce, gifplayback=as_gif, is_gif=True
+        )
+        msg = self.gen_new_msg(response.ID)
+        return construct_event(msg)
+
 
     async def reply_photo(
         self,
@@ -221,7 +228,7 @@ class Event:
         caption: str = None,
         quote: bool = True,
         viewonce: bool = False,
-        asgif: bool = False,
+        as_gif: bool = False,
     ):
         quoted = self.message if quote else None
         response = await self.client.send_video(
@@ -230,7 +237,7 @@ class Event:
             caption,
             quoted=quoted,
             viewonce=viewonce,
-            gifplayback=asgif,
+            gifplayback=as_gif,
         )
         msg = self.gen_new_msg(response.ID)
         return construct_event(msg)
