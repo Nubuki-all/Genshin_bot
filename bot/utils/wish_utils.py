@@ -1,10 +1,11 @@
 import random
 
+
 def get_wish_rarity(pity):
     ch_5_str = 0.6
     ch_4_str = 5.1
     ch_3_str = 94.3
-    
+
     if pity.last_5 >= 74 and pity.last_5 < 90:
         boost = (pity.last_5 - 73) * 6
         ch_3_str -= boost
@@ -23,10 +24,12 @@ def get_wish_rarity(pity):
     weight = [ch_3_str, ch_4_str, ch_5_str]
     return random.choices(rarities, weights=weight, k=1)[0]
 
+
 def get_4_star_type():
     type_ = ["character", "weapon"]
     weight = [65, 33]
     return random.choices(type_, weights=weight, k=1)[0]
+
 
 def get_4_star_rate_up(pity):
     rate_u = 50
@@ -37,4 +40,3 @@ def get_4_star_rate_up(pity):
     type_ = [True, False]
     weight = [rate_u, stnd]
     return random.choices(type_, weights=weight, k=1)[0]
-  

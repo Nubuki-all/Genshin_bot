@@ -415,7 +415,7 @@ async def send_rss(caption, chat, pics, server):
         if len_pic > 1:
             i = 0
 
-            send_media = bot.client.send_image 
+            send_media = bot.client.send_image
             if pics[0].endswith(".jpg"):
                 pass
             elif pics[0].endswith(".gif"):
@@ -433,7 +433,7 @@ async def send_rss(caption, chat, pics, server):
             for img in pics[1:]:
                 i += 1
 
-                reply_media = message.reply_photo 
+                reply_media = message.reply_photo
                 if img.endswith(".jpg"):
                     pass
                 elif img.endswith(".gif"):
@@ -443,7 +443,7 @@ async def send_rss(caption, chat, pics, server):
                 msg = await reply_media(img, caption, quote=True)
         elif pics:
 
-            send_media = bot.client.send_image 
+            send_media = bot.client.send_image
             if pics[0].endswith(".jpg"):
                 pass
             elif pics[0].endswith(".gif"):
