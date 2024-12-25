@@ -210,7 +210,7 @@ class Event:
         self,
         video: str | bytes,
         caption: str = None,
-        quote: bool = True,
+        quote: bool = True,msg
         viewonce: bool = False,
     ):
         quoted = self.message if quote else None
@@ -433,11 +433,11 @@ async def send_rss(caption, chat, pics, server):
             for img in pics[1:]:
                 i += 1
 
-                reply_media = message.reply_photo
+                reply_media = msg.reply_photo
                 if img.endswith(".jpg"):
                     pass
                 elif img.endswith(".gif"):
-                    reply_media = message.reply_video
+                    reply_media = msg.reply_video
 
                 caption = f"*({i} of {len_pic - 1})*"
                 msg = await reply_media(img, caption, quote=True)
