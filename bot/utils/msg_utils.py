@@ -225,7 +225,12 @@ class Event:
     ):
         quoted = self.message if quote else None
         response = await self.client.send_video(
-            self.chat.jid, video, caption, quoted=quoted, viewonce=viewonce, gifplayback=asgif,
+            self.chat.jid,
+            video,
+            caption,
+            quoted=quoted,
+            viewonce=viewonce,
+            gifplayback=asgif,
         )
         msg = self.gen_new_msg(response.ID)
         return construct_event(msg)
@@ -242,9 +247,9 @@ class Event:
 
     async def upload_file(self, file: bytes):
         response = await self.client.upload(file)
-        #msg = self.gen_new_msg(response.ID)
-        #return construct_event(msg)
-        return response 
+        # msg = self.gen_new_msg(response.ID)
+        # return construct_event(msg)
+        return response
 
     def gen_new_msg(self, msg_id: str, user_id: str = None):
         msg = copy.deepcopy(self.message)
