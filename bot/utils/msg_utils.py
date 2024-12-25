@@ -168,6 +168,15 @@ class Event:
         msg = self.gen_new_msg(response.ID)
         return construct_event(msg)
 
+    async def reply_gif(
+        self,
+        gif: str | bytes,
+        caption: str = None,
+        quote: bool = True,
+        viewonce: bool = False,
+    ):
+        return await self.reply_video(gif, caption, quote, viewonce, True)
+
     async def reply_photo(
         self,
         photo: str | bytes,
@@ -212,10 +221,11 @@ class Event:
         caption: str = None,
         quote: bool = True,
         viewonce: bool = False,
+        asgif: bool = False,
     ):
         quoted = self.message if quote else None
         response = await self.client.send_video(
-            self.chat.jid, video, caption, quoted=quoted, viewonce=viewonce
+            self.chat.jid, video, caption, quoted=quoted, viewonce=viewonce, gifplayback=asgif,
         )
         msg = self.gen_new_msg(response.ID)
         return construct_event(msg)
@@ -232,8 +242,9 @@ class Event:
 
     async def upload_file(self, file: bytes):
         response = await self.client.upload(file)
-        msg = self.gen_new_msg(response.ID)
-        return construct_event(msg)
+        #msg = self.gen_new_msg(response.ID)
+        #return construct_event(msg)
+        return response 
 
     def gen_new_msg(self, msg_id: str, user_id: str = None):
         msg = copy.deepcopy(self.message)
@@ -437,7 +448,7 @@ async def send_rss(caption, chat, pics, server):
                 if img.endswith(".jpg"):
                     pass
                 elif img.endswith(".gif"):
-                    reply_media = msg.reply_video
+                    reply_media = msg.reply_gif
 
                 caption = f"*({i} of {len_pic - 1})*"
                 msg = await reply_media(img, caption, quote=True)
