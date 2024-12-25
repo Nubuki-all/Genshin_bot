@@ -210,7 +210,7 @@ class Event:
         self,
         video: str | bytes,
         caption: str = None,
-        quote: bool = True,msg
+        quote: bool = True
         viewonce: bool = False,
     ):
         quoted = self.message if quote else None
