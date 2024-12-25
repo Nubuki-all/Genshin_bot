@@ -178,11 +178,16 @@ class Event:
     ):
         quoted = self.message if quote else None
         response = await self.client.send_video(
-            self.chat.jid, gif, caption, quoted=quoted, viewonce=viewonce, gifplayback=as_gif, is_gif=True
+            self.chat.jid,
+            gif,
+            caption,
+            quoted=quoted,
+            viewonce=viewonce,
+            gifplayback=as_gif,
+            is_gif=True,
         )
         msg = self.gen_new_msg(response.ID)
         return construct_event(msg)
-
 
     async def reply_photo(
         self,
