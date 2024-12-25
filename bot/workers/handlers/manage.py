@@ -242,7 +242,8 @@ async def rss_editor(event, args, client):
         _default = False
         data["chat"] = []
         for chat in arg.chat.split():
-            chat = event.chat.id if chat == "." else chat
+            if chat == ".":
+                chat = f"{event.chat.id}:{event.chat.server}"
             if chat.casefold() != "default":
                 data["chat"].append(chat)
             else:

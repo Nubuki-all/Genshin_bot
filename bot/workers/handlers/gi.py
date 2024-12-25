@@ -306,11 +306,10 @@ async def manage_autogift_chat(event, args, client):
         else:
             if not arg[0] in ("-add", "-rm"):
                 return
-        if not arg[1].split(":")[0].isdigit():
-            if arg[1].casefold() not in ("default", "."):
-                msg = "*Invalid chat!*"
-                return
-            arg[1] = None if arg[1] != "." else event.chat.id
+        if arg[1] == ".":
+            arg[1] = f"{event.chat.id}:{event.chat.server}"
+        elif arg[1].casefold() == "default":
+            arg[1] = None
         if arg[0] == "-add":
             if arg[1] in bot.gift_dict["chats"]:
                 msg = "*Chat already added!*"
