@@ -206,6 +206,20 @@ class Event:
         msg = self.gen_new_msg(response.ID)
         return construct_event(msg)
 
+    async def reply_video(
+        self,
+        video: str | bytes,
+        caption: str = None,
+        quote: bool = True,
+        viewonce: bool = False,
+    ):
+        quoted = self.message if quote else None
+        response = await self.client.send_video(
+            self.chat.jid, video, caption, quoted=quoted, viewonce=viewonce
+        )
+        msg = self.gen_new_msg(response.ID)
+        return construct_event(msg)
+
     async def send_typing_status(self, typing=True):
         status = (
             ChatPresence.CHAT_PRESENCE_COMPOSING
@@ -358,7 +372,7 @@ async def parse_and_send_rss(data: dict, chat_ids: list = None):
     try:
         author = data.get("author")
         chats = chat_ids or conf.RSS_CHAT.split()
-        pic = data.get("pic")
+        pics = data.get("pic")
         content = data.get("content")
         summary = sanitize_text(data.get("summary"))
         tgh_link = str()
@@ -389,34 +403,55 @@ async def parse_and_send_rss(data: dict, chat_ids: list = None):
                 if len(top_chat) > 1
                 else (str(top_chat[0]), "s.whatsapp.net")
             )
-            await send_rss(caption, chat, pic, server)
+            await send_rss(caption, chat, pics, server)
             await asyncio.sleep(5)
     except Exception:
         await logger(Exception)
 
 
-async def send_rss(caption, chat, pic, server):
+async def send_rss(caption, chat, pics, server):
     try:
-        len_pic = len(pic)
+        len_pic = len(pics)
         if len_pic > 1:
             i = 0
-            rep = await bot.client.send_image(
+
+            send_media = bot.client.send_image 
+            if pics[0].endswith(".jpg"):
+                pass
+            elif pics[0].endswith(".gif"):
+                send_media = bot.client.send_video
+
+            rep = await send_media(
                 jid.build_jid(chat, server=server),
-                pic[0],
+                pics[0],
                 caption,
             )
             message = construct_message(
                 chat, conf.PH_NUMBER, rep.ID, "image", server=server
             )
             msg = construct_event(message)
-            for img in pic[1:]:
+            for img in pics[1:]:
                 i += 1
+
+                reply_media = message.reply_photo 
+                if img.endswith(".jpg"):
+                    pass
+                elif img.endswith(".gif"):
+                    reply_media = message.reply_video
+
                 caption = f"*({i} of {len_pic - 1})*"
-                msg = await msg.reply_photo(img, caption, quote=True)
-        elif pic:
-            await bot.client.send_image(
+                msg = await reply_media(img, caption, quote=True)
+        elif pics:
+
+            send_media = bot.client.send_image 
+            if pics[0].endswith(".jpg"):
+                pass
+            elif pics[0].endswith(".gif"):
+                send_media = bot.client.send_video
+
+            await send_media(
                 jid.build_jid(chat, server),
-                pic[0],
+                pics[0],
                 caption,
             )
         else:
