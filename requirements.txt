@@ -8,6 +8,7 @@ html_telegraph_poster
 lxml[html_clean]
 pymongo
 python-decouple
+pytz
 urlextract
 w3lib
 git+https://github.com/Nubuki-all/EnkaCard

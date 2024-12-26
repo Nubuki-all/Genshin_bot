@@ -88,7 +88,6 @@ async def wait_on_client():
 async def on_startup():
     try:
         await update_enka_assets()
-        scheduler.start()
         for signame in {"SIGINT", "SIGTERM", "SIGABRT"}:
             bot.loop.add_signal_handler(
                 getattr(signal, signame),
@@ -101,6 +100,7 @@ async def on_startup():
             # re_x()
             return
         else:
+            scheduler.start()
             await wait_for_client()
         if len(sys.argv) == 3:
             await onrestart()

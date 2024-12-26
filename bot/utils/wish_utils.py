@@ -1,5 +1,7 @@
 import random
 
+from .gi_utils import get_all_wep
+
 
 def get_wish_rarity(pity):
     ch_5_str = 0.6
@@ -40,3 +42,35 @@ def get_4_star_rate_up(pity):
     type_ = [True, False]
     weight = [rate_u, stnd]
     return random.choices(type_, weights=weight, k=1)[0]
+
+
+class Wishes:
+    def __init__(self):
+        self.pity = self.Pity()
+        self.pulls = []
+        self.total_pulls = 0
+    class Pity:
+        def __init__(self):
+            self.last_5 = 0
+            self.last_4 = 0
+            self.r4_rate_up = None
+
+        def update(self):
+            self.last_5 += 1
+            self.last_4 += 1
+            if self.r4_rate_up != None:
+                self.r4_rate_up = not self.r4_rate_up
+
+        
+async def pull(wish: Wish, multi=False):
+    if not multi:
+        wish.pity.update()
+        rarity = get_wish_rarity(wish.pity)
+        if rarity == 3:
+            weapons = await get_all_wep(rarity)
+            weapon = random.choice(weapons)
+            return weapon
+        if rarity == 4:
+            get_4_star_type
+            weapons = await get_all_wep(rarity)
+    

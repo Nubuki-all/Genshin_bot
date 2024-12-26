@@ -184,6 +184,17 @@ async def fetch_random_character(amount=4):
         await logger(Exception)
 
 
+async def get_all_wep(rarity=3):
+    try:
+        if rarity == None:
+            rarity = "name"
+        weapon_list_url = "https://genshin-db-api.vercel.app/api/v5/characters?query={}&matchCategories=true&verboseCategories=true".format(rarity)
+        weapons = await get_gi_info(get=weapon_list_url)
+        return weapons
+    except Exception:
+        await logger(Exception)
+
+
 async def fetch_weapon_detail(weapon: dict, weapon_stats: dict) -> tuple:
     name = weapon.get("name")
     des = weapon.get("description")
