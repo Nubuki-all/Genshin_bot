@@ -49,6 +49,7 @@ class Wishes:
         self.pity = self.Pity()
         self.pulls = []
         self.total_pulls = 0
+
     class Pity:
         def __init__(self):
             self.last_5 = 0
@@ -58,10 +59,10 @@ class Wishes:
         def update(self):
             self.last_5 += 1
             self.last_4 += 1
-            if self.r4_rate_up != None:
+            if self.r4_rate_up is not None:
                 self.r4_rate_up = not self.r4_rate_up
 
-        
+
 async def pull(wish: Wish, multi=False):
     if not multi:
         wish.pity.update()
@@ -73,4 +74,3 @@ async def pull(wish: Wish, multi=False):
         if rarity == 4:
             get_4_star_type
             weapons = await get_all_wep(rarity)
-    
