@@ -36,7 +36,7 @@ def updater(msg=None):
             ver = file.read()
         qclean()
         Path("update").touch()
-        bashrun(["python3", "update.py"])
+        bashrun([sys.executable, "update.py"])
         with open(version_file, "r") as file:
             ver2 = file.read()
 
