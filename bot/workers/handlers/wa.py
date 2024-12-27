@@ -2,6 +2,10 @@ import io
 import random
 
 from clean_links.clean import clean_url
+import torch
+from PIL import Image
+import numpy as np
+from RealESRGAN import RealESRGAN
 from urlextract import URLExtract
 
 from bot.config import bot
