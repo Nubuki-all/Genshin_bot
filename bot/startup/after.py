@@ -100,8 +100,8 @@ async def on_startup():
             # re_x()
             return
         else:
-            scheduler.start()
             await wait_for_client()
+            scheduler.start()
         if len(sys.argv) == 3:
             await onrestart()
         else:

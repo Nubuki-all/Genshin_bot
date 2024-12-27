@@ -34,11 +34,8 @@ from .workers.handlers.stuff import (
     getcmds,
     getmeme,
     hello,
-    sanitize_url,
-    sticker_reply,
-    stickerize_image,
 )
-
+from .workers.handlers.wa import sanitilze_url, sticker_reply, stickerize_image, upscale_image
 
 @bot.client.event(ConnectedEv)
 async def on_connected(_: NewAClient, __: ConnectedEv):
@@ -122,6 +119,11 @@ async def _(client: NewAClient, message: Event):
 @bot.register("rchallenge")
 async def _(client: NewAClient, message: Event):
     await event_handler(message, random_challenge)
+
+
+@bot.register("upscale")
+async def _(client: NewAClient, message: Event):
+    await event_handler(message, upscale_image)
 
 
 @bot.register("rss")
