@@ -132,6 +132,7 @@ async def stickerize_image(event, args, client):
             else:
                 rate = max_sticker_filesize // seconds
             rate = f"{rate}k"
+        forced = False if m_type == "image" else forced
         await event.send_typing_status()
         file = await download_replied_media(event.quoted, mtype=m_type)
         me = await bot.client.get_me()
@@ -170,7 +171,7 @@ async def upscale_image(event, args, client):
             return await event.reply(
                 "*Command can only be used when replying to an image.*"
             )
-        status_msg = await event.reply("Please wait…")
+        status_msg = await event.reply("*Please wait…*")
         file = await download_replied_media(event.quoted, mtype="image")
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
