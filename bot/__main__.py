@@ -30,12 +30,9 @@ from .workers.handlers.manage import (
     rss_handler,
     update_handler,
 )
-from .workers.handlers.stuff import (
-    getcmds,
-    getmeme,
-    hello,
-)
-from .workers.handlers.wa import sanitilze_url, sticker_reply, stickerize_image, upscale_image
+from .workers.handlers.stuff import getcmds, getmeme, hello
+from .workers.handlers.wa import sticker_reply, stickerize_image, upscale_image
+
 
 @bot.client.event(ConnectedEv)
 async def on_connected(_: NewAClient, __: ConnectedEv):

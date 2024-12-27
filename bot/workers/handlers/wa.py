@@ -4,10 +4,9 @@ import random
 from clean_links.clean import clean_url
 from urlextract import URLExtract
 
-from bot.config import bot, conf
+from bot.config import bot
 from bot.fun.quips import enquip, enquip4
 from bot.fun.stickers import ran_stick
-from bot.utils.bot_utils import get_json
 from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
     clean_reply,
@@ -17,6 +16,7 @@ from bot.utils.msg_utils import (
     user_is_allowed,
     user_is_owner,
 )
+
 
 async def sticker_reply(event, args, client):
     """
@@ -164,15 +164,17 @@ async def upscale_image(event, args, client):
             return await event.reply("*CPU heavy commands are currently disabled.*")
         quoted_msg = event.quoted.quotedMessage
         if not quoted_msg.imageMessage.URL:
-            return await event.reply("*Command can only be used when replying to an image.*")
+            return await event.reply(
+                "*Command can only be used when replying to an image.*"
+            )
         status_msg = await event.reply("Please wait…")
         file = await download_replied_media(event.quoted, mtype="image")
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
         model = RealESRGAN(device, scale=4)
-        model.load_weights('weights/RealESRGAN_x4.pth', download=True)
-        
-        image = Image.open(io.BytesIO(file)).convert('RGB')
+        model.load_weights("weights/RealESRGAN_x4.pth", download=True)
+
+        image = Image.open(io.BytesIO(file)).convert("RGB")
         sr_image = model.predict(image)
         output = io.BytesIO()
         sr_image.save(output, format="png")
