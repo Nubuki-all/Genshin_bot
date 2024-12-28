@@ -226,6 +226,6 @@ async def pick_random(event, args, client):
 
 def list_items(items, ini):
     msg = f"{ini}\n"
-    for character in characters:
-        msg += f"*⁍* {items}\n"
+    for item in items:
+        msg += f"*⁍* {item}\n"
     return msg
