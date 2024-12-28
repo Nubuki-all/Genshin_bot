@@ -31,7 +31,7 @@ from .workers.handlers.manage import (
     update_handler,
 )
 from .workers.handlers.stuff import getcmds, getmeme, hello
-from .workers.handlers.wa import sticker_reply, stickerize_image, upscale_image
+from .workers.handlers.wa import pick_random, sticker_reply, stickerize_image, upscale_image
 
 
 @bot.client.event(ConnectedEv)
@@ -111,6 +111,11 @@ async def _(client: NewAClient, message: Event):
 @bot.register("sticker")
 async def _(client: NewAClient, message: Event):
     await event_handler(message, stickerize_image)
+
+
+@bot.register("random")
+async def _(client: NewAClient, message: Event):
+    await event_handler(message, pick_random, require_args=True)
 
 
 @bot.register("rchallenge")

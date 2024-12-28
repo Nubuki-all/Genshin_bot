@@ -46,19 +46,19 @@ async def enka_handler(event, args, client):
     Requires character build for the specified uid to be public
 
     Arguments:
-    uid: {genshin player uid} (Required)
-    -c or --card or --character {character name}: use quotes if the name has spaces eg:- "Hu tao"; Also supports lookups
-    -cs or --cards or --characters {characters} same as -c but for multiple characters; delimited by commas
-    -t <int> {template}: card generation template; currently only two templates exist; default 1
+        uid: {genshin player uid} (Required)
+        -c or --card or --character {character name}: use quotes if the name has spaces eg:- "Hu tao"; Also supports lookups
+        -cs or --cards or --characters {characters} same as -c but for multiple characters; delimited by commas
+        -t <int> {template}: card generation template; currently only two templates exist; default 1
     Flags:
-    -v2: Get cards in new template
-    -v3: Get cards in (another) new template
-    -d or --dump: Dump all character build from the given uid
-    -ls or --list: List all currently showcased characters
-    -p or --profile: To get player card instead (v3 not supported)
-    --hide_uid: Hide uid in card
-    --no_top: Remove akasha ranking from card
-    --update: update library
+        -v2: Get cards in new template
+        -v3: Get cards in (another) new template
+        -d or --dump: Dump all character build from the given uid
+        -ls or --list: List all currently showcased characters
+        -p or --profile: To get player card instead (v3 not supported)
+        --hide_uid: Hide uid in card
+        --no_top: Remove akasha ranking from card
+        --update: update library
 
     Examples:
     123454697855 -c "Hu tao" -v2 --hide_uid
@@ -412,7 +412,7 @@ async def send_verbose_event(event_list, event, reply):
 
 async def get_events(event, args, client):
     """
-    Get list of current and upcoming genshin events
+    Get a list of current and upcoming genshin events
     Argument:
         -v: Get events with images
     """
