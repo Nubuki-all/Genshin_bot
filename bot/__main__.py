@@ -33,6 +33,7 @@ from .workers.handlers.manage import (
 from .workers.handlers.stuff import getcmds, getmeme, hello
 from .workers.handlers.wa import (
     pick_random,
+    sanitize_url,
     sticker_reply,
     stickerize_image,
     upscale_image,
