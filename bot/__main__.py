@@ -31,7 +31,12 @@ from .workers.handlers.manage import (
     update_handler,
 )
 from .workers.handlers.stuff import getcmds, getmeme, hello
-from .workers.handlers.wa import pick_random, sticker_reply, stickerize_image, upscale_image
+from .workers.handlers.wa import (
+    pick_random,
+    sticker_reply,
+    stickerize_image,
+    upscale_image,
+)
 
 
 @bot.client.event(ConnectedEv)
