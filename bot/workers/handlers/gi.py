@@ -1,5 +1,6 @@
 import asyncio
 import time
+from inspect import getdoc
 
 from bs4 import BeautifulSoup
 
@@ -112,7 +113,7 @@ async def enka_handler(event, args, client):
                 return await u_reply.edit("Updated enka assets.")
             await u_reply.delete()
         if not (card or cards or dump or prof or list_):
-            return await event.reply(f"```{enka_handler.__doc__}```")
+            return await event.reply(getdoc(enka_handler))
         if arg.t not in ("1", "2"):
             arg.t = 1
         profile, error = await get_enka_profile(args)

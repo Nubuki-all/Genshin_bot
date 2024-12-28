@@ -188,13 +188,35 @@ async def get_all_wep(rarity=3):
     try:
         if rarity is None:
             rarity = "name"
-        weapon_list_url = "https://genshin-db-api.vercel.app/api/v5/characters?query={}&matchCategories=true&verboseCategories=true".format(
+        weapon_list_url = "https://genshin-db-api.vercel.app/api/v5/weapons?query={}&matchCategories=true&verboseCategories=true".format(
             rarity
         )
         weapons = await get_gi_info(get=weapon_list_url)
         return weapons
     except Exception:
         await logger(Exception)
+
+
+async def get_rate_up_weapons():
+    try:
+        gold, purple = [], []
+        events_url = "https://api.ennead.cc/mihoyo/genshin/calendar"
+        events = await get_gi_info(get=events_url)
+        banners = events["banners"]
+        if not banners:
+            return
+        for banner in banners:
+            if banner.get("weapons"):
+                break
+        for weapon in banner.get("weapons"):
+            if weapon.get("rarity") == "5":
+                gold.append(weapon.get("name"))
+            if weapon.get("rarity") == "4":
+                purple.append(weapon)
+    except Exception:
+        await logger(Exception)
+    finally:
+        return gold, purple
 
 
 async def fetch_weapon_detail(weapon: dict, weapon_stats: dict) -> tuple:

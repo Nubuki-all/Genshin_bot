@@ -191,3 +191,41 @@ async def upscale_image(event, args, client):
     finally:
         if status_msg:
             await status_msg.delete()
+
+
+async def pick_random(event, args, client):
+    """
+    A randomizer;
+    Select a random or multiple random values from a list.
+    Arguments:
+        -a: Amount of values to select
+        -m: Message header for returned values
+        -s: Change delimiter, default="\\n" (new lines)
+    """
+    try:
+        arg, args = get_args(
+            "-a",
+            "-m",
+            "-s",
+            to_parse=args,
+            get_unknown=True,
+        )
+        items = args.split((arg.s or "\n"))
+        if len(items) < 2:
+            return await event.reply("I need more options to choose from.")
+        if arg.a:
+            if not arg.a.isdigit():
+                return await event.reply("-a: value has to be a digit.")
+            arg.a = int(arg.a)
+        out = random.sample(items, (arg.a or 1))
+        msg = list_items(out, (arg.m or "*Selected:*"))
+        await event.reply(msg)
+    except Exception:
+        await logger(Exception)
+
+
+def list_items(items, ini):
+    msg = f"{ini}\n"
+    for character in characters:
+        msg += f"*⁍* {items}\n"
+    return msg

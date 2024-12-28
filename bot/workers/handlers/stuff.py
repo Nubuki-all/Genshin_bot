@@ -94,7 +94,7 @@ async def getcmds(event, args, client):
 {pre}sanitize - *Sanitize link or message*
 {pre}sticker - *Turns images to stickers*
 {pre}rchallenge - *Get a random boss challenge card*
-{pre}upscale - {'*Upscale replied image*' if not bot.disable_cic else '_Currently not available_'}
+{pre}upscale - {'*Upscale replied image*' if not bot.disable_cic else '_Currently not available!_'}
 {pre}bash - *[Dev.] Run bash commands*
 {pre}eval - *[Dev.] Evaluate python commands*
 {pre}rss - *[Owner] Setup bot to auto post RSS feeds*
