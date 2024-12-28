@@ -63,7 +63,6 @@ class Wishes:
                 self.r4_rate_up = not self.r4_rate_up
 
 
-
 async def pull(wish: Wish, multi=False):
     if not multi:
         wish.pity.update()
@@ -75,5 +74,3 @@ async def pull(wish: Wish, multi=False):
         if rarity == 4:
             type_ = get_4_star_type()
             weapons = await get_all_wep(rarity)
-            
-            
