@@ -77,7 +77,9 @@ logging.basicConfig(
         logging.StreamHandler(),
     ],
 )
+logging.getLogger("neonize").setLevel(logging.INFO)
 logging.getLogger("urllib3").setLevel(logging.INFO)
+
 LOGS = logging.getLogger(__name__)
 
 no_verbose = [
