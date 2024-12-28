@@ -201,11 +201,13 @@ async def pick_random(event, args, client):
         -a: Amount of values to select
         -m: Message header for returned values
         -s: Change delimiter, default="\\n" (new lines)
-        
+
     """
     try:
         if not event.quoted_text:
-            return await event.reply("*Reply to a message with list of items to choose from.*")
+            return await event.reply(
+                "*Reply to a message with list of items to choose from.*"
+            )
         arg, _ = get_args(
             "-a",
             "-m",
