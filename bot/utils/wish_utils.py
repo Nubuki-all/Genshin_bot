@@ -1,6 +1,6 @@
-import random  # pylint: skip-file
+import random  # autoflake: skip_file
 
-from .gi_utils import get_all_wep
+from .gi_utils import get_all_wep, get_rate_up_weapons
 
 
 def get_wish_rarity(pity):
@@ -63,6 +63,7 @@ class Wishes:
                 self.r4_rate_up = not self.r4_rate_up
 
 
+
 async def pull(wish: Wish, multi=False):
     if not multi:
         wish.pity.update()
@@ -72,5 +73,7 @@ async def pull(wish: Wish, multi=False):
             weapon = random.choice(weapons)
             return weapon
         if rarity == 4:
-            get_4_star_type()
+            type_ = get_4_star_type()
             weapons = await get_all_wep(rarity)
+            
+            
