@@ -199,7 +199,7 @@ async def pick_random(event, args, client):
     Select a random or multiple random values from a list (replied message).
     Arguments:
         -a: Amount of values to select
-        -m: Message header for returned values
+        -m: Message header for returned values; can add without specifying -m
         -s: Change delimiter, default="\\n" (new lines)
 
     """
@@ -208,11 +208,11 @@ async def pick_random(event, args, client):
             return await event.reply(
                 "*Reply to a message with list of items to choose from.*"
             )
-        arg, _ = get_args(
+        arg, args = get_args(
             "-a",
             "-m",
             "-s",
-            to_parse=args,
+            to_parse=(args or str()),
             get_unknown=True,
         )
         items = event.quoted_text.split((arg.s or "\n"))
@@ -222,8 +222,9 @@ async def pick_random(event, args, client):
             if not arg.a.isdigit():
                 return await event.reply("-a: value has to be a digit.")
             arg.a = int(arg.a)
+        args = arg.m or args
         out = random.sample(items, (arg.a or 1))
-        msg = list_items(out, (arg.m or "*Selected:*"))
+        msg = list_items(out, (args or "*Selected:*"))
         await event.reply(msg)
     except Exception:
         await logger(Exception)
@@ -232,5 +233,5 @@ async def pick_random(event, args, client):
 def list_items(items, ini):
     msg = f"{ini}\n"
     for item in items:
-        msg += f"*⁍* {item}\n"
+        msg += f"*⁍* {item.strip()}\n"
     return msg
