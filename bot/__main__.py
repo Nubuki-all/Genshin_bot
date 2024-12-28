@@ -120,7 +120,7 @@ async def _(client: NewAClient, message: Event):
 
 @bot.register("random")
 async def _(client: NewAClient, message: Event):
-    await event_handler(message, pick_random, require_args=True)
+    await event_handler(message, pick_random)
 
 
 @bot.register("rchallenge")

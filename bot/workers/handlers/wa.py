@@ -196,21 +196,24 @@ async def upscale_image(event, args, client):
 async def pick_random(event, args, client):
     """
     A randomizer;
-    Select a random or multiple random values from a list.
+    Select a random or multiple random values from a list (replied message).
     Arguments:
         -a: Amount of values to select
         -m: Message header for returned values
         -s: Change delimiter, default="\\n" (new lines)
+        
     """
     try:
-        arg, args = get_args(
+        if not event.quoted_text:
+            return await event.reply("*Reply to a message with list of items to choose from.*")
+        arg, _ = get_args(
             "-a",
             "-m",
             "-s",
             to_parse=args,
             get_unknown=True,
         )
-        items = args.split((arg.s or "\n"))
+        items = event.quoted_text.split((arg.s or "\n"))
         if len(items) < 2:
             return await event.reply("I need more options to choose from.")
         if arg.a:
