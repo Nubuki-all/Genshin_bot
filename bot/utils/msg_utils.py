@@ -340,7 +340,7 @@ def register(key: str | None = None):
 
 
 bot.register = register
-
+background_tasks = set()
 
 async def on_message(client: NewAClient, message: MessageEv):
     event = construct_event(message)
@@ -352,7 +352,9 @@ async def on_message(client: NewAClient, message: MessageEv):
         )
         func = function_dict.get(command)
         if func:
-            await func(client, event)
+            task = asyncio.create_task(func(client, event))
+            background_tasks.add(task)
+            task.add_done_callback(background_tasks.discard)
     for func in function_dict[None]:
         await func(client, event)
 
