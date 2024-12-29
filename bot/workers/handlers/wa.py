@@ -7,6 +7,7 @@ from PIL import Image
 from RealESRGAN import RealESRGAN
 from urlextract import URLExtract
 
+from bot import heavy_proc_lock
 from bot.config import bot
 from bot.fun.quips import enquip, enquip4
 from bot.fun.stickers import ran_stick
@@ -173,22 +174,24 @@ async def upscale_image(event, args, client):
             return await event.reply(
                 "*Command can only be used when replying to an image.*"
             )
-        status_msg = await event.reply("*Please wait…*")
+        status_msg = await event.reply("*Please wait…*") if not heavy_proc_lock.locked() else await event.reply("*Waiting in queue…*")
         file = await download_replied_media(event.quoted, mtype="image")
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        model = RealESRGAN(device, scale=4)
-        model.load_weights("weights/RealESRGAN_x4.pth", download=True)
-
-        image = Image.open(io.BytesIO(file)).convert("RGB")
-        sr_image = model.predict(image)
-        output = io.BytesIO()
-        sr_image.save(output, format="png")
+        async with heavy_proc_lock:
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+            model = RealESRGAN(device, scale=4)
+            model.load_weights("weights/RealESRGAN_x4.pth", download=True)
+    
+            image = Image.open(io.BytesIO(file)).convert("RGB")
+            sr_image = model.predict(image)
+            output = io.BytesIO()
+            sr_image.save(output, format="png")
         output.name = f"upscaled_image.png"
         raw = output.getvalue()
-        await event.reply_photo(raw)
+        msg = await event.reply_photo(raw)
         raw = await png_to_jpg(raw)
-        await event.reply_photo(raw, enquip4())
+        await msg.reply_photo(raw, enquip4())
     except Exception as e:
         await logger(Exception)
         await status_msg.edit(f"*Error:*\n{e}")
