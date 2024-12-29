@@ -342,6 +342,7 @@ def register(key: str | None = None):
 bot.register = register
 background_tasks = set()
 
+
 async def on_message(client: NewAClient, message: MessageEv):
     event = construct_event(message)
     if event.type == "text":
