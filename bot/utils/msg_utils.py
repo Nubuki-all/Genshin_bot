@@ -352,7 +352,7 @@ async def on_message(client: NewAClient, message: MessageEv):
         )
         func = function_dict.get(command)
         if func:
-            await func(client, event))
+            await func(client, event)
     for func in function_dict[None]:
         await func(client, event)
 
