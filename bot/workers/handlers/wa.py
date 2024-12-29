@@ -10,6 +10,7 @@ from urlextract import URLExtract
 from bot.config import bot
 from bot.fun.quips import enquip, enquip4
 from bot.fun.stickers import ran_stick
+from bot.utils.bot_utils import png_to_jpg
 from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
     clean_reply,
@@ -33,11 +34,12 @@ async def sticker_reply(event, args, client):
         me = await bot.client.get_me()
         if not event.text.startswith("@" + me.JID.User):
             return
+        reply = event.reply_to_message if len(event.text.split()) == 1 else event
         await event.send_typing_status()
         random_sticker = ran_stick()
         await clean_reply(
             event,
-            event.reply_to_message,
+            reply,
             "reply_sticker",
             random_sticker,
             quote=True,
@@ -183,7 +185,10 @@ async def upscale_image(event, args, client):
         output = io.BytesIO()
         sr_image.save(output, format="png")
         output.name = f"upscaled_image.png"
-        await event.reply_photo(output.getvalue())
+        raw = output.getvalue()
+        await event.reply_photo(raw)
+        raw = await png_to_jpg(raw)
+        await event.reply_photo(raw, enquip4())
     except Exception as e:
         await logger(Exception)
         await status_msg.edit(f"*Error:*\n{e}")

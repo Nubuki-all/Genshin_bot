@@ -7,6 +7,7 @@ from functools import partial
 import aiohttp
 import pytz
 import requests
+from ffmpeg.asyncio import FFmpeg
 
 from bot import LOGS, bot, telegraph_errors, time
 
@@ -134,3 +135,16 @@ def time_formatter(seconds: float) -> str:
         + ((str(seconds) + "s, ") if seconds else "")
     )
     return tmp[:-2]
+
+
+async def png_to_jpg(png: bytes):
+    ffmpeg = (
+        FFmpeg()
+        .option("y")
+        .input("pipe:0")
+        .output(
+            "pipe:1",
+            f="mjpeg",
+        )
+    )
+    return await ffmpeg.execute(png)

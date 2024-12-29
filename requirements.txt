@@ -8,6 +8,7 @@ html_telegraph_poster
 lxml[html_clean]
 pymongo
 python-decouple
+python-ffmpeg
 pytz
 urlextract
 w3lib
