@@ -162,7 +162,8 @@ async def _(client: NewAClient, message: MessageEv):
 ########### Start ############
 
 try:
-    loop = asyncio.get_event_loop()
+    #loop = asyncio.get_event_loop()
+    loop = bot.client.loop
     bot.loop = loop
     loop.create_task(on_startup())
     if not bot.initialized_client:

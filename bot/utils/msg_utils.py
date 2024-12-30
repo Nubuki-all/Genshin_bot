@@ -426,6 +426,7 @@ async def parse_and_send_rss(data: dict, chat_ids: list = None):
                 if chat
                 else expanded_chat.extend(conf.RSS_CHAT.split())
             )
+        func_list = []
         for chat in expanded_chat:
             top_chat = chat.split(":")
             chat, server = (
@@ -433,8 +434,9 @@ async def parse_and_send_rss(data: dict, chat_ids: list = None):
                 if len(top_chat) > 1
                 else (str(top_chat[0]), "s.whatsapp.net")
             )
-            await send_rss(caption, chat, pics, server)
-            await asyncio.sleep(5)
+            func = send_rss(caption, chat, pics, server)
+            func_list.append(func)
+        await asyncio.gather(*func_list)
     except Exception:
         await logger(Exception)
 
