@@ -6,6 +6,7 @@ clean_links
 feedparser
 html_telegraph_poster
 lxml[html_clean]
+opencv-python-headless
 pymongo
 python-decouple
 python-ffmpeg
