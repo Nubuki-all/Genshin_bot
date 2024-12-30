@@ -80,7 +80,14 @@ async def get_enka_profile(uid, card=False, template=1):
         return result, error
 
 
-async def get_enka_card(uid, char_id, akasha=True, huid=False, template=1):
+async def get_enka_card(*args, **kwargs):
+    loop = asyncio.new_event_loop()
+    result = loop.run_until_complete(get_enka_cards(*args, **kwargs))
+    loop.close()
+    return result
+
+
+async def get_enka_cards(uid, char_id, akasha=True, huid=False, template=1):
     error = False
     result = None
     try:
