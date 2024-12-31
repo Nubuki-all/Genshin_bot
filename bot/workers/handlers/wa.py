@@ -7,7 +7,6 @@ from PIL import Image
 from RealESRGAN import RealESRGAN
 from urlextract import URLExtract
 
-from bot import heavy_proc_lock
 from bot.config import bot
 from bot.fun.quips import enquip, enquip4
 from bot.fun.stickers import ran_stick
