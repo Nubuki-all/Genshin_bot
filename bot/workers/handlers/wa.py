@@ -11,7 +11,7 @@ from bot import heavy_proc_lock
 from bot.config import bot
 from bot.fun.quips import enquip, enquip4
 from bot.fun.stickers import ran_stick
-from bot.utils.bot_utils import png_to_jpg
+from bot.utils.bot_utils import png_to_jpg, turn, wait_for_turn, waiting_for_turn
 from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
     clean_reply,
@@ -160,6 +160,7 @@ async def upscale_image(event, args, client):
         None yet.
     """
     status_msg = None
+    turn_id = f"{event.chat.id}:{event.id}"
     user = event.from_user.id
     if not user_is_owner(user):
         if not pm_is_allowed(event):
@@ -174,23 +175,25 @@ async def upscale_image(event, args, client):
             return await event.reply(
                 "*Command can only be used when replying to an image.*"
             )
-        status_msg = (
-            await event.reply("*Please wait…*")
-            if not heavy_proc_lock.locked()
-            else await event.reply("*Waiting in queue…*")
-        )
+        turn().append(turn_id)
+        status_msg = await event.reply("*…*")
         file = await download_replied_media(event.quoted, mtype="image")
 
-        async with heavy_proc_lock:
-            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-            model = RealESRGAN(device, scale=4)
-            model.load_weights("weights/RealESRGAN_x4.pth", download=True)
-
-            image = Image.open(io.BytesIO(file)).convert("RGB")
-            sr_image = model.predict(image)
-            output = io.BytesIO()
-            sr_image.save(output, format="png")
+        if waiting_for_turn():
+            w_msg = await status_msg.edit(
+                "*Waiting till previous upscaling process gets completed.*"
+            )
+            await wait_for_turn(turn_id)
+        # async with heavy_proc_lock:
+        # Not happening with current Library
+        await status_msg.edit("*Upscaling please wait…*")
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model = RealESRGAN(device, scale=4)
+        model.load_weights("weights/RealESRGAN_x4.pth", download=True)
+        image = Image.open(io.BytesIO(file)).convert("RGB")
+        sr_image = model.predict(image)
+        output = io.BytesIO()
+        sr_image.save(output, format="png")
         output.name = f"upscaled_image.png"
         raw = output.getvalue()
         msg = await event.reply_photo(raw)
@@ -201,6 +204,8 @@ async def upscale_image(event, args, client):
         await status_msg.edit(f"*Error:*\n{e}")
         status_msg = None
     finally:
+        if turn(turn_id):
+            turn().pop(0)
         if status_msg:
             await status_msg.delete()
 

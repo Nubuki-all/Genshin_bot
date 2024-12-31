@@ -148,3 +148,20 @@ async def png_to_jpg(png: bytes):
         )
     )
     return await ffmpeg.execute(png)
+
+
+def turn(turn_id: str = None):
+    if turn_id:
+        return turn_id in bot.p_queue
+    return bot.p_queue
+
+
+async def wait_for_turn(turn_id: str):
+    while turn(turn_id):
+        await asyncio.sleep(5)
+        if bot.p_queue[0] == turn_id:
+            return 1
+
+
+def waiting_for_turn():
+    return turn() and len(turn()) > 1
