@@ -20,6 +20,7 @@ from bot.utils.gi_utils import (
     fetch_weapon_detail,
     get_challenge_image,
     get_character_image,
+    get_character_info_fallback,
     get_enka_card,
     get_enka_card2,
     get_enka_card3,
@@ -47,7 +48,7 @@ async def enka_handler(event, args, client):
 
     Arguments:
         uid: {genshin player uid} (Required)
-        -c or --card or --character {character name}: use quotes if the name has spaces eg:- "Hu tao"; Also supports lookups
+        -c or --card or --character {character name}*: use quotes if the name has spaces eg:- "Hu tao"; Also supports lookups
         -cs or --cards or --characters {characters} same as -c but for multiple characters; delimited by commas
         -t <int> {template}: card generation template; currently only two templates exist; default 1
     Flags:
@@ -67,6 +68,7 @@ async def enka_handler(event, args, client):
         - retrieves profile card using the new template for the given uid
     12345678900 -c xq
         - retrieves the current build for whatever matches the character name provided; in this case Xingqui
+    *Now supports last three digits of character id too
     """
     error = None
     status = None
@@ -144,6 +146,7 @@ async def enka_handler(event, args, client):
             return s_remove(path)
         if card:
             info = await get_gi_info(query=card)
+            info = await get_character_info_fallback(card) if not info else info
             if not info:
                 return await event.reply(
                     f"*Character not found.*\nYou searched for {card}.\nNot what you searched for?\nTry again with double quotes"
@@ -179,6 +182,7 @@ async def enka_handler(event, args, client):
             for name in cards.split(","):
                 name = name.strip()
                 info = await get_gi_info(query=name)
+                info = await get_character_info_fallback(card) if not info else info
                 if not info:
                     errors += f"{name}, "
                     continue

@@ -41,6 +41,21 @@ async def get_gi_info(
     return info
 
 
+async def get_character_info_fallback(id_or_name: str, full: bool = False):
+    uri = "https://gi.yatta.moe/api/v2/en/avatar"
+    resp = await get_gi_info(get=uri)
+    characters = resp.get("items")
+    if not characters:
+        return None
+    for char in list(characters.values()):
+        id_ = char.get("id")
+        name = char.get("name")
+        if id_[5:] == id_or_name or name.casefold() == id_or_name.casefold():
+            if not full:
+                return char
+            new_uri = uri + "/" + str(id_)
+            return await get_gi_info(get=new_uri)
+
 async def async_dl(url, retries=5):
     retry_options = ExponentialRetry(attempts=20)
     client_session = aiohttp.ClientSession()
