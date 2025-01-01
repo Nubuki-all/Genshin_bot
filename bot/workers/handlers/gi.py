@@ -146,7 +146,9 @@ async def enka_handler(event, args, client):
             return s_remove(path)
         if card:
             info = await get_gi_info(query=card)
-            info = await get_character_info_fallback(card) if not info else info
+            if not info:
+                await status.edit(f"Character with name; *{card}* not found.\nTrying workaround…") if not card.isdigit() else None
+                info = await get_character_info_fallback(card)
             if not info:
                 return await event.reply(
                     f"*Character not found.*\nYou searched for {card}.\nNot what you searched for?\nTry again with double quotes"
