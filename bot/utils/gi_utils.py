@@ -48,12 +48,12 @@ async def get_character_info_fallback(id_or_name: str, full: bool = False):
     if not characters:
         return
     for char in list(characters.values()):
-        id_ = char.get("id")
+        id_ = str(char.get("id"))
         name = char.get("name")
         if id_[5:] == id_or_name or name.casefold() == id_or_name.casefold():
             if not full:
                 return char
-            new_uri = uri + "/" + str(id_)
+            new_uri = uri + "/" + id_
             return await get_gi_info(get=new_uri)
 
 
