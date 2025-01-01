@@ -44,9 +44,9 @@ async def get_gi_info(
 async def get_character_info_fallback(id_or_name: str, full: bool = False):
     uri = "https://gi.yatta.moe/api/v2/en/avatar"
     resp = await get_gi_info(get=uri)
-    characters = resp.get("items")
+    characters = resp["data"].get("items")
     if not characters:
-        return None
+        return
     for char in list(characters.values()):
         id_ = char.get("id")
         name = char.get("name")
