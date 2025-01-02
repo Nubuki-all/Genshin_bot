@@ -22,19 +22,20 @@ from bot.utils.msg_utils import (
 )
 
 
-async def sticker_reply(event, args, client):
+async def sticker_reply(event, args, client, overide=False):
     """
     Sends a random sticker upon being tagged
     """
     try:
         if event.type != "text":
             return
-        if not event.text.startswith("@"):
-            return
-        me = await bot.client.get_me()
-        if not event.text.startswith("@" + me.JID.User):
-            return
-        reply = event.reply_to_message if len(event.text.split()) == 1 else event
+        if not overide:
+            if not event.text.startswith("@"):
+                return
+            me = await bot.client.get_me()
+            if not event.text.startswith("@" + me.JID.User):
+                return
+        reply = event.reply_to_message if len(event.text.split()) == 1 and not overide else event
         await event.send_typing_status()
         random_sticker = ran_stick()
         await clean_reply(
@@ -174,6 +175,8 @@ async def upscale_image(event, args, client):
             return await event.reply(
                 "*Command can only be used when replying to an image.*"
             )
+        if quoted_msg.imageMessage.fileLength > 17939583:
+            return await sticker_reply(event, args, client, True)
         turn().append(turn_id)
         status_msg = await event.reply("*…*")
         file = await download_replied_media(event.quoted, mtype="image")
