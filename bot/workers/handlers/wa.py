@@ -35,7 +35,11 @@ async def sticker_reply(event, args, client, overide=False):
             me = await bot.client.get_me()
             if not event.text.startswith("@" + me.JID.User):
                 return
-        reply = event.reply_to_message if len(event.text.split()) == 1 and not overide else event
+        reply = (
+            event.reply_to_message
+            if len(event.text.split()) == 1 and not overide
+            else event
+        )
         await event.send_typing_status()
         random_sticker = ran_stick()
         await clean_reply(
