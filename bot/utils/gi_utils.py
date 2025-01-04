@@ -30,14 +30,12 @@ async def get_gi_info(
         url = get
     field = "stats" if stats else "result"
     retry_options = ExponentialRetry(attempts=10)
-    client_session = aiohttp.ClientSession()
-    retry_requests = RetryClient(client_session)
-    async with retry_requests.get(url, retry_options=retry_options) as result:
-        if direct:
-            info = await result.json()
-        else:
-            info = (await result.json()).get(field)
-    await client_session.close()
+    retry_requests = RetryClient(bot.requests)
+    result = await retry_requests.post(url, retry_options=retry_options)
+    if direct:
+        info = await result.json()
+    else:
+        info = (await result.json()).get(field)
     return info
 
 
@@ -59,21 +57,18 @@ async def get_character_info_fallback(id_or_name: str, full: bool = False):
 
 async def async_dl(url, retries=5):
     retry_options = ExponentialRetry(attempts=20)
-    client_session = aiohttp.ClientSession()
-    retry_requests = RetryClient(client_session)
-    async with retry_requests.get(url, retry_options=retry_options) as result:
-        try:
-            assert result.status == 200
-        except AssertionError as e:
-            if not retries:
-                raise e from None
-            retries -= 1
-            await client_session.close()
-            await asyncio.sleep(5)
-            return await async_dl(url, retries)
-        raw = await result.content.read()
-    await client_session.close()
-    return raw
+    retry_requests = RetryClient(bot.requests)
+    result = await retry_requests.get(url, retry_options=retry_options)
+    try:
+        assert result.status == 200
+    except AssertionError as e:
+        if not retries:
+            raise e from None
+        retries -= 1
+        await asyncio.sleep(5)
+        return await async_dl(url, retries)
+    return await result.content.read()
+
 
 
 async def enka_update():

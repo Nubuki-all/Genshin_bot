@@ -12,6 +12,11 @@ from bot.utils.os_utils import re_x, updater
 from bot.utils.rss_utils import schedule_rss, scheduler
 
 
+async def shutdown_services():
+    await bot.client.disconnect()
+    await bot.requests.close()
+
+
 async def restart_handler(event, args, client):
     """Restarts bot. (To avoid issues use /update instead.)"""
     if not user_is_owner(event.from_user.id):
@@ -19,7 +24,7 @@ async def restart_handler(event, args, client):
     try:
         rst = await event.reply("*Restarting Please Wait…*")
         message = f"{rst.chat.id}:{rst.id}:{rst.chat.server}"
-        await bot.client.disconnect()
+        await shutdown_services()
         re_x("restart", message)
     except Exception:
         await event.reply("An Error Occurred")
@@ -33,7 +38,7 @@ async def update_handler(event, args, client):
             return
         upt_mess = "*Updating…*"
         reply = await event.reply(f"{upt_mess}")
-        await bot.client.disconnect()
+        await shutdown_services()
         updater(reply)
     except Exception:
         await logger(Exception)

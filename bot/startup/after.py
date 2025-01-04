@@ -1,3 +1,4 @@
+import aiohttp
 import signal
 
 from bot import Message, asyncio, bot, con_ind, conf, jid, sys, version_file
@@ -64,6 +65,7 @@ async def on_termination():
     except Exception:
         pass
     # More cleanup code?
+    await bot.requests.close()
     force_exit()
     # exit()
 
@@ -109,6 +111,7 @@ async def on_startup():
             await onstart()
             await logger(e="Please Restart bot.")
             return
+        bot.requests = aiohttp.ClientSession(loop=bot.loop)
         await send_presence()
         await asyncio.sleep(5)
         await send_presence(False)
