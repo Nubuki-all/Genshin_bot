@@ -312,8 +312,8 @@ async def save_notes(event, args, client):
         data = {
             args: {
                 "user": user,
-                "user_name": event.from_user.name
-                "note": event.quoted_text
+                "user_name": event.from_user.name,
+                "note": event.quoted_text,
             }
             
         }
