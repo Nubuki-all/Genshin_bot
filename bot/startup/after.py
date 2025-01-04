@@ -91,6 +91,7 @@ async def wait_on_client():
 async def on_startup():
     try:
         await update_enka_assets()
+        bot.requests = aiohttp.ClientSession(loop=bot.loop)
         for signame in {"SIGINT", "SIGTERM", "SIGABRT"}:
             bot.loop.add_signal_handler(
                 getattr(signal, signame),
@@ -112,7 +113,6 @@ async def on_startup():
             await onstart()
             await logger(e="Please Restart bot.")
             return
-        bot.requests = aiohttp.ClientSession(loop=bot.loop)
         await send_presence()
         await asyncio.sleep(5)
         await send_presence(False)
