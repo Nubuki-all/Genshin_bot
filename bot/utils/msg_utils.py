@@ -84,7 +84,9 @@ class Event:
             if (
                 self.quoted.quotedMessage.documentWithCaptionMessage.message.documentMessage.URL
             ):
-                self.quoted_document = self.quoted.quotedMessage.documentWithCaptionMessage
+                self.quoted_document = (
+                    self.quoted.quotedMessage.documentWithCaptionMessage
+                )
             if self.quoted.quotedMessage.documentMessage.URL:
                 self.quoted_document = self.quoted.quotedMessage.documentMessage
             self.quoted_image = (
