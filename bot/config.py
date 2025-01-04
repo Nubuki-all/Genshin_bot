@@ -34,7 +34,7 @@ class Config:
 
             self.CMD_PREFIX = config("CMD_PREFIX", default="")
             self.DATABASE_URL = config("DATABASE_URL", default=None)
-            self.DBNAME = config("DBNAME", default="ENC")
+            self.DBNAME = config("DBNAME", default="Qiqi")
             self.DEBUG = config("DEBUG", default=False, cast=bool)
             self.DEV = config("DEV", default=0, cast=str)
             self.DYNO = config("DYNO", default=None)
