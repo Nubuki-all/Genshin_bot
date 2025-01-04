@@ -146,10 +146,10 @@ class Event:
             return await self.reply_document(file, file_name, text, quote)
         if image and file_name:
             return await self.reply_photo(image, text, quote)
+        text = text or message
         if not text:
             raise Exception("Specify a text to reply with.")
         # msg_id = self.id if quote else None
-        text = text or message
         await self.send_typing_status()
 
         try:
