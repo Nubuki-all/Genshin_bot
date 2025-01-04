@@ -349,7 +349,9 @@ async def get_notes(event, args, client):
     Get saved notes;
     Arguments:
         None: Get all saved notes
-        any: (note_name) Get a particular saved note
+        any: (note_name) Get a particular saved note*
+
+    *Can also get notes through #note_name
     """
     user = event.from_user.id
     if not user_is_owner(user):
@@ -387,10 +389,10 @@ async def get_notes(event, args, client):
                 event.reply_to_message,
                 "reply_photo",
                 note[0],
-                (note[1] + f"\n\nBy: @{user}"),
+                (note[1] + f"\n\nBy: @{user}").lstrip("\n"),
             )
         elif note_type == Message:
-            note.caption += f"\n\nBy: @{user}"
+            note.caption += f"\n\nBy: @{user}".lstrip("\n")
             note.contextInfo.mentionedJID.append(f"{user}@s.whatsapp.net")
             return await clean_reply(
                 event, event.reply_to_message, "reply", message=note
@@ -437,4 +439,21 @@ async def delete_notes(event, args, client):
         await save2db2(bot.notes_dict, "note")
         return await event.reply(f"*Successfully removed note with title; {args}*")
     except Exception:
+        await logger(Exception)
+
+async def get_notes2(event, args, client):
+    """
+    Alias for get_notes
+    """
+    try:
+        if event.type != "text":
+            return
+        if not event.text.startswith("#"):
+            return
+        chat = event.chat.id
+        if not (notes := bot.notes_dict.get(chat)):
+            return
+        if (note := notes.get(event.text[1:])):
+            return await get_notes(event, event.text[1:], None)
+    except  Exception:
         await logger(Exception)

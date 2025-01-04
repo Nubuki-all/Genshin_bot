@@ -34,6 +34,7 @@ from .workers.handlers.stuff import getcmds, getmeme, hello
 from .workers.handlers.wa import (
     delete_notes,
     get_notes,
+    get_notes2,
     pick_random,
     sanitize_url,
     save_notes,
@@ -170,6 +171,11 @@ async def _(client: NewAClient, message: Event):
 @bot.register(None)
 async def _(client: NewAClient, message: Event):
     await sticker_reply(message, None, client)
+
+
+@bot.register(None)
+async def _(client: NewAClient, message: Event):
+    await get_notes2(message, None, client)
 
 
 @bot.client.event(MessageEv)
