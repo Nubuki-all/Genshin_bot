@@ -195,7 +195,7 @@ async def upscale_image(event, args, client):
             )
             await wait_for_turn(turn_id)
         # async with heavy_proc_lock:
-        # Lock works now but eh i like the current implementation better 
+        # Lock works now but eh i like the current implementation better
         await status_msg.edit("*Upscaling please wait…*")
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model = RealESRGAN(device, scale=4)
@@ -276,7 +276,11 @@ async def list_notes(event, args, client):
     """
     try:
         chat = event.chat.id
-        chat_name = (await bot.client.get_group_info(event.chat.jid)).GroupName.Name if event.chat.is_group else event.from_user.name
+        chat_name = (
+            (await bot.client.get_group_info(event.chat.jid)).GroupName.Name
+            if event.chat.is_group
+            else event.from_user.name
+        )
         if not (notes := bot.notes_dict.get(chat)):
             return await event.reply(f"*No notes found for chat: {chat_name}!*")
         reply = await event.reply("_Fetching notes…_")
@@ -288,7 +292,7 @@ async def list_notes(event, args, client):
         await reply.edit(msg)
     except Exception:
         await logger(Exception)
-        
+
 
 async def save_notes(event, args, client):
     """
@@ -315,7 +319,6 @@ async def save_notes(event, args, client):
                 "user_name": event.from_user.name,
                 "note": event.quoted_text,
             }
-            
         }
         bot.notes_dict[chat].update(data)
         await save2db2(bot.notes_dict, "note")
@@ -328,7 +331,7 @@ async def get_notes(event, args, client):
     """
     Get saved notes;
     Arguments:
-        None: Get all saved notes 
+        None: Get all saved notes
         any: (note_name) Get a particular saved note
     """
     user = event.from_user.id
@@ -341,12 +344,18 @@ async def get_notes(event, args, client):
         if not args:
             return await list_notes(event, args, client)
         chat = event.chat.id
-        chat_name = (await bot.client.get_group_info(event.chat.jid)).GroupName.Name if event.chat.is_group else event.from_user.name
+        chat_name = (
+            (await bot.client.get_group_info(event.chat.jid)).GroupName.Name
+            if event.chat.is_group
+            else event.from_user.name
+        )
         if not bot.notes_dict.get(chat):
             return await event.reply(f"*No notes found for chat: {chat_name}!*")
         notes = bot.notes_dict[chat]
         if not (u_note := notes.get(args)):
-            return await event.reply(f"*Notes with name: {args} not found in {chat_name}!*")
+            return await event.reply(
+                f"*Notes with name: {args} not found in {chat_name}!*"
+            )
         user, note = u_note.get("user"), u_note.get("note")
         msg = note + f"\n\nBy: @{user}"
         return await clean_reply(event, event.reply_to_message, "reply", msg)
@@ -369,7 +378,11 @@ async def delete_notes(event, args, client):
             return
     try:
         chat = event.chat.id
-        chat_name = (await bot.client.get_group_info(event.chat.jid)).GroupName.Name if event.chat.is_group else event.from_user.name
+        chat_name = (
+            (await bot.client.get_group_info(event.chat.jid)).GroupName.Name
+            if event.chat.is_group
+            else event.from_user.name
+        )
         if not (notes := bot.notes_dict.get(chat)):
             return await event.reply(f"*No notes found for chat: {chat_name}!*")
         if args.casefold() == "all":
@@ -377,9 +390,13 @@ async def delete_notes(event, args, client):
             await save2db2(bot.notes_dict, "note")
             return await event.reply(f"*Successfully removed all notes in {chat_name}*")
         if not (u_note := notes.get(args)):
-            return await event.reply(f"*Notes with name: {args} not found in {chat_name}!*")
+            return await event.reply(
+                f"*Notes with name: {args} not found in {chat_name}!*"
+            )
         if not user_is_owner(user) and user != notes[args]["user"]:
-            return await event.reply("You can't delete this note; Most likely because *you* did not add it.")
+            return await event.reply(
+                "You can't delete this note; Most likely because *you* did not add it."
+            )
         notes.pop(args)
         await save2db2(bot.notes_dict, "note")
         return await event.reply(f"*Successfully removed note with title; {args}*")

@@ -21,6 +21,7 @@ db_cluster = {
     "rss": rssdb,
 }
 
+
 async def save2db(db, update, retries=3):
     while retries:
         try:
