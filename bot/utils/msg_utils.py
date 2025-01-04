@@ -79,29 +79,30 @@ class Event:
         # To do expand quoted; has members [stanzaID, participant,
         # quotedMessage.conversation]
         self.quoted = self.ext_msg.contextInfo if add_replied else None
-        self.quoted_document = None
-        if (
-            self.quoted.quotedMessage.documentWithCaptionMessage.message.documentMessage.URL
-        ):
-            self.quoted_document = self.quoted.quotedMessage.documentWithCaptionMessage
-        if self.quoted.quotedMessage.documentMessage.URL:
-            self.quoted_document = self.quoted.quotedMessage.documentMessage
-        self.quoted_image = (
-            self.quoted.quotedMessage.imageMessage
-            if self.quoted.quotedMessage.imageMessage.URL
-            else None
-        )
+        self.quoted_document = self.quoted_image = self.quoted_video = None
+        if self.quoted:
+            if (
+                self.quoted.quotedMessage.documentWithCaptionMessage.message.documentMessage.URL
+            ):
+                self.quoted_document = self.quoted.quotedMessage.documentWithCaptionMessage
+            if self.quoted.quotedMessage.documentMessage.URL:
+                self.quoted_document = self.quoted.quotedMessage.documentMessage
+            self.quoted_image = (
+                self.quoted.quotedMessage.imageMessage
+                if self.quoted.quotedMessage.imageMessage.URL
+                else None
+            )
+            self.quoted_video = (
+                self.quoted.quotedMessage.videoMessage
+                if self.quoted.quotedMessage.videoMessage.URL
+                else None
+            )
         self.quoted_text = (
             (
                 self.quoted.quotedMessage.conversation
                 or self.quoted.quotedMessage.extendedTextMessage.text
             )
             if self.quoted
-            else None
-        )
-        self.quoted_video = (
-            self.quoted.quotedMessage.videoMessage
-            if self.quoted.quotedMessage.videoMessage.URL
             else None
         )
         self.quoted_msg = (
