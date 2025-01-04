@@ -79,6 +79,11 @@ class Event:
         # To do expand quoted; has members [stanzaID, participant,
         # quotedMessage.conversation]
         self.quoted = self.ext_msg.contextInfo if add_replied else None
+        if self.quoted.quotedMessage.documentWithCaptionMessage.URL:
+            self.quoted_document = self.quoted.quotedMessage.documentWithCaptionMessage
+        if self.quoted.quotedMessage.documentMessage.URL:
+            self.quoted_document = self.quoted.quotedMessage.documentMessage
+        self.quoted_image = self.quoted.quotedMessage.imageMessage if self.quoted.quotedMessage.imageMessage.URL else None
         self.quoted_text = (
             (
                 self.quoted.quotedMessage.conversation
@@ -87,6 +92,8 @@ class Event:
             if self.quoted
             else None
         )
+        self.quoted_video = self.quoted.quotedMessage.videoMessage if self.quoted.quotedMessage.videoMessage.URL else None
+        self.quoted_msg = self.quoted_text or self.quoted_document or self.quoted_image or self.quoted_video
         self.reply_to_message = self.get_quoted_msg()
         self.outgoing = message.Info.MessageSource.IsFromMe
         self.is_status = message.Info.MessageSource.Chat.User.casefold() == "status"
@@ -112,6 +119,7 @@ class Event:
         quote: bool = True,
         link_preview: bool = True,
         reply_privately: bool = False,
+        message: Message = None,
     ):
         if not self.constructed:
             return
@@ -122,6 +130,7 @@ class Event:
         if not text:
             raise Exception("Specify a text to reply with.")
         # msg_id = self.id if quote else None
+        text = text or message
         await self.send_typing_status()
 
         try:

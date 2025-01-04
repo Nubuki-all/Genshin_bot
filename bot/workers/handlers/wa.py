@@ -15,6 +15,7 @@ from bot.utils.bot_utils import png_to_jpg, turn, wait_for_turn, waiting_for_tur
 from bot.utils.db_utils import save2db2
 from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
+    Message,
     clean_reply,
     download_replied_media,
     get_args,
@@ -296,7 +297,7 @@ async def list_notes(event, args, client):
 
 async def save_notes(event, args, client):
     """
-    Saves a replied Text message to bot database;
+    Saves a replied Text/media message to bot database;
     Can be retrieved with get {note_name}
     Argument:
         note_name: name to save note as
@@ -308,8 +309,23 @@ async def save_notes(event, args, client):
         if not user_is_allowed(user):
             return
     try:
-        if not event.quoted_text:
-            return await event.reply("Can only save replied text.")
+        if not event.quoted_msg:
+            return await event.reply("Can only save replied text or media.")
+        ### note gen:
+        note_type = str
+        if event.quoted_text:
+            note = event.quoted_text
+        elif event.quoted_image:
+            if event.quoted_image.fileLength < 5000000:
+                note = await download_replied_media(event.quoted, mtype="image")
+                note = [note, event.quoted_image.caption]
+                note_type = bytes
+            else:
+                note = event.quoted_image
+                note_type = Message
+        elif event.quoted_msg:
+            note = event.quoted_msg
+            note_type = Message
         chat = event.chat.id
         if not bot.notes_dict.get(chat):
             bot.notes_dict[chat] = {}
@@ -317,7 +333,8 @@ async def save_notes(event, args, client):
             args: {
                 "user": user,
                 "user_name": event.from_user.name,
-                "note": event.quoted_text,
+                "note": note,
+                "note_type": note_type,
             }
         }
         bot.notes_dict[chat].update(data)
@@ -356,9 +373,16 @@ async def get_notes(event, args, client):
             return await event.reply(
                 f"*Notes with name: {args} not found in {chat_name}!*"
             )
-        user, note = u_note.get("user"), u_note.get("note")
-        msg = note + f"\n\nBy: @{user}"
-        return await clean_reply(event, event.reply_to_message, "reply", msg)
+        user, note, note_type = u_note.get("user"), u_note.get("note"), u_note.get("note_type")
+        if note_type == str:
+            msg = note + f"\n\nBy: @{user}"
+            return await clean_reply(event, event.reply_to_message, "reply", msg)
+        elif note_type == bytes:
+            return await clean_reply(event, event.reply_to_message, "reply_photo", note[0], (note[1] + f"\n\nBy: @{user}"))
+        elif note_type == Message:
+            note.caption += f"\n\nBy: @{user}"
+            note.contextInfo.mentionedJID.append(f"{user}@s.whatsapp.net")
+            return await clean_reply(event, event.reply_to_message, "reply", message=note)
     except Exception:
         await logger(Exception)
 
