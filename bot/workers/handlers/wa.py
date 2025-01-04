@@ -311,7 +311,7 @@ async def save_notes(event, args, client):
     try:
         if not event.quoted_msg:
             return await event.reply("Can only save replied text or media.")
-        ### note gen:
+        # note gen:
         note_type = str
         if event.quoted_text:
             note = event.quoted_text
@@ -373,16 +373,28 @@ async def get_notes(event, args, client):
             return await event.reply(
                 f"*Notes with name: {args} not found in {chat_name}!*"
             )
-        user, note, note_type = u_note.get("user"), u_note.get("note"), u_note.get("note_type")
+        user, note, note_type = (
+            u_note.get("user"),
+            u_note.get("note"),
+            u_note.get("note_type"),
+        )
         if note_type == str:
             msg = note + f"\n\nBy: @{user}"
             return await clean_reply(event, event.reply_to_message, "reply", msg)
         elif note_type == bytes:
-            return await clean_reply(event, event.reply_to_message, "reply_photo", note[0], (note[1] + f"\n\nBy: @{user}"))
+            return await clean_reply(
+                event,
+                event.reply_to_message,
+                "reply_photo",
+                note[0],
+                (note[1] + f"\n\nBy: @{user}"),
+            )
         elif note_type == Message:
             note.caption += f"\n\nBy: @{user}"
             note.contextInfo.mentionedJID.append(f"{user}@s.whatsapp.net")
-            return await clean_reply(event, event.reply_to_message, "reply", message=note)
+            return await clean_reply(
+                event, event.reply_to_message, "reply", message=note
+            )
     except Exception:
         await logger(Exception)
 

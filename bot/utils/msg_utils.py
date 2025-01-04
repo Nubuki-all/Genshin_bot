@@ -83,7 +83,11 @@ class Event:
             self.quoted_document = self.quoted.quotedMessage.documentWithCaptionMessage
         if self.quoted.quotedMessage.documentMessage.URL:
             self.quoted_document = self.quoted.quotedMessage.documentMessage
-        self.quoted_image = self.quoted.quotedMessage.imageMessage if self.quoted.quotedMessage.imageMessage.URL else None
+        self.quoted_image = (
+            self.quoted.quotedMessage.imageMessage
+            if self.quoted.quotedMessage.imageMessage.URL
+            else None
+        )
         self.quoted_text = (
             (
                 self.quoted.quotedMessage.conversation
@@ -92,8 +96,17 @@ class Event:
             if self.quoted
             else None
         )
-        self.quoted_video = self.quoted.quotedMessage.videoMessage if self.quoted.quotedMessage.videoMessage.URL else None
-        self.quoted_msg = self.quoted_text or self.quoted_document or self.quoted_image or self.quoted_video
+        self.quoted_video = (
+            self.quoted.quotedMessage.videoMessage
+            if self.quoted.quotedMessage.videoMessage.URL
+            else None
+        )
+        self.quoted_msg = (
+            self.quoted_text
+            or self.quoted_document
+            or self.quoted_image
+            or self.quoted_video
+        )
         self.reply_to_message = self.get_quoted_msg()
         self.outgoing = message.Info.MessageSource.IsFromMe
         self.is_status = message.Info.MessageSource.Chat.User.casefold() == "status"
