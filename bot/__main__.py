@@ -32,8 +32,11 @@ from .workers.handlers.manage import (
 )
 from .workers.handlers.stuff import getcmds, getmeme, hello
 from .workers.handlers.wa import (
+    delete_notes,
+    get_notes,
     pick_random,
     sanitize_url,
+    save_notes,
     sticker_reply,
     stickerize_image,
     upscale_image,

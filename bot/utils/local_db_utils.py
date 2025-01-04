@@ -1,6 +1,6 @@
 import pickle
 
-from bot import bot, local_budb, local_enkadb, local_gdb, local_rdb
+from bot import bot, local_budb, local_enkadb, local_gdb, local_ndb, local_rdb
 
 from .bot_utils import list_to_str
 from .os_utils import file_exists
@@ -17,8 +17,13 @@ def load_local_db():
             local_dict = pickle.load(file)
         bot.gift_dict.update(local_dict)
 
+    if file_exists(local_ndb):
+        with open(local_ndb, "rb") as file:
+            local_dict = pickle.load(file)
+        bot.notes_dict.update(local_dict)
+
     if file_exists(local_budb):
-        with open(local_udb, "rb") as file:
+        with open(local_budb, "rb") as file:
             local_b_users = pickle.load(file)
         for user in local_b_users:
             if user not in bot.banned:
@@ -35,6 +40,9 @@ def save2db_lcl2(db):
     elif db == "gift":
         with open(local_gdb, "wb") as file:
             pickle.dump(bot.gift_dict, file)
+    elif db == "note":
+        with open(local_ndb, "wb") as file:
+            pickle.dump(bot.notes_dict, file)
 
 
 def load_enka_db():

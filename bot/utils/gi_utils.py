@@ -32,7 +32,7 @@ async def get_gi_info(
     field = "stats" if stats else "result"
     retry_options = ExponentialRetry(attempts=10)
     retry_requests = RetryClient(bot.requests)
-    result = await retry_requests.post(url, retry_options=retry_options)
+    result = await retry_requests.get(url, retry_options=retry_options)
     if direct:
         info = await result.json()
     else:

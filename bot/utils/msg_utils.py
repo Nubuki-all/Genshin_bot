@@ -52,7 +52,7 @@ class Event:
         def construct(self, message: MessageEv):
             self.jid = message.Info.MessageSource.Chat
             self.id = self.jid.User
-            self.is_empty = message.Info.MessageSource.Sender.IsEmpty
+            self.is_empty = message.Info.MessageSource.Chat.IsEmpty
             self.is_group = message.Info.MessageSource.IsGroup
             self.server = self.jid.Server
 

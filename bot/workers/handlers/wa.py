@@ -1,4 +1,5 @@
 import io
+import itertools
 import random
 
 import torch
@@ -11,6 +12,7 @@ from bot.config import bot
 from bot.fun.quips import enquip, enquip4
 from bot.fun.stickers import ran_stick
 from bot.utils.bot_utils import png_to_jpg, turn, wait_for_turn, waiting_for_turn
+from bot.utils.db_utils import save2db2
 from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
     clean_reply,
@@ -193,7 +195,7 @@ async def upscale_image(event, args, client):
             )
             await wait_for_turn(turn_id)
         # async with heavy_proc_lock:
-        # Not happening with current Library
+        # Lock works now but eh i like the current implementation better 
         await status_msg.edit("*Upscaling please wait…*")
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model = RealESRGAN(device, scale=4)
@@ -228,6 +230,11 @@ async def pick_random(event, args, client):
         -s: Change delimiter, default="\\n" (new lines)
 
     """
+    if not user_is_owner(user):
+        if not pm_is_allowed(event):
+            return
+        if not user_is_allowed(user):
+            return
     try:
         if not event.quoted_text:
             return await event.reply(
@@ -260,3 +267,121 @@ def list_items(items, ini):
     for item in items:
         msg += f"*⁍* {item.strip()}\n"
     return msg
+
+
+async def list_notes(event, args, client):
+    """
+    Fetches the list of notes in a chat:
+    Arguments: [None]
+    """
+    try:
+        chat = event.chat.id
+        chat_name = (await bot.client.get_group_info(event.chat.jid)).GroupName.Name if event.chat.is_group else event.from_user.name
+        if not (notes := bot.notes_dict.get(chat)):
+            return await event.reply(f"*No notes found for chat: {chat_name}!*")
+        reply = await event.reply("_Fetching notes…_")
+        msg = f"*List of notes in {chat_name}*"
+        for i, title in zip(itertools.count(1), list(notes.keys())):
+            user = notes[title].get("user_name")
+            msg += f"\n{i}. *{title}*{f' added by *{user}*' if event.chat.is_group else str()}"
+
+        await reply.edit(msg)
+    except Exception:
+        await logger(Exception)
+        
+
+async def save_notes(event, args, client):
+    """
+    Saves a replied Text message to bot database;
+    Can be retrieved with get {note_name}
+    Argument:
+        note_name: name to save note as
+    """
+    user = event.from_user.id
+    if not user_is_owner(user):
+        if not pm_is_allowed(event):
+            return
+        if not user_is_allowed(user):
+            return
+    try:
+        if not event.quoted_text:
+            return await event.reply("Can only save replied text.")
+        chat = event.chat.id
+        if not bot.notes_dict.get(chat):
+            bot.notes_dict[chat] = {}
+        data = {
+            args: {
+                "user": user,
+                "user_name": event.from_user.name
+                "note": event.quoted_text
+            }
+            
+        }
+        bot.notes_dict[chat].update(data)
+        await save2db2(bot.notes_dict, "note")
+        await event.reply(f"*Saved replied messages to notes with name: {args}*")
+    except Exception:
+        await logger(Exception)
+
+
+async def get_notes(event, args, client):
+    """
+    Get saved notes;
+    Arguments:
+        None: Get all saved notes 
+        any: (note_name) Get a particular saved note
+    """
+    user = event.from_user.id
+    if not user_is_owner(user):
+        if not pm_is_allowed(event):
+            return
+        if not user_is_allowed(user):
+            return
+    try:
+        if not args:
+            return await list_notes(event, args, client)
+        chat = event.chat.id
+        chat_name = (await bot.client.get_group_info(event.chat.jid)).GroupName.Name if event.chat.is_group else event.from_user.name
+        if not bot.notes_dict.get(chat):
+            return await event.reply(f"*No notes found for chat: {chat_name}!*")
+        notes = bot.notes_dict[chat]
+        if not (u_note := notes.get(args)):
+            return await event.reply(f"*Notes with name: {args} not found in {chat_name}!*")
+        user, note = u_note.get("user"), u_note.get("note")
+        msg = note + f"\n\nBy: @{user}"
+        return await clean_reply(event, event.reply_to_message, "reply", msg)
+    except Exception:
+        await logger(Exception)
+
+
+async def delete_notes(event, args, client):
+    """
+    Delete saved notes:
+    Arguments:
+        note_name: name of note to delete
+        all: (Owner) delete all notes for this chat
+    """
+    user = event.from_user.id
+    if not user_is_owner(user):
+        if not pm_is_allowed(event):
+            return
+        if not user_is_allowed(user):
+            return
+    try:
+        chat = event.chat.id
+        chat_name = (await bot.client.get_group_info(event.chat.jid)).GroupName.Name if event.chat.is_group else event.from_user.name
+        if not (notes := bot.notes_dict.get(chat)):
+            return await event.reply(f"*No notes found for chat: {chat_name}!*")
+        if args.casefold() == "all":
+            bot.notes_dict.pop(chat)
+            await save2db2(bot.notes_dict, "note")
+            return await event.reply(f"*Successfully removed all notes in {chat_name}*")
+        if not (u_note := notes.get(args)):
+            return await event.reply(f"*Notes with name: {args} not found in {chat_name}!*")
+        if not user_is_owner(user) and user != notes[args]["user"]:
+            return await event.reply("You can't delete this note; Most likely because *you* did not add it.")
+        notes.pop(args)
+        await save2db2(bot.notes_dict, "note")
+        return await event.reply(f"*Successfully removed note with title; {args}*")
+    except Exception:
+        await logger(Exception)

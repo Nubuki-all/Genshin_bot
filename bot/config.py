@@ -77,6 +77,7 @@ class Runtime_Config:
         self.paused = False
         self.gift_dict = {}
         self.p_queue = []
+        self.notes_dict = {}
         self.rss_dict = {}
         self.rss_ran_once = False
         self.version = None

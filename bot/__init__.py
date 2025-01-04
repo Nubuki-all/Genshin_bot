@@ -57,6 +57,7 @@ local_gdb = ".local_giftdb.pkl"
 local_rdb = ".local_rssdb.pkl"
 local_budb = ".banned_users.pkl"
 local_enkadb = ".local_enkadb.pkl"
+local_ndb = ".local_notedb.pkl"
 log_file_name = "logs.txt"
 rss_dict_lock = asyncio.Lock()
 uptime = time.time()

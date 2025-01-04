@@ -63,14 +63,16 @@ if conf.DATABASE_URL:
     rssdb = db["rss"]
     userdb = db["users"]
     miscdb = db["misc"]
+    nfdb = db["note_filter"]
 
     load_db(userdb, "banned_users", bot.banned, "list")
     load_db(miscdb, "gift", bot.gift_dict, "dict")
+    load_db(nfdb, "note", bot.notes_dict, "dict")
     load_db(rssdb, "rss", bot.rss_dict, "dict")
 
 
 else:
-    rssdb = userdb = miscdb = None
+    rssdb = userdb = miscdb = nfdb = None
 
     load_local_db()
 
