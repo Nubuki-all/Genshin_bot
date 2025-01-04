@@ -79,7 +79,9 @@ class Event:
         # To do expand quoted; has members [stanzaID, participant,
         # quotedMessage.conversation]
         self.quoted = self.ext_msg.contextInfo if add_replied else None
-        if self.quoted.quotedMessage.documentWithCaptionMessage.message.documentMessage.URL:
+        if (
+            self.quoted.quotedMessage.documentWithCaptionMessage.message.documentMessage.URL
+        ):
             self.quoted_document = self.quoted.quotedMessage.documentWithCaptionMessage
         if self.quoted.quotedMessage.documentMessage.URL:
             self.quoted_document = self.quoted.quotedMessage.documentMessage
