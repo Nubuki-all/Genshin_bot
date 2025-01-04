@@ -441,6 +441,7 @@ async def delete_notes(event, args, client):
     except Exception:
         await logger(Exception)
 
+
 async def get_notes2(event, args, client):
     """
     Alias for get_notes
@@ -453,7 +454,7 @@ async def get_notes2(event, args, client):
         chat = event.chat.id
         if not (notes := bot.notes_dict.get(chat)):
             return
-        if (note := notes.get(event.text[1:])):
+        if note := notes.get(event.text[1:]):
             return await get_notes(event, event.text[1:], None)
-    except  Exception:
+    except Exception:
         await logger(Exception)
