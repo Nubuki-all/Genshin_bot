@@ -3,7 +3,6 @@ import io
 import itertools
 import random
 
-import aiohttp
 from aiohttp_retry import ExponentialRetry, RetryClient
 from bs4 import BeautifulSoup
 from encard import encard, update_namecard
@@ -68,7 +67,6 @@ async def async_dl(url, retries=5):
         await asyncio.sleep(5)
         return await async_dl(url, retries)
     return await result.content.read()
-
 
 
 async def enka_update():
