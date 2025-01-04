@@ -12,6 +12,7 @@ from enkacard import enc_error, encbanner
 from enkanetwork import EnkaNetworkAPI, Language
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
+from bot import bot
 from .log_utils import logger
 
 uri = "https://genshin-db-api.vercel.app/api/v5/{}?query={}&dumpResult=true"
@@ -67,6 +68,7 @@ async def async_dl(url, retries=5):
         await asyncio.sleep(5)
         return await async_dl(url, retries)
     return await result.content.read()
+
 
 
 async def enka_update():
