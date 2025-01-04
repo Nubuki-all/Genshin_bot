@@ -32,8 +32,11 @@ from .workers.handlers.manage import (
 )
 from .workers.handlers.stuff import getcmds, getmeme, hello
 from .workers.handlers.wa import (
+    delete_notes,
+    get_notes,
     pick_random,
     sanitize_url,
+    save_notes,
     sticker_reply,
     stickerize_image,
     upscale_image,
@@ -107,6 +110,21 @@ async def _(client: NewAClient, message: Event):
 @bot.register("events")
 async def _(client: NewAClient, message: Event):
     await event_handler(message, get_events)
+
+
+@bot.register("save")
+async def _(client: NewAClient, message: Event):
+    await event_handler(message, save_notes, require_args=True)
+
+
+@bot.register("get")
+async def _(client: NewAClient, message: Event):
+    await event_handler(message, get_notes)
+
+
+@bot.register("del_note")
+async def _(client: NewAClient, message: Event):
+    await event_handler(message, delete_notes, require_args=True)
 
 
 @bot.register("sanitize")
