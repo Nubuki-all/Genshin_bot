@@ -13,7 +13,13 @@ from urlextract import URLExtract
 from bot.config import bot
 from bot.fun.quips import enquip, enquip4
 from bot.fun.stickers import ran_stick
-from bot.utils.bot_utils import png_to_jpg, split_text, turn, wait_for_turn, waiting_for_turn
+from bot.utils.bot_utils import (
+    png_to_jpg,
+    split_text,
+    turn,
+    wait_for_turn,
+    waiting_for_turn,
+)
 from bot.utils.db_utils import save2db2
 from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
@@ -294,7 +300,11 @@ async def list_notes(event, args, client):
 
         chain_reply = None
         for text in split_text(msg):
-            chain_reply = await reply.edit(txt) if not chain_reply else await chain_reply.reply(txt)
+            chain_reply = (
+                await reply.edit(txt)
+                if not chain_reply
+                else await chain_reply.reply(txt)
+            )
             await asyncio.sleep(2)
     except Exception:
         await logger(Exception)
