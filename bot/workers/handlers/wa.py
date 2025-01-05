@@ -301,9 +301,9 @@ async def list_notes(event, args, client):
         chain_reply = None
         for text in split_text(msg):
             chain_reply = (
-                await reply.edit(txt)
+                await reply.edit(text)
                 if not chain_reply
-                else await chain_reply.reply(txt)
+                else await chain_reply.reply(text)
             )
             await asyncio.sleep(2)
     except Exception:
