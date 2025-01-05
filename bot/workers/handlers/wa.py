@@ -334,7 +334,7 @@ async def save_notes(event, args, client):
         elif event.quoted_msg:
             note = event.quoted_msg
             note_type = Message
-        chat = event.chat.id
+        event.chat.id
         data = {
             args: {
                 "user": user,
