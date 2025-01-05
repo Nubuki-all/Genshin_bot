@@ -1,3 +1,4 @@
+import copy
 import io
 import itertools
 import random
@@ -392,7 +393,9 @@ async def get_notes(event, args, client):
                 (note[1] + f"\n\nBy: @{user}").lstrip("\n"),
             )
         elif note_type == Message:
-            note.caption += f"\n\nBy: @{user}".lstrip("\n")
+            note = copy.deepcopy(note)
+            newlines = '\n\n'
+            note.caption += f"{ newlines if note.caption else str()}By: @{user}"
             note.contextInfo.mentionedJID.append(f"{user}@s.whatsapp.net")
             return await clean_reply(
                 event, event.reply_to_message, "reply", message=note
