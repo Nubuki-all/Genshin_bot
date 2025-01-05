@@ -79,7 +79,7 @@ class Event:
         # To do expand quoted; has members [stanzaID, participant,
         # quotedMessage.conversation]
         self.quoted = self.ext_msg.contextInfo if add_replied else None
-        self.quoted_document = self.quoted_image = self.quoted_video = None
+        self.quoted_document = self.quoted_image = self.quoted_video = self.quoted_viewonce = None
         if self.quoted:
             if (
                 self.quoted.quotedMessage.documentWithCaptionMessage.message.documentMessage.URL
@@ -99,6 +99,10 @@ class Event:
                 if self.quoted.quotedMessage.videoMessage.URL
                 else None
             )
+            self.quoted_viewonce_ = self.quoted.quotedMessage.viewOnceMessageV2.message
+            self.quoted_viewonce = self.quoted_viewonce_.imageMessage or self.quoted_viewonce_.videoMessage
+            self.quoted_viewonce = None if not self.quoted_viewonce.URL else self.quoted_viewonce
+            
         self.quoted_text = (
             (
                 self.quoted.quotedMessage.conversation
@@ -112,6 +116,7 @@ class Event:
             or self.quoted_document
             or self.quoted_image
             or self.quoted_video
+            or self.quoted_viewonce
         )
         self.reply_to_message = self.get_quoted_msg()
         self.outgoing = message.Info.MessageSource.IsFromMe

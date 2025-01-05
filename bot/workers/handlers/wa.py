@@ -402,6 +402,8 @@ async def get_notes(event, args, client):
             newlines = "\n\n"
             note.caption += f"{ newlines if note.caption else str()}By: @{user}"
             note.contextInfo.mentionedJID.append(f"{user}@s.whatsapp.net")
+            if hasattr(note, "viewOnce"):
+                note.viewOnce = False
             return await clean_reply(
                 event, event.reply_to_message, "reply", message=note
             )
