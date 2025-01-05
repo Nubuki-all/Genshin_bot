@@ -1,3 +1,4 @@
+import asyncio
 import copy
 import io
 import itertools
@@ -12,7 +13,7 @@ from urlextract import URLExtract
 from bot.config import bot
 from bot.fun.quips import enquip, enquip4
 from bot.fun.stickers import ran_stick
-from bot.utils.bot_utils import png_to_jpg, turn, wait_for_turn, waiting_for_turn
+from bot.utils.bot_utils import png_to_jpg, split_text, turn, wait_for_turn, waiting_for_turn
 from bot.utils.db_utils import save2db2
 from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
@@ -291,7 +292,10 @@ async def list_notes(event, args, client):
             user = notes[title].get("user_name")
             msg += f"\n{i}. *{title}*{f' added by *{user}*' if event.chat.is_group else str()}"
 
-        await reply.edit(msg)
+        chain_reply = None
+        for text in split_text(msg):
+            chain_reply = await reply.edit(txt) if not chain_reply else await chain_reply.reply(txt)
+            await asyncio.sleep(2)
     except Exception:
         await logger(Exception)
 
@@ -313,6 +317,8 @@ async def save_notes(event, args, client):
     try:
         if not event.quoted_msg:
             return await event.reply("Can only save replied text or media.")
+        if args.casefold() in ("all", "notes"):
+            return await event.reply(f"Given note_name *{args}* is blocked.")
         if not bot.notes_dict.get(chat):
             bot.notes_dict[chat] = {}
         if (notes := bot.notes_dict[chat]).get(args):
@@ -320,6 +326,7 @@ async def save_notes(event, args, client):
                 return await event.reply(
                     f"Note with name '{args}' already exists and can't be overwritten; Most likely because *you* did not add it."
                 )
+        status_msg = await event.reply("…")
         # note gen:
         note_type = str
         if event.quoted_text:
@@ -345,7 +352,7 @@ async def save_notes(event, args, client):
         }
         notes.update(data)
         await save2db2(bot.notes_dict, "note")
-        await event.reply(f"_Saved replied message to notes with name:_ *{args}*")
+        await status_msg.edit(f"_Saved replied message to notes with name:_ *{args}*")
     except Exception:
         await logger(Exception)
 
@@ -366,7 +373,7 @@ async def get_notes(event, args, client):
         if not user_is_allowed(user):
             return
     try:
-        if not args:
+        if not args or (args and args.casefold() == "all"):
             return await list_notes(event, args, client)
         chat = event.chat.id
         chat_name = (
@@ -466,6 +473,8 @@ async def get_notes2(event, args, client):
         chat = event.chat.id
         if not (notes := bot.notes_dict.get(chat)):
             return
+        if event.text[1:].casefold() == "notes":
+            return await get_notes(event, None, None)
         if note := notes.get(event.text[1:]):
             return await get_notes(event, event.text[1:], None)
     except Exception:
