@@ -303,6 +303,7 @@ async def save_notes(event, args, client):
     Argument:
         note_name: name to save note as
     """
+    chat = event.chat.id
     user = event.from_user.id
     if not user_is_owner(user):
         if not pm_is_allowed(event):
@@ -334,7 +335,6 @@ async def save_notes(event, args, client):
         elif event.quoted_msg:
             note = event.quoted_msg
             note_type = Message
-        event.chat.id
         data = {
             args: {
                 "user": user,
