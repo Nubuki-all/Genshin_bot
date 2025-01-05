@@ -345,7 +345,7 @@ async def save_notes(event, args, client):
         }
         notes.update(data)
         await save2db2(bot.notes_dict, "note")
-        await event.reply(f"_Saved replied messages to notes with name:_ *{args}*")
+        await event.reply(f"_Saved replied message to notes with name:_ *{args}*")
     except Exception:
         await logger(Exception)
 
