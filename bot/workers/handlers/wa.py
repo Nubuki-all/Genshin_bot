@@ -379,7 +379,7 @@ async def get_notes(event, args, client):
         notes = bot.notes_dict[chat]
         if not (u_note := notes.get(args)):
             return await event.reply(
-                f"Notes with name: *{args}* not found in *{chat_name}*!"
+                f"Note with name: *{args}* not found in *{chat_name}*!"
             )
         user, note, note_type = (
             u_note.get("user"),
@@ -439,7 +439,7 @@ async def delete_notes(event, args, client):
             )
         if not (u_note := notes.get(args)):
             return await event.reply(
-                f"Notes with name: *{args}* not found in *{chat_name}!*"
+                f"Note with name: *{args}* not found in *{chat_name}!*"
             )
         if not user_is_owner(user) and user != notes[args]["user"]:
             return await event.reply(
