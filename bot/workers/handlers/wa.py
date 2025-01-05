@@ -394,7 +394,7 @@ async def get_notes(event, args, client):
             )
         elif note_type == Message:
             note = copy.deepcopy(note)
-            newlines = '\n\n'
+            newlines = "\n\n"
             note.caption += f"{ newlines if note.caption else str()}By: @{user}"
             note.contextInfo.mentionedJID.append(f"{user}@s.whatsapp.net")
             return await clean_reply(
