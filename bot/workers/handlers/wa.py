@@ -434,7 +434,9 @@ async def delete_notes(event, args, client):
         if args.casefold() == "all":
             bot.notes_dict.pop(chat)
             await save2db2(bot.notes_dict, "note")
-            return await event.reply(f"_Successfully removed all notes in_ *{chat_name}*")
+            return await event.reply(
+                f"_Successfully removed all notes in_ *{chat_name}*"
+            )
         if not (u_note := notes.get(args)):
             return await event.reply(
                 f"Notes with name: *{args}* not found in *{chat_name}!*"
