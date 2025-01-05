@@ -345,7 +345,7 @@ async def save_notes(event, args, client):
         }
         notes.update(data)
         await save2db2(bot.notes_dict, "note")
-        await event.reply(f"*Saved replied messages to notes with name: {args}*")
+        await event.reply(f"_Saved replied messages to notes with name:_ *{args}*")
     except Exception:
         await logger(Exception)
 
@@ -375,11 +375,11 @@ async def get_notes(event, args, client):
             else event.from_user.name
         )
         if not bot.notes_dict.get(chat):
-            return await event.reply(f"*No notes found for chat: {chat_name}!*")
+            return await event.reply(f"_No notes found for chat:_ *{chat_name}*!")
         notes = bot.notes_dict[chat]
         if not (u_note := notes.get(args)):
             return await event.reply(
-                f"*Notes with name: {args} not found in {chat_name}!*"
+                f"Notes with name: *{args}* not found in *{chat_name}*!"
             )
         user, note, note_type = (
             u_note.get("user"),
@@ -430,14 +430,14 @@ async def delete_notes(event, args, client):
             else event.from_user.name
         )
         if not (notes := bot.notes_dict.get(chat)):
-            return await event.reply(f"*No notes found for chat: {chat_name}!*")
+            return await event.reply(f"_No notes found for chat:_ *{chat_name}*!")
         if args.casefold() == "all":
             bot.notes_dict.pop(chat)
             await save2db2(bot.notes_dict, "note")
-            return await event.reply(f"*Successfully removed all notes in {chat_name}*")
+            return await event.reply(f"_Successfully removed all notes in_ *{chat_name}*")
         if not (u_note := notes.get(args)):
             return await event.reply(
-                f"*Notes with name: {args} not found in {chat_name}!*"
+                f"Notes with name: *{args}* not found in *{chat_name}!*"
             )
         if not user_is_owner(user) and user != notes[args]["user"]:
             return await event.reply(
@@ -445,7 +445,7 @@ async def delete_notes(event, args, client):
             )
         notes.pop(args)
         await save2db2(bot.notes_dict, "note")
-        return await event.reply(f"*Successfully removed note with title; {args}*")
+        return await event.reply(f"_Successfully removed note with title:_ *{args}*")
     except Exception:
         await logger(Exception)
 
