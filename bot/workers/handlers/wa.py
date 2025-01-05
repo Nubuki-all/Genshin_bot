@@ -452,9 +452,7 @@ async def delete_notes(event, args, client):
             return await event.reply(f"_No notes found for chat:_ *{chat_name}*!")
         if args.casefold() == "all":
             if not user_is_owner(user) and event.chat.is_group:
-                return await event.reply(
-                f"*Permission denied.*"
-                )
+                return await event.reply(f"*Permission denied.*")
             bot.notes_dict.pop(chat)
             await save2db2(bot.notes_dict, "note")
             return await event.reply(
