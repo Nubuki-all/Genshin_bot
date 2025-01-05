@@ -312,6 +312,13 @@ async def save_notes(event, args, client):
     try:
         if not event.quoted_msg:
             return await event.reply("Can only save replied text or media.")
+        if not bot.notes_dict.get(chat):
+            bot.notes_dict[chat] = {}
+        if (notes := bot.notes_dict[chat]).get(args):
+            if not user_is_owner(user) and user != notes[args]["user"]:
+                return await event.reply(
+                    f"Note with name '{args}' already exists and can't be overwritten; Most likely because *you* did not add it."
+                )
         # note gen:
         note_type = str
         if event.quoted_text:
@@ -328,8 +335,6 @@ async def save_notes(event, args, client):
             note = event.quoted_msg
             note_type = Message
         chat = event.chat.id
-        if not bot.notes_dict.get(chat):
-            bot.notes_dict[chat] = {}
         data = {
             args: {
                 "user": user,
@@ -338,7 +343,7 @@ async def save_notes(event, args, client):
                 "note_type": note_type,
             }
         }
-        bot.notes_dict[chat].update(data)
+        notes.update(data)
         await save2db2(bot.notes_dict, "note")
         await event.reply(f"*Saved replied messages to notes with name: {args}*")
     except Exception:
