@@ -6,6 +6,7 @@ from neonize.aioze.client import NewAClient
 from neonize.events import event
 from neonize.utils import log
 
+
 async def gen():
 
     def interrupted(*_):
@@ -21,10 +22,7 @@ async def gen():
     await client.PairPhone(
         PH_NUMBER,
         show_push_notification=True,
-        )
-
-
-
+    )
 
 
 try:
