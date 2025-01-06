@@ -92,13 +92,7 @@ async def getcmds(event, args, client):
 {pre}codes - *Get lastest giftcodes*
 {pre}events - *Get current and upcoming events*
 {pre}sanitize - *Sanitize link or message*
-{pre}sticker - *Turns images to stickers*
-{pre}get - *Get previously saved item*
-{pre}save - *Save a replied text/media*
-{pre}del_note - *Delete a saved item*
-{pre}random - *Get a random choice*
 {pre}rchallenge - *Get a random boss challenge card*
-{pre}upscale - {'*Upscale replied image*' if not bot.disable_cic else '_Currently not available!_'}
 {pre}bash - *[Dev.] Run bash commands*
 {pre}eval - *[Dev.] Evaluate python commands*
 {pre}rss - *[Owner] Setup bot to auto post RSS feeds*

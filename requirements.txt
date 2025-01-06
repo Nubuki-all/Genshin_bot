@@ -16,7 +16,6 @@ git+https://github.com/Nubuki-all/EnkaCard
 git+https://github.com/Nubuki-all/ENCard
 git+https://github.com/Nubuki-all/enka-card
 git+https://github.com/Nubuki-all/neonize@patch-1
-git+https://github.com/Nubuki-all/Real-ESRGAN
 #Snyk pins 
 certifi>=2023.7.22 # not directly required, pinned by Snyk to avoid a vulnerability
 dnspython>=2.6.0rc1 # not directly required, pinned by Snyk to avoid a vulnerability

@@ -113,44 +113,15 @@ async def _(client: NewAClient, message: Event):
     await event_handler(message, get_events)
 
 
-@bot.register("save")
-async def _(client: NewAClient, message: Event):
-    await event_handler(message, save_notes, require_args=True)
-
-
-@bot.register("get")
-async def _(client: NewAClient, message: Event):
-    await event_handler(message, get_notes)
-
-
-@bot.register("del_note")
-async def _(client: NewAClient, message: Event):
-    await event_handler(message, delete_notes, require_args=True)
-
-
 @bot.register("sanitize")
 async def _(client: NewAClient, message: Event):
     await event_handler(message, sanitize_url)
-
-
-@bot.register("sticker")
-async def _(client: NewAClient, message: Event):
-    await event_handler(message, stickerize_image)
-
-
-@bot.register("random")
-async def _(client: NewAClient, message: Event):
-    await event_handler(message, pick_random)
 
 
 @bot.register("rchallenge")
 async def _(client: NewAClient, message: Event):
     await event_handler(message, random_challenge)
 
-
-@bot.register("upscale")
-async def _(client: NewAClient, message: Event):
-    await event_handler(message, upscale_image)
 
 
 @bot.register("rss")
@@ -167,15 +138,6 @@ async def _(client: NewAClient, message: Event):
 async def _(client: NewAClient, message: Event):
     await event_handler(message, restart_handler)
 
-
-@bot.register(None)
-async def _(client: NewAClient, message: Event):
-    await sticker_reply(message, None, client)
-
-
-@bot.register(None)
-async def _(client: NewAClient, message: Event):
-    await get_notes2(message, None, client)
 
 
 @bot.client.event(MessageEv)

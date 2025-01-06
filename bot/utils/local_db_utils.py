@@ -17,11 +17,6 @@ def load_local_db():
             local_dict = pickle.load(file)
         bot.gift_dict.update(local_dict)
 
-    if file_exists(local_ndb):
-        with open(local_ndb, "rb") as file:
-            local_dict = pickle.load(file)
-        bot.notes_dict.update(local_dict)
-
     if file_exists(local_budb):
         with open(local_budb, "rb") as file:
             local_b_users = pickle.load(file)
@@ -40,9 +35,6 @@ def save2db_lcl2(db):
     elif db == "gift":
         with open(local_gdb, "wb") as file:
             pickle.dump(bot.gift_dict, file)
-    elif db == "note":
-        with open(local_ndb, "wb") as file:
-            pickle.dump(bot.notes_dict, file)
 
 
 def load_enka_db():
