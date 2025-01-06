@@ -1,37 +1,13 @@
-import asyncio
-import copy
-import io
-import itertools
-import random
-
-import torch
 from clean_links.clean import clean_url
-from PIL import Image
-from RealESRGAN import RealESRGAN
 from urlextract import URLExtract
 
-from bot.config import bot
-from bot.fun.quips import enquip, enquip4
-from bot.fun.stickers import ran_stick
-from bot.utils.bot_utils import (
-    png_to_jpg,
-    split_text,
-    turn,
-    wait_for_turn,
-    waiting_for_turn,
-)
-from bot.utils.db_utils import save2db2
 from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
-    Message,
     clean_reply,
-    download_replied_media,
-    get_args,
     pm_is_allowed,
     user_is_allowed,
     user_is_owner,
 )
-
 
 
 async def sanitize_url(event, args, client):
@@ -78,5 +54,3 @@ async def sanitize_url(event, args, client):
     finally:
         if status_msg:
             await status_msg.delete()
-
-

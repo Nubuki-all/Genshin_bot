@@ -31,17 +31,7 @@ from .workers.handlers.manage import (
     update_handler,
 )
 from .workers.handlers.stuff import getcmds, getmeme, hello
-from .workers.handlers.wa import (
-    delete_notes,
-    get_notes,
-    get_notes2,
-    pick_random,
-    sanitize_url,
-    save_notes,
-    sticker_reply,
-    stickerize_image,
-    upscale_image,
-)
+from .workers.handlers.wa import sanitize_url
 
 
 @bot.client.event(ConnectedEv)
@@ -123,7 +113,6 @@ async def _(client: NewAClient, message: Event):
     await event_handler(message, random_challenge)
 
 
-
 @bot.register("rss")
 async def _(client: NewAClient, message: Event):
     await event_handler(message, rss_handler, require_args=True)
@@ -137,7 +126,6 @@ async def _(client: NewAClient, message: Event):
 @bot.register("restart")
 async def _(client: NewAClient, message: Event):
     await event_handler(message, restart_handler)
-
 
 
 @bot.client.event(MessageEv)
