@@ -104,10 +104,10 @@ async def enka_handler(event, args, client):
         unknowns = unknown.split()
         invalid = str()
         for unkwn in unknowns:
-            invalid += f"{unkwn} "
             if unkwn.isdigit():
                 uid = unkwn
                 break
+            invalid += f"{unkwn} "
         else:
             uid = None
         invalid = invalid.rstrip()
