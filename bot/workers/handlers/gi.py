@@ -101,7 +101,7 @@ async def enka_handler(event, args, client):
             to_parse=args,
             get_unknown=True,
         )
-        unknowns =  unknown.split()
+        unknowns = unknown.split()
         invalid = str()
         for unkwn in unknowns:
             invalid += f"{unkwn} "
@@ -170,7 +170,11 @@ async def enka_handler(event, args, client):
                     if not card.isdigit()
                     else None
                 )
-                info = await get_character_info_fallback(card) if card.casefold() != "traveler" else info
+                info = (
+                    await get_character_info_fallback(card)
+                    if card.casefold() != "traveler"
+                    else info
+                )
             if not info:
                 return await event.reply(
                     f"*Character not found.*\nYou searched for {card}.\nNot what you searched for?\nTry again with double quotes"
