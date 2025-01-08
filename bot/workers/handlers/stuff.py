@@ -114,6 +114,7 @@ async def hello(event, args, client):
     except Exception:
         await logger(Exception)
 
+
 async def up(event, args, client):
     """ping bot!"""
     user = event.from_user.id
