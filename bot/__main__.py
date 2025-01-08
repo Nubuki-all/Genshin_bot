@@ -30,7 +30,7 @@ from .workers.handlers.manage import (
     rss_handler,
     update_handler,
 )
-from .workers.handlers.stuff import getcmds, getmeme, hello
+from .workers.handlers.stuff import getcmds, getmeme, hello, up
 from .workers.handlers.wa import sanitize_url
 
 
@@ -65,7 +65,7 @@ async def _(client: NewAClient, message: Event):
 
 @bot.register("eval")
 async def _(client: NewAClient, message: Event):
-    await event_handler(message, eval_message, require_args=True)
+    await event_handler(message, eval_message, bot.client, require_args=True)
 
 
 @bot.register("bash")
@@ -116,6 +116,11 @@ async def _(client: NewAClient, message: Event):
 @bot.register("rss")
 async def _(client: NewAClient, message: Event):
     await event_handler(message, rss_handler, require_args=True)
+
+
+@bot.register("ping")
+async def _(client: NewAClient, message: Event):
+    await event_handler(message, up)
 
 
 @bot.register("update")

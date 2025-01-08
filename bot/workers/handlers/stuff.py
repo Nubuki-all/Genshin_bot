@@ -1,3 +1,5 @@
+from datetime import datetime as dt
+
 from bot.config import bot, conf
 from bot.utils.bot_utils import get_json
 from bot.utils.log_utils import logger
@@ -93,6 +95,7 @@ async def getcmds(event, args, client):
 {pre}events - *Get current and upcoming events*
 {pre}sanitize - *Sanitize link or message*
 {pre}rchallenge - *Get a random boss challenge card*
+{pre}ping - *Check if bot is alive*
 {pre}bash - *[Dev.] Run bash commands*
 {pre}eval - *[Dev.] Evaluate python commands*
 {pre}rss - *[Owner] Setup bot to auto post RSS feeds*
@@ -110,3 +113,22 @@ async def hello(event, args, client):
         await event.reply("Hi!")
     except Exception:
         await logger(Exception)
+
+async def up(event, args, client):
+    """ping bot!"""
+    user = event.from_user.id
+    if not user_is_owner(user):
+        if not pm_is_allowed(event):
+            return
+        if not user_is_allowed(user):
+            return
+    ist = dt.now()
+    msg = await event.reply("…")
+    st = dt.now()
+    ims = (st - ist).microseconds / 1000
+    msg1 = "*Pong! ——* _{}ms_"
+    st = dt.now()
+    await msg.edit(msg1.format(ims))
+    ed = dt.now()
+    ms = (ed - st).microseconds / 1000
+    await msg.edit(f"1. {msg1.format(ims)}\n2. {msg1.format(ms)}")
