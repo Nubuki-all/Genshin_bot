@@ -79,7 +79,7 @@ async def enka_handler(event, args, client):
         if not user_is_allowed(user):
             return
     try:
-        arg, args = get_args(
+        arg, unknown = get_args(
             ["--hide_uid", "store_true"],
             ["--no_top", "store_false"],
             ["--update", "store_true"],
@@ -101,6 +101,16 @@ async def enka_handler(event, args, client):
             to_parse=args,
             get_unknown=True,
         )
+        unknowns =  unknown.split()
+        invalid = str()
+        for unkwn in unknowns:
+            invalid += f"{unkwn} "
+            if unkwn.isdigit():
+                uid = unkwn
+                break
+        else:
+            uid = None
+        invalid = invalid.rstrip()
         card = arg.c or arg.card or arg.character
         cards = arg.cs or arg.cards or arg.characters
         dump = arg.d or arg.dump
@@ -116,9 +126,15 @@ async def enka_handler(event, args, client):
             await u_reply.delete()
         if not (card or cards or dump or prof or list_):
             return await event.reply(getdoc(enka_handler))
+        if not uid:
+            if invalid:
+                await event.reply(f"*{invalid}?*")
+            return await event.reply(f"*Please supply a UID*")
+        if invalid:
+            await event.reply(f"*Warning:* No idea what '{invalid}' means.")
         if arg.t not in ("1", "2"):
             arg.t = 1
-        profile, error = await get_enka_profile(args)
+        profile, error = await get_enka_profile(uid)
         if error:
             result = profile
             return
@@ -130,9 +146,9 @@ async def enka_handler(event, args, client):
         status = await event.reply("*Fetching card(s), Please Wait…*")
         if prof:
             cprofile, error = (
-                await get_enka_profile(args, card=True, template=arg.t)
+                await get_enka_profile(uid, card=True, template=arg.t)
                 if not arg.v2
-                else await get_enka_profile2(args, huid=arg.hide_uid)
+                else await get_enka_profile2(uid, huid=arg.hide_uid)
             )
             if error:
                 return
@@ -154,19 +170,19 @@ async def enka_handler(event, args, client):
                     if not card.isdigit()
                     else None
                 )
-                info = await get_character_info_fallback(card)
+                info = await get_character_info_fallback(card) if card.casefold() != "traveler" else info
             if not info:
                 return await event.reply(
                     f"*Character not found.*\nYou searched for {card}.\nNot what you searched for?\nTry again with double quotes"
                 )
             char_id = info.get("id")
             if arg.v2:
-                result, error = await get_enka_card2(args, char_id, arg.hide_uid)
+                result, error = await get_enka_card2(uid, char_id, arg.hide_uid)
             elif arg.v3:
-                result, error = await get_enka_card3(args, char_id)
+                result, error = await get_enka_card3(uid, char_id)
             else:
                 result, error = await get_enka_card(
-                    args, char_id, akasha=akasha, huid=arg.hide_uid, template=arg.t
+                    uid, char_id, akasha=akasha, huid=arg.hide_uid, template=arg.t
                 )
             if error:
                 return
@@ -202,12 +218,12 @@ async def enka_handler(event, args, client):
                 return await event.reply(error_txt)
             ids = ids.strip(",")
             if arg.v2:
-                result, error = await get_enka_card2(args, ids, huid=arg.hide_uid)
+                result, error = await get_enka_card2(uid, ids, huid=arg.hide_uid)
             elif arg.v3:
-                result, error = await get_enka_card3(args, ids)
+                result, error = await get_enka_card3(uid, ids)
             else:
                 result, error = await get_enka_card(
-                    args, ids, akasha=akasha, huid=arg.hide_uid, template=arg.t
+                    uid, ids, akasha=akasha, huid=arg.hide_uid, template=arg.t
                 )
             if error:
                 return
@@ -224,12 +240,12 @@ async def enka_handler(event, args, client):
             return await send_multi_cards(event, reply, result, profile)
         if dump:
             if arg.v2:
-                result, error = await get_enka_card2(args, str(), huid=arg.hide_uid)
+                result, error = await get_enka_card2(uid, str(), huid=arg.hide_uid)
             elif arg.v3:
-                result, error = await get_enka_card3(args, str())
+                result, error = await get_enka_card3(uid, str())
             else:
                 result, error = await get_enka_card(
-                    args, None, akasha=akasha, huid=arg.hide_uid, template=arg.t
+                    uid, None, akasha=akasha, huid=arg.hide_uid, template=arg.t
                 )
             if error:
                 return
