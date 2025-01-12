@@ -639,7 +639,7 @@ async def random_challenge(event, args, client):
                 await status.edit("*Retrying…*")
                 return await random_challenge(event, None, client)
             other_chars = await fetch_random_character(3, exclude=spec_char)
-            characters = [spec_char].extend(other_chars)
+            (characters := [spec_char]).extend(other_chars)
         else:
             characters = await fetch_random_character()
         if not characters:
