@@ -635,9 +635,7 @@ async def random_challenge(event, args, client):
         if args:
             spec_char = await get_gi_info(query=args)
             if not spec_char:
-                await event.reply(
-                    f"*Character with name '{args}' not found.*"
-                )
+                await event.reply(f"*Character with name '{args}' not found.*")
                 await status.edit("*Retrying…*")
                 return await random_challenge(event, None, client)
             other_chars = await fetch_random_character(3, exclude=spec_char)
