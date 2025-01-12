@@ -607,9 +607,11 @@ def get_rewards(rewards):
 async def random_challenge(event, args, client):
     """
     Generates a completely random boss challenge;
-    No arguments are required
+    Argument:
+        A character to guarantee inclusion in challenge.
     """
     e = None
+    spec_char = None
     status = None
     user = event.from_user.id
     if not user_is_owner(user):
@@ -630,7 +632,18 @@ async def random_challenge(event, args, client):
         await status.edit(
             f"*Generating random challenge:*\nFetching random boss: *{boss_name}*\nFetching random characters…"
         )
-        characters = await fetch_random_character()
+        if args:
+            spec_char = await get_gi_info(query=args)
+            if not spec_char:
+                await event.reply(
+                    f"*Character with name '{args}' not found.*"
+                )
+                await status.edit("*Retrying…*")
+                return await random_challenge(event, None, client)
+            other_chars = await fetch_random_character(3, exclude=spec_char)
+            characters = [spec_char].extend(other_chars)
+        else:
+            characters = await fetch_random_character()
         if not characters:
             e = "Couldn't fetch characters"
             return
