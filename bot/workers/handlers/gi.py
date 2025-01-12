@@ -694,12 +694,11 @@ async def random_challenge(event, args, client):
         await clean_reply(event, reply, "reply_photo", photo=final_img, caption=caption)
     except Exception as err:
         await logger(Exception)
+        await status.edit(f"*Error:*\n{err}")
+        status = None
+    finally:
         if e:
             await event.reply(e)
-        else:
-            await status.edit(f"*Error:*\n{err}")
-            status = None
-    finally:
         if status:
             await asyncio.sleep(3)
             await status.delete()
