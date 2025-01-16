@@ -318,28 +318,30 @@ class Event:
         return construct_event(msg, False)
 
 
-async def download_replied_media(quoted, mtype="image") -> bytes:
-    if mtype == "image":
-        item = quoted.quotedMessage.imageMessage
+async def download_replied_media(event) -> bytes:
+    if item := event.quoted_image:
+        mtype = "image"
         media_type = MediaType.MediaImage
-    elif mtype == "video":
-        item = quoted.quotedMessage.videoMessage
+    elif item := event.quoted_video:
+        mtype = "video"
         media_type = MediaType.MediaVideo
-    direct_path = item.directPath
-    enc_file_hash = item.fileEncSHA256
-    file_hash = item.fileSHA256
-    media_key = item.mediaKey
-    file_length = item.fileLength
-    mms_type = mtype
-    return await bot.client.download_media_with_path(
-        direct_path,
-        enc_file_hash,
-        file_hash,
-        media_key,
-        file_length,
-        media_type,
-        mms_type,
-    )
+    elif item := event.quoted_audio:
+        mtype = "audio"
+        media_type = MediaType.MediaAudio
+    elif item := event.quoted_document:
+        mtype = "document"
+        media_type = MediaType.MediaDocument
+    else:
+        raise Exception (
+        f"""Expected either:
+        ImageMessage
+        VideoMessage
+        AudioMessage
+        DocumentMessage
+        not {type(event.quoted_msg).__name__}
+        """
+        )
+
 
 
 def user_is_allowed(user: str | int):
