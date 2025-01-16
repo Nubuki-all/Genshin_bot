@@ -257,7 +257,7 @@ async def fetch_weapon_detail(weapon: dict, weapon_stats: dict) -> tuple:
                 if not i:
                     continue
                 if "/" in i:
-                    i = f"({i})" 
+                    i = f"({i})"
                 value += f"*{i}*/"
             key.append(value.rstrip("/"))
         effects = effects.format(*key)
