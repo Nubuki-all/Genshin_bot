@@ -1,10 +1,10 @@
 from pymongo.errors import ServerSelectionTimeoutError
 
 from bot import asyncio
-from bot.config import bot, conf
+from bot.config import conf
 from bot.startup.before import miscdb, pickle, rssdb, userdb
 
-from .bot_utils import list_to_str, sync_to_async
+from .bot_utils import sync_to_async
 from .local_db_utils import save2db_lcl2
 
 # i suck at using database -_-' (#3)

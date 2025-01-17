@@ -366,7 +366,9 @@ def user_is_admin(user: str, members: list):
 
 def user_is_allowed(user: str | int):
     user = str(user)
-    return not (bot.user_dict.get(user, {}).get("banned", False) or user in conf.BANNED_USERS)
+    return not (
+        bot.user_dict.get(user, {}).get("banned", False) or user in conf.BANNED_USERS
+    )
 
 
 def user_is_dev(user: str):
@@ -381,7 +383,7 @@ def user_is_owner(user: str | int):
 
 def user_is_sudoer(user: str | int):
     user = str(user)
-    return  bot.user_dict.get(user, {}).get("sudoer", False)
+    return bot.user_dict.get(user, {}).get("sudoer", False)
 
 
 def pm_is_allowed(event: Event):

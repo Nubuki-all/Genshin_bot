@@ -134,7 +134,9 @@ async def enka_handler(event, args, client):
                 await event.reply(f"*Warning:* This uid has  already been saved")
                 will_save = False
             elif prev_uid := bot.user_dict.get(user, {}).get("genshin_uid"):
-                await event.reply(f"*Info:* Overwriting previously saved uid: {prev_uid} with: {uid}…")
+                await event.reply(
+                    f"*Info:* Overwriting previously saved uid: {prev_uid} with: {uid}…"
+                )
             if will_save:
                 bot.user_dict.setdefault(user, {}).update(genshin_uid=uid)
                 await save2db2(bot.user_dict, "users")
