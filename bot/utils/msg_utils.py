@@ -479,7 +479,7 @@ async def parse_and_send_rss(data: dict, chat_ids: list = None):
                 tgh_link = (await post_to_tgph(title, content, author, url))["url"]
             except Exception:
                 await logger(Exception)
-            caption += f"\n\n*Telegraph:* {tgh_link}\n*Hoyolab:* {url}"
+            caption += f"\n\n- *Telegraph:* {tgh_link}\n- *Hoyolab:* {url}"
         expanded_chat = []
         for chat in chats:
             (
