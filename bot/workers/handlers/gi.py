@@ -150,7 +150,7 @@ async def enka_handler(event, args, client):
         if not uid:
             uid = bot.user_dict.get(user, {}).get("genshin_uid", None)
         if delete:
-            if not saved_uid := bot.user_dict.get(user, {}).get("genshin_uid"):
+            if not (saved_uid := bot.user_dict.get(user, {}).get("genshin_uid")):
                 await event.reply("*No saved uid was found to delete!*")
             else:
                 bot.user_dict.setdefault(user, {}).update(genshin_uid=None)
