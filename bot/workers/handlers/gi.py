@@ -57,6 +57,7 @@ async def enka_handler(event, args, client):
         -d or --dump: Dump all character build from the given uid
         -ls or --list: List all currently showcased characters
         -p or --profile: To get player card instead (v3 not supported)
+        -s or --save: Remember your uid
         --hide_uid: Hide uid in card
         --no_top: Remove akasha ranking from card
         --update: update library
@@ -97,6 +98,8 @@ async def enka_handler(event, args, client):
             ["-v3", "store_true"],
             ["-ls", "store_true"],
             ["--list", "store_true"],
+            ["-s", "store_true"],
+            ["--save", "store_true"],
             "-t",
             to_parse=args,
             get_unknown=True,
@@ -117,13 +120,30 @@ async def enka_handler(event, args, client):
         prof = arg.p or arg.profile
         akasha = arg.no_top
         reply = event.reply_to_message
+        save = arg.s or arg.save
+        vital_args = bool(card or cards or dump or prof or list_)
         if arg.update:
             u_reply = await event.reply("*Updating enka assets…*")
             await enka_update()
-            if not (card or cards or dump or prof):
+            if not vital_args:
                 return await u_reply.edit("Updated enka assets.")
             await u_reply.delete()
-        if not (card or cards or dump or prof or list_):
+        if uid and save:
+            will_save = True
+            if bot.user_dict.get(user, {}).get("genshin_uid") == uid:
+                await event.reply(f"*Warning:* This uid has  already been saved")
+                will_save = False
+            elif prev_uid := bot.user_dict.get(user, {}).get("genshin_uid"):
+                await event.reply(f"*Info:* Overwriting previously saved uid: {prev_uid} with: {uid}…")
+            if will_save:
+                bot.user_dict.setdefault(user, {}).update(genshin_uid=uid)
+                await save2db2(bot.user_dict, "users")
+                await event.reply("*Saved your uid successfully!*")
+            if not vital_args:
+                return
+        if not uid:
+            uid = bot.user_dict.get(user, {}).get("genshin_uid", None)
+        if not vital_args:
             return await event.reply(getdoc(enka_handler))
         if not uid:
             if invalid:

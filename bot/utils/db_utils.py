@@ -18,6 +18,7 @@ database = conf.DATABASE_URL
 db_cluster = {
     "gift": miscdb,
     "rss": rssdb,
+    "users": userdb,
 }
 
 
@@ -33,15 +34,9 @@ async def save2db(db, update, retries=3):
             await asyncio.sleep(0.5)
 
 
-async def save2db2(data: dict | str = False, db: str = None):
+async def save2db2(data: dict | str, db: str):
     if not database:
         return await sync_to_async(save2db_lcl2, db)
-    if data is False:
-        busers = list_to_str(bot.banned)
-        data = pickle.dumps(busers)
-        _update = {"banned_users": data}
-        await save2db(userdb, _update)
-        return
     p_data = pickle.dumps(data)
     _update = {db: p_data}
     await save2db(db_cluster.get(db), _update)

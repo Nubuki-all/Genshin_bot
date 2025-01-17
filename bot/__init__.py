@@ -55,7 +55,7 @@ from .config import bot, conf
 heavy_proc_lock = asyncio.Lock()
 local_gdb = ".local_giftdb.pkl"
 local_rdb = ".local_rssdb.pkl"
-local_budb = ".banned_users.pkl"
+local_udb = ".local_users.pkl"
 local_enkadb = ".local_enkadb.pkl"
 log_file_name = "logs.txt"
 rss_dict_lock = asyncio.Lock()
