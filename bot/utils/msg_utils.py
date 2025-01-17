@@ -341,6 +341,22 @@ async def download_replied_media(event) -> bytes:
         not {type(event.quoted_msg).__name__}
         """
         )
+    direct_path = item.directPath
+    enc_file_hash = item.fileEncSHA256
+    file_hash = item.fileSHA256
+    media_key = item.mediaKey
+    file_length = item.fileLength
+    mms_type = mtype
+    return await bot.client.download_media_with_path(
+        direct_path,
+        enc_file_hash,
+        file_hash,
+        media_key,
+        file_length,
+        media_type,
+        mms_type,
+    )
+
 
 
 def user_is_allowed(user: str | int):
@@ -453,7 +469,7 @@ async def parse_and_send_rss(data: dict, chat_ids: list = None):
         url = data.get("link")
         # auth_text = f" by {author}" if author else str()
         caption = f"*{title}*"
-        caption += f"\n`{summary or str()}`"
+        caption += f"\n> {summary}" if summary else str()
         if content:
             if len(content) > 65536:
                 content = (
