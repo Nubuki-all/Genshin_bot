@@ -57,6 +57,7 @@ async def enka_handler(event, args, client):
         -d or --dump: Dump all character build from the given uid
         -ls or --list: List all currently showcased characters
         -p or --profile: To get player card instead (v3 not supported)
+        -f or --delete: Forget your uid
         -s or --save: Remember your uid
         --hide_uid: Hide uid in card
         --no_top: Remove akasha ranking from card
@@ -100,6 +101,8 @@ async def enka_handler(event, args, client):
             ["--list", "store_true"],
             ["-s", "store_true"],
             ["--save", "store_true"],
+            ["-f", "store_true"],
+            ["--delete", "store_true"],
             "-t",
             to_parse=args,
             get_unknown=True,
@@ -120,6 +123,7 @@ async def enka_handler(event, args, client):
         prof = arg.p or arg.profile
         akasha = arg.no_top
         reply = event.reply_to_message
+        delete = arg.f or arg.delete
         save = arg.s or arg.save
         vital_args = bool(card or cards or dump or prof or list_)
         if arg.update:
@@ -145,6 +149,15 @@ async def enka_handler(event, args, client):
                 return
         if not uid:
             uid = bot.user_dict.get(user, {}).get("genshin_uid", None)
+        if delete:
+            if not saved_uid := bot.user_dict.get(user, {}).get("genshin_uid"):
+                await event.reply("*No saved uid was found to delete!*")
+            else:
+                bot.user_dict.setdefault(user, {}).update(genshin_uid=None)
+                await save2db2(bot.user_dict, "users")
+                await event.reply(f"*Saved UID: {saved_uid} has been deleted!*")
+            if not vital_args:
+                return
         if not vital_args:
             return await event.reply(getdoc(enka_handler))
         if not uid:
