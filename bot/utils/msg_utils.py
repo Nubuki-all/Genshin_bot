@@ -358,7 +358,6 @@ async def download_replied_media(event) -> bytes:
     )
 
 
-
 def user_is_allowed(user: str | int):
     user = str(user)
     return user not in bot.banned
