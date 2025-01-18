@@ -30,10 +30,10 @@ from bot.utils.gi_utils import (
 )
 from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
+    chat_is_allowed,
     clean_reply,
     get_args,
     get_msg_from_codes,
-    chat_is_allowed,
     sanitize_text,
     user_is_allowed,
     user_is_privileged,

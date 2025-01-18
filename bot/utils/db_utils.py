@@ -22,6 +22,7 @@ db_cluster = {
     "users": userdb,
 }
 
+
 async def save2db(db, update, retries=3):
     while retries:
         try:

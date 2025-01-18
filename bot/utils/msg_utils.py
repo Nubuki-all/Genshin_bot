@@ -332,15 +332,17 @@ async def download_replied_media(event) -> bytes:
         mtype = "document"
         media_type = MediaType.MediaDocument
     else:
-        raise Exception(inspect.cleandoc(
-            f"""Expected either:
+        raise Exception(
+            inspect.cleandoc(
+                f"""Expected either:
         ImageMessage
         VideoMessage
         AudioMessage
         DocumentMessage
         not {type(event.quoted_msg).__name__}
         """
-        ))
+            )
+        )
     direct_path = item.directPath
     enc_file_hash = item.fileEncSHA256
     file_hash = item.fileSHA256
@@ -363,6 +365,7 @@ def chat_is_allowed(event: Event):
         return not bot.ignore_pm
     else:
         return not bot.group_dict.get(event.chat.id, {}).get("disabled", False)
+
 
 def user_is_admin(user: str, members: list):
     for member in members:
@@ -394,7 +397,6 @@ def user_is_privileged(user):
 def user_is_sudoer(user: str | int):
     user = str(user)
     return bot.user_dict.get(user, {}).get("sudoer", False)
-
 
 
 function_dict = {None: []}

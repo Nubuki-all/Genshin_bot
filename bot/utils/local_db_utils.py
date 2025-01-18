@@ -1,6 +1,6 @@
 import pickle
 
-from bot import bot, local_enkadb, local_gdb, local_gcdb, local_rdb, local_udb
+from bot import bot, local_enkadb, local_gcdb, local_gdb, local_rdb, local_udb
 
 from .os_utils import file_exists
 

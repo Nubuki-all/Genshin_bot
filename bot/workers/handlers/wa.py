@@ -3,8 +3,8 @@ from urlextract import URLExtract
 
 from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
-    clean_reply,
     chat_is_allowed,
+    clean_reply,
     user_is_allowed,
     user_is_privileged,
 )
