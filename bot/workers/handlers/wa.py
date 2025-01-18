@@ -4,9 +4,9 @@ from urlextract import URLExtract
 from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
     clean_reply,
-    pm_is_allowed,
+    chat_is_allowed,
     user_is_allowed,
-    user_is_owner,
+    user_is_privileged,
 )
 
 
@@ -18,8 +18,8 @@ async def sanitize_url(event, args, client):
     """
     status_msg = None
     user = event.from_user.id
-    if not user_is_owner(user):
-        if not pm_is_allowed(event):
+    if not user_is_privileged(user):
+        if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
             return

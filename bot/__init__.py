@@ -54,6 +54,7 @@ from .config import bot, conf
 
 heavy_proc_lock = asyncio.Lock()
 local_gdb = ".local_giftdb.pkl"
+local_gcdb = ".local_groups.pkl"
 local_rdb = ".local_rssdb.pkl"
 local_udb = ".local_users.pkl"
 local_enkadb = ".local_enkadb.pkl"

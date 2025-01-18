@@ -3,7 +3,7 @@ from datetime import datetime as dt
 from bot.config import bot, conf
 from bot.utils.bot_utils import get_json
 from bot.utils.log_utils import logger
-from bot.utils.msg_utils import pm_is_allowed, user_is_allowed, user_is_owner
+from bot.utils.msg_utils import chat_is_allowed, user_is_allowed, user_is_privileged
 
 meme_list = []
 
@@ -48,8 +48,8 @@ async def getmeme(event, args, client):
     subreddit - custom subreddit
     """
     user = event.from_user.id
-    if not user_is_owner(user):
-        if not pm_is_allowed(event):
+    if not user_is_privileged(user):
+        if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
             return
@@ -87,8 +87,8 @@ async def getcmds(event, args, client):
         None
     """
     user = event.from_user.id
-    if not user_is_owner(user):
-        if not pm_is_allowed(event):
+    if not user_is_privileged(user):
+        if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
             return
@@ -105,9 +105,14 @@ async def getcmds(event, args, client):
 {pre}ping - *Check if bot is alive*
 {pre}bash - *[Dev.] Run bash commands*
 {pre}eval - *[Dev.] Evaluate python commands*
-{pre}rss - *[Owner] Setup bot to auto post RSS feeds*
-{pre}update - *[Owner] Update & restarts bot*
-{pre}restart - *[Owner] Restarts bot*
+{pre}ban - *[Owner] prevent a user from using bot*
+{pre}unban - *[Owner] unban a user*
+{pre}sudo - *[Owner] Promote a user to sudoers*
+{pre}rss - *[Owner | Sudo] Setup bot to auto post RSS feeds*
+{pre}update - *[Owner | Sudo] Update & restarts bot*
+{pre}restart - *[Owner | Sudo] Restarts bot*
+{pre}disable - *[Owner | Sudo] Disable bot replies in a GC*
+{pre}enable - *[Owner | Sudo] Enable bot replies in a GC*
 {pre}pause - *[Owner] Pauses bot*"""
         await event.reply(msg)
     except Exception as e:
@@ -125,8 +130,8 @@ async def hello(event, args, client):
 async def up(event, args, client):
     """ping bot!"""
     user = event.from_user.id
-    if not user_is_owner(user):
-        if not pm_is_allowed(event):
+    if not user_is_privileged(user):
+        if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
             return

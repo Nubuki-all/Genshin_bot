@@ -33,10 +33,10 @@ from bot.utils.msg_utils import (
     clean_reply,
     get_args,
     get_msg_from_codes,
-    pm_is_allowed,
+    chat_is_allowed,
     sanitize_text,
     user_is_allowed,
-    user_is_owner,
+    user_is_privileged,
 )
 from bot.utils.os_utils import s_remove
 
@@ -75,8 +75,8 @@ async def enka_handler(event, args, client):
     error = None
     status = None
     user = event.from_user.id
-    if not user_is_owner(user):
-        if not pm_is_allowed(event):
+    if not user_is_privileged(user):
+        if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
             return
@@ -135,7 +135,7 @@ async def enka_handler(event, args, client):
         if uid and save:
             will_save = True
             if bot.user_dict.get(user, {}).get("genshin_uid") == uid:
-                await event.reply(f"*Warning:* This uid has  already been saved")
+                await event.reply(f"*Warning:* This uid has already been saved")
                 will_save = False
             elif prev_uid := bot.user_dict.get(user, {}).get("genshin_uid"):
                 await event.reply(
@@ -328,8 +328,8 @@ async def weapon_handler(event, args, client):
     """
     status = None
     user = event.from_user.id
-    if not user_is_owner(user):
-        if not pm_is_allowed(event):
+    if not user_is_privileged(user):
+        if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
             return
@@ -357,7 +357,7 @@ async def weapon_handler(event, args, client):
 
 async def manage_autogift_chat(event, args, client):
     user = event.from_user.id
-    if not user_is_owner(user):
+    if not user_is_privileged(user):
         return
     try:
         msg = str()
@@ -414,8 +414,8 @@ async def getgiftcodes(event, args, client):
     if args:
         return await manage_autogift_chat(event, args, client)
     user = event.from_user.id
-    if not user_is_owner(user):
-        if not pm_is_allowed(event):
+    if not user_is_privileged(user):
+        if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
             return
@@ -484,8 +484,8 @@ async def get_events(event, args, client):
     """
     status = None
     user = event.from_user.id
-    if not user_is_owner(user):
-        if not pm_is_allowed(event):
+    if not user_is_privileged(user):
+        if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
             return
@@ -649,8 +649,8 @@ async def random_challenge(event, args, client):
     spec_char = None
     status = None
     user = event.from_user.id
-    if not user_is_owner(user):
-        if not pm_is_allowed(event):
+    if not user_is_privileged(user):
+        if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
             return

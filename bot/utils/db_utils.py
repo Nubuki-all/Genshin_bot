@@ -17,10 +17,10 @@ _filter = {"_id": conf.PH_NUMBER}
 database = conf.DATABASE_URL
 db_cluster = {
     "gift": miscdb,
+    "groups": userdb,
     "rss": rssdb,
     "users": userdb,
 }
-
 
 async def save2db(db, update, retries=3):
     while retries:

@@ -68,6 +68,7 @@ class Runtime_Config:
         self.client = None
         self.docker_deployed = False
         self.enka_dict = {}
+        self.group_dict = {}
         self.ignore_pm = False
         self.max_message_length = 4096
         self.offline = False

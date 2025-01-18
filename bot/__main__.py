@@ -25,9 +25,14 @@ from .workers.handlers.gi import (
     weapon_handler,
 )
 from .workers.handlers.manage import (
+    ban,
+    disable,
+    enable,
     pause_handler,
     restart_handler,
     rss_handler,
+    sudoers,
+    unban,
     update_handler,
 )
 from .workers.handlers.stuff import getcmds, getmeme, hello, up
@@ -118,6 +123,16 @@ async def _(client: NewAClient, message: Event):
     await event_handler(message, rss_handler, require_args=True)
 
 
+@bot.register("ban")
+async def _(client: NewAClient, message: Event):
+    await event_handler(message, ban)
+
+
+@bot.register("unban")
+async def _(client: NewAClient, message: Event):
+    await event_handler(message, unban)
+
+
 @bot.register("ping")
 async def _(client: NewAClient, message: Event):
     await event_handler(message, up)
@@ -133,6 +148,21 @@ async def _(client: NewAClient, message: Event):
     await event_handler(message, restart_handler)
 
 
+@bot.register("sudo")
+async def _(client: NewAClient, message: Event):
+    await event_handler(message, sudoers, bot.client)
+
+
+@bot.register("disable")
+async def _(client: NewAClient, message: Event):
+    await event_handler(message, disable, bot.client)
+
+
+@bot.register("enable")
+async def _(client: NewAClient, message: Event):
+    await event_handler(message, enable, bot.client)
+
+
 @bot.client.event(MessageEv)
 async def _(client: NewAClient, message: MessageEv):
     await on_message(client, message)
@@ -141,15 +171,14 @@ async def _(client: NewAClient, message: MessageEv):
 ########### Start ############
 
 try:
-    loop = asyncio.get_event_loop()
-    bot.loop = loop
-    loop.create_task(on_startup())
+    bot.loop = asyncio.get_event_loop()
+    bot.loop.create_task(on_startup())
     if not bot.initialized_client:
-        loop.run_until_complete(
+        bot.loop.run_until_complete(
             bot.client.PairPhone(conf.PH_NUMBER, show_push_notification=True)
         )
     else:
-        loop.run_until_complete(bot.client.connect())
+        bot.loop.run_until_complete(bot.client.connect())
 except Exception:
     LOGS.critical(traceback.format_exc())
     LOGS.critical("Cannot recover from error, exiting…")
