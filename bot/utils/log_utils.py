@@ -12,7 +12,7 @@ async def group_logger(Exception: Exception, e: str):
         chat, server = map(str, gc) if len(gc) > 1 else (str(gc[0]), "g.us")
         msg = await bot.client.send_message(
             jid.build_jid(chat, server),
-            f"*#ERROR*\n\n*Summary of what happened:*\n> {error}\n\n*To restict error messages to logs set the* `conf.LOGS_IN_CHANNEL` *env var to* `False`.",
+            f"*#ERROR*\n\n*Summary of what happened:*\n> {error}\n\n*To restict error messages to logs unset the* `conf.LOG_GROUP` *env var*.",
         )
         return msg
     except Exception:
