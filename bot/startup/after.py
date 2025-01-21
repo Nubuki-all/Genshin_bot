@@ -90,13 +90,13 @@ async def wait_on_client():
 
 async def on_startup():
     try:
-        await update_enka_assets()
         bot.requests = aiohttp.ClientSession(loop=bot.loop)
         for signame in {"SIGINT", "SIGTERM", "SIGABRT"}:
             bot.loop.add_signal_handler(
                 getattr(signal, signame),
                 lambda: asyncio.create_task(on_termination()),
             )
+        await update_enka_assets()
         if not file_exists(con_ind):
             await wait_on_client()
             touch(con_ind)
