@@ -18,6 +18,8 @@ async def gen():
     log.setLevel(logging.DEBUG)
 
     PH_NUMBER = config("PH_NUMBER")
+    
+    wa_db = "db.sqlite3"
 
     client = NewAClient(wa_db)
     await client.PairPhone(
