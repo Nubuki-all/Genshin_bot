@@ -1,4 +1,5 @@
 import asyncio
+import html
 import io
 import sys
 import traceback
@@ -71,16 +72,16 @@ async def bash(event, cmd, client):
     OUTPUT = f"QUERY:\n__Command:__\n{cmd} \n__PID:__\n{process.pid}\n\nstderr: \n{e}\nOutput:\n{o}"
     if len(OUTPUT) > 4000:
         with io.BytesIO(str.encode(OUTPUT)) as out_file:
-            out_file.name = "exec.text"
             await event.reply_document(
-                document=out_file,
+                document=out_file.getvalue(),
+                file_name="exec.text",
                 quote=True,
                 caption=cmd,
             )
             await asyncio.sleep(3)
             return await event.delete()
     else:
-        OUTPUT = f"```bash\n{cmd}```\n\n_PID:_\n{process.pid}\n\n```Stderr:\n{e}```\n\n```Output:\n{o}```\n"
+        OUTPUT = f"```bash\n{cmd}```\n\n_PID:_\n{process.pid}\n\n```Stderr:\n{e}```\n\n```Output:\n{html.escape(o)}```\n"
         await event.reply(OUTPUT, link_preview=False)
 
 
