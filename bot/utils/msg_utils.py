@@ -139,8 +139,7 @@ class Event:
         response = await self.client.edit_message(self.chat.jid, self.id, msg)
         msg = self.gen_new_msg(response.ID)
         return construct_event(msg)
-    
-    
+
     async def react(self, emoji: str):
         reaction = await self.client.build_reaction(
             self.chat.jid, self.from_user.jid, self.id, emoji
