@@ -44,7 +44,6 @@ from neonize.proto.Neonize_pb2 import Message as base_msg
 from neonize.proto.Neonize_pb2 import MessageInfo as base_msg_info
 from neonize.proto.Neonize_pb2 import MessageSource as base_msg_source
 from neonize.proto.waCompanionReg.WAWebProtobufsCompanionReg_pb2 import DeviceProps
-
 from neonize.proto.waE2E.WAWebProtobufsE2E_pb2 import (
     ContextInfo,
     ExtendedTextMessage,
@@ -115,4 +114,6 @@ bot.ignore_pm = conf.IGNORE_PM
 bot.block_nsfw = conf.BLOCK_NSFW
 bot.tgp_client = TelegraphPoster(use_api=True, telegraph_api_url=conf.TELEGRAPH_API)
 
-bot.client = NewAClient(wa_db, props=DeviceProps(os="Neonize_GI", platformType=DeviceProps.CHROME))
+bot.client = NewAClient(
+    wa_db, props=DeviceProps(os="Neonize_GI", platformType=DeviceProps.CHROME)
+)
