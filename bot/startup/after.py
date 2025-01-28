@@ -71,6 +71,17 @@ async def on_termination():
     # exit()
 
 
+async def update_presence():
+    while True:
+        try:
+            await send_presence()
+            await asyncio.sleep(5)
+            await send_presence(False)
+        except Exception:
+            pass
+        await asyncio.sleep(300)
+
+
 async def wait_for_client():
     while True:
         if await bot.client.is_logged_in:
@@ -113,8 +124,6 @@ async def on_startup():
             await onstart()
             await logger(e="Please Restart bot.")
             return
-        await send_presence()
-        await asyncio.sleep(5)
-        # await send_presence(False)
+        asyncio.create_task(update_presence())
     except Exception:
         await logger(Exception)
