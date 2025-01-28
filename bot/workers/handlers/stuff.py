@@ -124,6 +124,7 @@ async def hello(event, args, client):
     try:
         await event.reply("Hi!")
     except Exception:
+        await event.react("❌")
         await logger(Exception)
 
 

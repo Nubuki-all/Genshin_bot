@@ -290,6 +290,7 @@ async def enka_handler(event, args, client):
             return await send_multi_cards(event, reply, result, profile)
     except Exception:
         await logger(Exception)
+        await event.react("❌")
     finally:
         if status:
             await status.delete()
@@ -347,6 +348,7 @@ async def weapon_handler(event, args, client):
         await clean_reply(event, reply, "reply_photo", photo=pic, caption=caption)
     except Exception as e:
         await logger(Exception)
+        await event.react("❌")
         await status.edit(f"*Error:*\n{e}")
         status = None
     finally:
@@ -395,6 +397,7 @@ async def manage_autogift_chat(event, args, client):
             return
     except Exception:
         await logger(Exception)
+        await event.react("❌")
     finally:
         if msg:
             await event.reply(msg)
@@ -614,6 +617,7 @@ async def get_events(event, args, client):
         await event.reply(msg)
     except Exception:
         await logger(Exception)
+        await event.react("❌")
         await status.edit(f"*Error:*\n{e}")
         status = None
     finally:
@@ -731,6 +735,7 @@ async def random_challenge(event, args, client):
         await clean_reply(event, reply, "reply_photo", photo=final_img, caption=caption)
     except Exception as err:
         await logger(Exception)
+        await event.react("❌")
         await status.edit(f"*Error:*\n{err}")
         status = None
     finally:
