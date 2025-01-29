@@ -83,31 +83,33 @@ class Event:
             self.quoted_viewonce
         ) = None
         if self.quoted:
-            if (
-                self.quoted.quotedMessage.documentWithCaptionMessage.message.documentMessage.URL
+            if self.quoted.quotedMessage.audioMessage.ByteSize():
+                self.quoted_audio = self.quoted.quotedMessage.audioMessage
+
+            elif (
+                self.quoted.quotedMessage.documentWithCaptionMessage.message.documentMessage.ByteSize()
             ):
                 self.quoted_document = (
                     self.quoted.quotedMessage.documentWithCaptionMessage.message.documentMessage
                 )
-            if self.quoted.quotedMessage.documentMessage.URL:
+            elif self.quoted.quotedMessage.documentMessage.ByteSize():
                 self.quoted_document = self.quoted.quotedMessage.documentMessage
-            self.quoted_image = (
-                self.quoted.quotedMessage.imageMessage
-                if self.quoted.quotedMessage.imageMessage.URL
-                else None
-            )
-            self.quoted_video = (
-                self.quoted.quotedMessage.videoMessage
-                if self.quoted.quotedMessage.videoMessage.URL
-                else None
-            )
-            self.quoted_viewonce_ = self.quoted.quotedMessage.viewOnceMessageV2.message
-            self.quoted_viewonce = (
-                self.quoted_viewonce_.imageMessage or self.quoted_viewonce_.videoMessage
-            )
-            self.quoted_viewonce = (
-                None if not self.quoted_viewonce.URL else self.quoted_viewonce
-            )
+            elif self.quoted.quotedMessage.imageMessage.ByteSize():
+                self.quoted_image = self.quoted.quotedMessage.imageMessage
+            elif self.quoted.quotedMessage.videoMessage.ByteSize():
+                self.quoted_video = self.quoted.quotedMessage.videoMessage
+            elif self.quoted.quotedMessage.viewOnceMessageV2.message.ByteSize():
+                self.quoted_viewonce_ = (
+                    self.quoted.quotedMessage.viewOnceMessageV2.message
+                )
+                for x in ("imageMessage", "videoMessage"):
+                    self.quoted_viewonce = getattr(self.quoted_viewonce_, x)
+                    if self.quoted_viewonce.ByteSize():
+                        break
+            elif self.quoted.quotedMessage.viewOnceMessageV2Extension.message.ByteSize():
+                self.quoted_viewonce = (
+                    self.quoted.quotedMessage.viewOnceMessageV2Extension.message.audioMessage
+                )
 
         self.quoted_text = (
             (
@@ -119,6 +121,7 @@ class Event:
         )
         self.quoted_msg = (
             self.quoted_text
+            or self.quoted_audio
             or self.quoted_document
             or self.quoted_image
             or self.quoted_video
