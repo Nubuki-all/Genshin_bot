@@ -140,7 +140,7 @@ async def rss_list(event, args, client):
     user = event.from_user.id
     if not user_is_owner(user):
         if not user_is_sudoer(user):
-            return await event.react("🚫")
+            return
     if not bot.rss_dict:
         return await event.reply(
             "*No subscriptions!*",
@@ -178,7 +178,7 @@ async def rss_get(event, args, client):
     user = event.from_user.id
     if not user_is_owner(user):
         if not user_is_sudoer(user):
-            return await event.react("🚫")
+            return
     arg, args = get_args(
         "-a",
         ["-g", "store_true"],
@@ -247,7 +247,7 @@ async def rss_editor(event, args, client):
     user = event.from_user.id
     if not user_is_owner(user):
         if not user_is_sudoer(user):
-            return await event.react("🚫")
+            return
     arg, args = get_args(
         "-l",
         "--exf",
@@ -327,7 +327,7 @@ async def del_rss(event, args, client):
     user = event.from_user.id
     if not user_is_owner(user):
         if not user_is_sudoer(user):
-            return await event.react("🚫")
+            return
     if not bot.rss_dict.get(args):
         return await event.reply(f"'{args}' not found in list of subscribed rss feeds!")
     bot.rss_dict.pop(args)
@@ -360,7 +360,7 @@ async def rss_sub(event, args, client):
     user = event.from_user.id
     if not user_is_owner(user):
         if not user_is_sudoer(user):
-            return await event.react("🚫")
+            return
     arg, args = get_args(
         "-t",
         "--exf",
