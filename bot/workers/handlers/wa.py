@@ -51,6 +51,7 @@ async def sanitize_url(event, args, client):
         return await clean_reply(event, event.reply_to_message, "reply", msg)
     except Exception:
         await logger(Exception)
+        await event.react("❌")
     finally:
         if status_msg:
             await status_msg.delete()

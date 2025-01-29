@@ -79,7 +79,7 @@ async def enka_handler(event, args, client):
         if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
-            return
+            return await event.react("⛔")
     try:
         arg, unknown = get_args(
             ["--hide_uid", "store_true"],
@@ -333,7 +333,7 @@ async def weapon_handler(event, args, client):
         if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
-            return
+            return await event.react("⛔")
     try:
         reply = event.reply_to_message
         status = await event.reply(f"*Fetching weapon details for {args}…*")
@@ -360,7 +360,7 @@ async def weapon_handler(event, args, client):
 async def manage_autogift_chat(event, args, client):
     user = event.from_user.id
     if not user_is_privileged(user):
-        return
+        return await event.react("🚫")
     try:
         msg = str()
         arg = args.split(maxsplit=1)
@@ -421,7 +421,7 @@ async def getgiftcodes(event, args, client):
         if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
-            return
+            return await event.react("⛔")
     link = "https://hoyo-codes.seria.moe/codes?game=genshin"
     try:
         reply = await event.reply("*Fetching latest giftcodes…*")
@@ -491,7 +491,7 @@ async def get_events(event, args, client):
         if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
-            return
+            return await event.react("⛔")
     try:
         status = await event.reply("*Fetching events…*")
         api = "https://api.ennead.cc/mihoyo/genshin/calendar"
@@ -657,7 +657,7 @@ async def random_challenge(event, args, client):
         if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
-            return
+            return await event.react("⛔")
     try:
         reply = event.reply_to_message
         status = await event.reply(

@@ -52,7 +52,7 @@ async def getmeme(event, args, client):
         if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
-            return
+            return await event.react("⛔")
     link = "https://meme-api.com/gimme"
     try:
         if args:
@@ -91,7 +91,7 @@ async def getcmds(event, args, client):
         if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
-            return
+            return await event.react("⛔")
     try:
         pre = conf.CMD_PREFIX
         msg = f"""{pre}start - *Hi!*
@@ -135,7 +135,7 @@ async def up(event, args, client):
         if not chat_is_allowed(event):
             return
         if not user_is_allowed(user):
-            return
+            return await event.react("⛔")
     ist = dt.now()
     msg = await event.reply("…")
     st = dt.now()
