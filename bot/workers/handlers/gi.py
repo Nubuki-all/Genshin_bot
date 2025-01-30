@@ -246,7 +246,7 @@ async def enka_handler(event, args, client):
             for name in cards.split(","):
                 name = name.strip()
                 info = await get_gi_info(query=name)
-                info = await get_character_info_fallback(card) if not info else info
+                info = await get_character_info_fallback(name) if not info and card.casefold() != "traveler" else info
                 if not info:
                     errors += f"{name}, "
                     continue
