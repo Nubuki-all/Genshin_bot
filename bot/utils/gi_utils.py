@@ -76,11 +76,11 @@ async def enka_update():
     await update_namecard.update()
 
 
-async def get_enka_profile(uid, card=False, template=1):
+async def get_enka_profile(uid, card=False, template=1, huid=False):
     error = None
     result = None
     try:
-        async with encbanner.ENC(uid=uid) as encard:
+        async with encbanner.ENC(uid=uid, hide_uid=huid) as encard:
             result = await encard.profile(card=card, teamplate=template)
     except enc_error.ENCardError as e:
         error = e
@@ -138,7 +138,7 @@ async def get_enka_card2(uid, char_id, huid=False):
         return result, error
 
 
-async def get_enka_card3(uid, char_id):
+async def get_enka_card3(uid, char_id, huid=False):
     error = result = None
     try:
         client = EnkaNetworkAPI(lang=Language.EN)
@@ -151,7 +151,7 @@ async def get_enka_card3(uid, char_id):
                 character_name.append(character.name)
                 if char_id and str(character.id) not in char_id.split(","):
                     continue
-                card = generate_image(data, character, client.lang)
+                card = generate_image(data, character, client.lang, hide_uid=huid)
                 card = Card(character.name, card)
                 cards.append(card)
             result = Result(character_name, cards)
