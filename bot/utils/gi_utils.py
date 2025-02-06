@@ -280,7 +280,7 @@ async def fetch_weapon_detail(weapon: dict, weapon_stats: dict) -> tuple:
         caption += (
             f"*{main_stat}:* *{base_stat}* ➜ *{max_main_stat}* _(Lvl {max_level})_\n"
         )
-    caption += f"```{(des[:2000] + '…') if len(des) > 2000 else des}```\n\n"
+    caption += f"> {(des[:2000] + '…') if len(des) > 2000 else des}\n\n"
     if effects:
         caption += f"*{effect_name}* +\n"
         caption += f"{effects}"
