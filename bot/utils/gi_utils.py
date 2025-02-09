@@ -110,7 +110,9 @@ async def get_enka_card(uid, char_id, akasha=True, huid=False, template=1, retry
             return
         await logger(e="Updating enka assets and trying again…")
         await enka_update()
-        return await get_enka_card(uid, char_id, akasha=True, huid=False, template=1, retry=True)
+        return await get_enka_card(
+            uid, char_id, akasha=True, huid=False, template=1, retry=True
+        )
     except Exception as e:
         error = True
         result = e
