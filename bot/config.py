@@ -38,7 +38,7 @@ class Config:
             self.DEV = config("DEV", default=0, cast=str)
             self.DYNO = config("DYNO", default=None)
 
-            self.LOG_GROUP = config("LOG_GROUP", default=0, cast=int)
+            self.LOG_GROUP = config("LOG_GROUP", default="")
             self.IGNORE_PM = config("IGNORE_PM", default=True, cast=bool)
             self.RSS_CHAT = config(
                 "RSS_CHAT",

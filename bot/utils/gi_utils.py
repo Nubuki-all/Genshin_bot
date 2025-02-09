@@ -91,7 +91,7 @@ async def get_enka_profile(uid, card=False, template=1, huid=False):
         return result, error
 
 
-async def get_enka_card(uid, char_id, akasha=True, huid=False, template=1):
+async def get_enka_card(uid, char_id, akasha=True, huid=False, template=1, retry=False):
     error = False
     result = None
     try:
@@ -102,6 +102,15 @@ async def get_enka_card(uid, char_id, akasha=True, huid=False, template=1):
     except enc_error.ENCardError as e:
         error = True
         result = e
+    except AttributeError as e:
+        await logger(Exception)
+        if retry:
+            error = True
+            result = e
+            return
+        await logger(e="Updating enka assets and trying again…")
+        await enka_update()
+        return await get_enka_card(uid, char_id, akasha=True, huid=False, template=1, retry=True)
     except Exception as e:
         error = True
         result = e
