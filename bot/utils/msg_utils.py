@@ -418,6 +418,10 @@ def user_is_sudoer(user: str | int):
     return bot.user_dict.get(user, {}).get("sudoer", False)
 
 
+async def get_user_info(user_id):
+    return await bot.client.contact.get_contact(jid.build_jid(user_id))
+
+
 function_dict = {None: []}
 
 
