@@ -141,7 +141,7 @@ async def enka_handler(event, args, client):
             await u_reply.delete()
         if mention and uid:
             await event.reply("Ignoring your mention…")
-        elif mention: 
+        elif mention:
             mentioned = await get_user_info(mention[1:])
             not_found_err = "*No idea who {} is.*"
             if not mentioned.Found:
