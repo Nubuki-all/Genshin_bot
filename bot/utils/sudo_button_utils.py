@@ -48,7 +48,7 @@ async def create_sudo_button(
             poll_info.update({get_sha256(trunc_string(value[0], 100)): key})
         poll_info.update(user=user_id)
         if conf_btn and selectable > 1:
-            poll_info.update({"conf_btn": get_sha256(trunc_string(conf_btn))})
+            poll_info.update({"conf_btn": get_sha256(trunc_string(conf_btn, 100))})
         active_poll_dict.update({msg.ID: poll_info})
         return poll_msg, msg.ID
 

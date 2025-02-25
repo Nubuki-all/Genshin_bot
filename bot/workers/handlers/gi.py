@@ -110,7 +110,7 @@ async def enka_handler(event, args, client):
             ["-f", "store_true"],
             ["--delete", "store_true"],
             "-t",
-            to_parse=args,
+            to_parse=args or str(),
             get_unknown=True,
         )
         unknowns = unknown.split()
@@ -177,6 +177,8 @@ async def enka_handler(event, args, client):
             if not vital_args:
                 return
         if uid and not vital_args:
+            if invalid:
+                await event.reply(f"*{invalid}?*")
             await enka_button_handler(event, uid, client)
             return
         if not vital_args:
