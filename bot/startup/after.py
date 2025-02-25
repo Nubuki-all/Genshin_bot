@@ -117,13 +117,14 @@ async def on_startup():
         else:
             await wait_for_client()
             scheduler.start()
+        bot.me = await bot.client.get_me()
         if len(sys.argv) == 3:
             await onrestart()
         else:
             await asyncio.sleep(3)
             await onstart()
-            await logger(e="Please Restart bot.")
-            return
+            # await logger(e="Please Restart bot.")
+            # return
         asyncio.create_task(update_presence())
     except Exception:
         await logger(Exception)

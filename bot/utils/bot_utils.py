@@ -3,6 +3,7 @@ import datetime
 import itertools
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
+from hashlib import sha256
 
 import aiohttp
 import pytz
@@ -168,3 +169,14 @@ async def wait_for_turn(turn_id: str):
 
 def waiting_for_turn():
     return turn() and len(turn()) > 1
+
+
+def get_sha256(string: str):
+    return sha256(string.encode("utf-8")).hexdigest()
+
+
+def trunc_string(string: str, limit: int):
+    return (string[: limit - 2] + "…") if len(string) > limit else string
+
+def split_list_in_half(list_: list):
+    return (list_[:len(list_)//2], list_[len(list_)//2:])

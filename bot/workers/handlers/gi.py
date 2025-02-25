@@ -1,5 +1,6 @@
 import asyncio
 import time
+import uuid
 from inspect import getdoc
 
 from bs4 import BeautifulSoup
@@ -10,6 +11,7 @@ from bot.utils.bot_utils import (
     get_json,
     get_text,
     get_timestamp,
+    split_list_in_half,
     time_formatter,
 )
 from bot.utils.db_utils import save2db2
@@ -32,6 +34,7 @@ from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
     chat_is_allowed,
     clean_reply,
+    construct_msg_and_evt,
     get_args,
     get_msg_from_codes,
     get_user_info,
@@ -40,6 +43,7 @@ from bot.utils.msg_utils import (
     user_is_privileged,
 )
 from bot.utils.os_utils import s_remove
+from bot.utils.sudo_button_utils import create_sudo_button, wait_for_button_response
 
 
 async def enka_handler(event, args, client):
@@ -172,6 +176,9 @@ async def enka_handler(event, args, client):
                 await event.reply(f"*Saved UID: {saved_uid} has been deleted!*")
             if not vital_args:
                 return
+        if uid and not vital_args:
+            await enka_button_handler(event, uid, client)
+            return
         if not vital_args:
             return await event.reply(getdoc(enka_handler))
         if not uid:
@@ -344,6 +351,63 @@ def list_characters(characters):
     for character in characters:
         msg += f"*⁍* {character}\n"
     return msg
+
+
+async def enka_button_handler(event, uid, client):
+    profile, error = await get_enka_profile(uid)
+    if error:
+        return await event.reply(f"*Error:*\n{profile or error}")
+    button_dict = {}
+    button_dict2 = {}
+    characters = profile.characters.character_name
+    characters2 = []
+    if len(characters) > 12:
+        characters, characters2 = split_list_in_half(characters)
+    for char_name in characters:
+        button_dict.update({uuid.uuid4(): [char_name, char_name]})
+    cfm_btn = "confirm_button"
+    cfm_btn_txt = "Next" if characters2 else "Done"
+    button_dict.update({uuid.uuid4(): [cfm_btn_txt, cfm_btn]})
+    for char_name in characters2:
+        button_dict2.update({uuid.uuid4(): [char_name, char_name]})
+    if button_dict2:
+        button_dict2.update({uuid.uuid4(): ["Done", cfm_btn]})
+    title = "Select the characters you want to fetch cards for and click Next/Done."
+    poll_msg_, msg_id = await create_sudo_button(
+        title, button_dict, event.chat.jid, user, 2, cfm_btn_txt
+    )
+    poll_msg = construct_msg_and_evt(
+        event.chat.id, bot.me.JID.User, msg_id, None, event.chat.server, poll_msg_
+    )
+    if not (results := await wait_for_button_response(msg_id)):
+        return await event.reply("yikes.")
+    await poll_msg.delete()
+    sel_char = str()
+    for result in results:
+        char = button_dict.get(result)[1]
+        if char == cfm_btn:
+            continue
+        sel_char += (char + ",")
+    if button_dict2:
+        poll_msg_, msg_id = await create_sudo_button(
+            title, button_dict2, event.chat.jid, user, 2, "Done"
+        )
+        poll_msg = construct_msg_and_evt(
+            event.chat.id, bot.me.JID.User, msg_id, None, event.chat.server, poll_msg_
+        )
+        if not (results := await wait_for_button_response(msg_id)):
+            return await event.reply("yikes.")
+        await poll_msg.delete()
+        for result in results:
+            char = button_dict2.get(result)[1]
+            if char == cfm_btn:
+                continue
+            sel_char += (char + ",")
+    if not sel_char:
+        return await event.reply(getdoc(enka_handler))
+    else:
+        sel_char = sel_char.rstrip(",")
+    return await enka_handler(event, f"--characters {sel_char}", client)
 
 
 async def weapon_handler(event, args, client):

@@ -9,7 +9,9 @@ from functools import partial
 
 import httpx
 from bs4 import BeautifulSoup
+from neonize.types import MessageWithContextInfo
 from neonize.utils.enum import ChatPresence, ChatPresenceMedia, MediaType, Presence
+from neonize.utils.message import extract_text, get_poll_update_message
 
 from bot import (
     Message,
@@ -25,6 +27,7 @@ from bot.others.exceptions import ArgumentParserError
 
 from .bot_utils import post_to_tgph
 from .log_utils import logger
+from .sudo_button_utils import poll_as_button_handler
 
 
 class Event:
@@ -35,6 +38,16 @@ class Event:
     def __str__(self):
         return self.text
 
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            if k == "client":
+                v = None
+            setattr(result, k, copy.deepcopy(v, memo))
+        return result
+
     class User:
         def __init__(self):
             self.name = None
@@ -44,6 +57,7 @@ class Event:
             self.id = self.jid.User
             self.is_empty = message.Info.MessageSource.Sender.IsEmpty
             self.name = message.Info.Pushname
+            self.server = self.jid.Server
 
     class Chat:
         def __init__(self):
@@ -56,6 +70,16 @@ class Event:
             self.is_group = message.Info.MessageSource.IsGroup
             self.server = self.jid.Server
 
+    def _construct_media(self):
+        for msg, v in self._message.ListFields():
+            if not msg.name.endswith("Message"):
+                continue
+            setattr(self, msg.name.split("M")[0], v)
+            if not hasattr(v, "contextInfo"):
+                continue
+            self.media = v
+            break
+
     def construct(self, message: MessageEv, add_replied: bool = True):
         self.chat = self.Chat()
         self.chat.construct(message)
@@ -66,7 +90,9 @@ class Event:
         # To do support other message types
         self.id = message.Info.ID
         self.type = message.Info.Type
+        self.type = "text" if message.Info.MediaType == "url" else self.type
         self.media_type = message.Info.MediaType
+        self._message = message.Message
         self.ext_msg = message.Message.extendedTextMessage
         self.text_msg = message.Message.conversation
         self.short_text = self.text_msg
@@ -75,10 +101,23 @@ class Event:
         # self.mentioned = self.text.startswith(mention_str) if self.text else False
         # if self.mentioned:
         #    self.text = (self.text.split(maxsplit=1)[1]).strip()
-        self.text = self.text or self.short_text
+        self.text = self.text or self.short_text or None
         # To do expand quoted; has members [stanzaID, participant,
         # quotedMessage.conversation]
-        self.quoted = self.ext_msg.contextInfo if add_replied else None
+        self.audio = None
+        self.document = None
+        self.image = None
+        self.media = None
+        self.reaction = None
+        self.video = None
+        self._construct_media()
+        self.caption = (extract_text(self._message) or None) if not self.text else None
+
+        self.quoted = (
+            self.media.contextInfo
+            if add_replied and self.media and self.media.contextInfo.ByteSize()
+            else None
+        )
         self.quoted_audio = self.quoted_document = self.quoted_image = (
             self.quoted_video
         ) = self.quoted_viewonce = None
@@ -135,9 +174,18 @@ class Event:
         self.constructed = True
         return self
 
+    async def _send_message(self, chat, message, link_preview=True):
+        await self.send_typing_status()
+        response = await self.client.send_message(
+            to=chat, message=message, link_preview=link_preview
+        )
+        await self.send_typing_status(False)
+        msg = self.gen_new_msg(response.ID)
+        return construct_event(msg)
+
     async def delete(self):
         await self.client.revoke_message(self.chat.jid, self.from_user.jid, self.id)
-        return None
+        return
 
     async def edit(self, text: str):
         msg = Message(conversation=text)
@@ -160,7 +208,7 @@ class Event:
         quote: bool = True,
         link_preview: bool = True,
         reply_privately: bool = False,
-        message: Message = None,
+        message: MessageWithContextInfo = None,
     ):
         if not self.constructed:
             return
@@ -172,6 +220,8 @@ class Event:
         if not text:
             raise Exception("Specify a text to reply with.")
         # msg_id = self.id if quote else None
+        if not quote:
+            return await self._send_message(self.chat.jid, text, link_preview)
         await self.send_typing_status()
 
         try:
@@ -197,6 +247,20 @@ class Event:
 
         # self.user.name = None
         await self.send_typing_status(False)
+        msg = self.gen_new_msg(response.ID, private=reply_privately)
+        return construct_event(msg)
+
+    async def reply_audio(
+        self,
+        audio: str | bytes,
+        ptt: bool = False,
+        quote: bool = True,
+    ):
+        quoted = self.message if quote else None
+
+        response = await self.client.send_audio(
+            self.chat.jid, audio, ptt, quoted=quoted
+        )
         msg = self.gen_new_msg(response.ID)
         return construct_event(msg)
 
@@ -312,9 +376,14 @@ class Event:
         # return construct_event(msg)
         return response
 
-    def gen_new_msg(self, msg_id: str, user_id: str = None):
+    def gen_new_msg(
+        self, msg_id: str, user_id: str = None, chat_id: str = None, private=False
+    ):
         msg = copy.deepcopy(self.message)
         msg.Info.ID = msg_id
+        if private:
+            msg.Info.MessageSource.Chat.User = self.from_user.id
+            msg.Info.MessageSource.Chat.Server = self.from_user.server
         msg.Info.MessageSource.Sender.User = user_id or conf.PH_NUMBER
         return msg
 
@@ -324,12 +393,17 @@ class Event:
         # msg = self.gen_new_msg(
         # self.quoted.stanzaID, (self.quoted.participant.split("@"))[0], self.chat.id, self.text, self.chat.jid.Server
         # )
+        if self.quoted.remoteJID:
+            chat_id, server = self.quoted.remoteJID.split("@", maxsplit=1)
+        else:
+            chat_id = self.chat.id
+            server = self.chat.server
         msg = construct_message(
-            self.chat.id,
+            chat_id,
             (self.quoted.participant.split("@"))[0],
             self.quoted.stanzaID,
             None,
-            self.chat.jid.Server,
+            server,
             self.quoted.quotedMessage,
         )
         return construct_event(msg, False)
@@ -360,6 +434,7 @@ async def download_replied_media(event) -> bytes:
                 """
             )
         )
+
     direct_path = item.directPath
     enc_file_hash = item.fileEncSHA256
     file_hash = item.fileSHA256
@@ -450,22 +525,24 @@ bot.register = register
 
 
 async def on_message(client: NewAClient, message: MessageEv):
-    event = construct_event(message)
-    if event.type == "text":
-        command, args = (
-            event.text.split(maxsplit=1)
-            if len(event.text.split()) > 1
-            else (event.text, None)
-        )
-        func = function_dict.get(command)
-        if func:
-            # await func(client, event)
-            future = asyncio.run_coroutine_threadsafe(func(client, event), bot.loop)
-            future.result()
-    for func in function_dict[None]:
-        # await func(client, event)
-        future = asyncio.run_coroutine_threadsafe(func(client, event), bot.loop)
-        future.result()
+    try:
+        event = construct_event(message)
+        if get_poll_update_message(event.message):
+            return await poll_as_button_handler(event)
+        if event.type == "text":
+            command, args = (
+                event.text.split(maxsplit=1)
+                if len(event.text.split()) > 1
+                else (event.text, None)
+            )
+            func = function_dict.get(command)
+            if func:
+                # await func(client, event)
+                future = asyncio.run_coroutine_threadsafe(func(client, event), bot.loop)
+                future.result()
+    except Exception:
+        await logger(e="Unhandled Exception:")
+        await logger(Exception)
 
 
 def construct_event(message: MessageEv, add_replied=True):
@@ -491,6 +568,10 @@ def construct_message(
             ),
         ),
     )
+
+
+def construct_msg_and_evt(*args, **kwargs):
+    return construct_event(construct_message(*args, **kwargs))
 
 
 def get_msg_from_codes(codes: list, auto: bool = False):
