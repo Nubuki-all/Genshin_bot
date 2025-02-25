@@ -61,6 +61,7 @@ local_udb = ".local_users.pkl"
 local_enkadb = ".local_enkadb.pkl"
 log_file_name = "logs.txt"
 rss_dict_lock = asyncio.Lock()
+sudo_btn_lock = asyncio.Lock()
 uptime = time.time()
 version_file = "version.txt"
 wa_db = "db.sqlite3"
