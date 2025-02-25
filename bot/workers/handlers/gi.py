@@ -413,7 +413,7 @@ async def enka_button_handler(event, uid, client):
     if not sel_char:
         return await event.reply(getdoc(enka_handler))
     else:
-        sel_char = sel_char.rstrip(",")
+        sel_char = f'"{sel_char.rstrip(",")}"'
     return await enka_handler(event, f"--characters {sel_char}", client)
 
 
