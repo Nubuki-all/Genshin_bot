@@ -86,6 +86,7 @@ async def enka_handler(event, args, client):
         if not user_is_allowed(user):
             return await event.react("⛔")
     try:
+        or_args = args
         arg, unknown = get_args(
             ["--hide_uid", "store_true"],
             ["--no_top", "store_false"],
@@ -177,9 +178,7 @@ async def enka_handler(event, args, client):
             if not vital_args:
                 return
         if uid and not vital_args:
-            if invalid:
-                await event.reply(f"*{invalid}?*")
-            await enka_button_handler(event, uid, client)
+            await enka_button_handler(event, uid, or_args, client)
             return
         if not vital_args:
             return await event.reply(getdoc(enka_handler))
@@ -355,7 +354,7 @@ def list_characters(characters):
     return msg
 
 
-async def enka_button_handler(event, uid, client):
+async def enka_button_handler(event, uid, args, client):
     profile, error = await get_enka_profile(uid)
     if error:
         return await event.reply(f"*Error:*\n{profile or error}")
@@ -414,7 +413,7 @@ async def enka_button_handler(event, uid, client):
         return await event.reply(getdoc(enka_handler))
     else:
         sel_char = f'"{sel_char.rstrip(",")}"'
-    return await enka_handler(event, f"--characters {sel_char}", client)
+    return await enka_handler(event, f"--characters {sel_char} {args}", client)
 
 
 async def weapon_handler(event, args, client):
