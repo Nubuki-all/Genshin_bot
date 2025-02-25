@@ -528,7 +528,8 @@ async def on_message(client: NewAClient, message: MessageEv):
     try:
         event = construct_event(message)
         if get_poll_update_message(event.message):
-            return await poll_as_button_handler(event)
+            future = asyncio.run_coroutine_threadsafe(poll_as_button_handler(event), bot.looo)
+            return future.result()
         if event.type == "text" and event.text:
             command, args = (
                 event.text.split(maxsplit=1)
