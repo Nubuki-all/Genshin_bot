@@ -367,11 +367,15 @@ async def enka_button_handler(event, uid, client):
     if len(characters) > 12:
         characters, characters2 = split_list_in_half(characters)
     for char_name in characters:
+        if not char_name:
+            continue
         button_dict.update({uuid.uuid4(): [char_name, char_name]})
     cfm_btn = "confirm_button"
     cfm_btn_txt = "Next" if characters2 else "Done"
     button_dict.update({uuid.uuid4(): [cfm_btn_txt, cfm_btn]})
     for char_name in characters2:
+        if not char_name:
+            continue
         button_dict2.update({uuid.uuid4(): [char_name, char_name]})
     if button_dict2:
         button_dict2.update({uuid.uuid4(): ["Done", cfm_btn]})
