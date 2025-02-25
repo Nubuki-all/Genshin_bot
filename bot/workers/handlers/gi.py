@@ -387,7 +387,7 @@ async def enka_button_handler(event, uid, client):
         char = button_dict.get(result)[1]
         if char == cfm_btn:
             continue
-        sel_char += (char + ",")
+        sel_char += char + ","
     if button_dict2:
         poll_msg_, msg_id = await create_sudo_button(
             title, button_dict2, event.chat.jid, user, 2, "Done"
@@ -402,7 +402,7 @@ async def enka_button_handler(event, uid, client):
             char = button_dict2.get(result)[1]
             if char == cfm_btn:
                 continue
-            sel_char += (char + ",")
+            sel_char += char + ","
     if not sel_char:
         return await event.reply(getdoc(enka_handler))
     else:
