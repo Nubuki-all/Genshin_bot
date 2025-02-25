@@ -529,7 +529,7 @@ async def on_message(client: NewAClient, message: MessageEv):
         event = construct_event(message)
         if get_poll_update_message(event.message):
             return await poll_as_button_handler(event)
-        if event.type == "text":
+        if event.type == "text" and event.text:
             command, args = (
                 event.text.split(maxsplit=1)
                 if len(event.text.split()) > 1

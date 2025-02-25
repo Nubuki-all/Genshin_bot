@@ -59,6 +59,8 @@ local_gcdb = ".local_groups.pkl"
 local_rdb = ".local_rssdb.pkl"
 local_udb = ".local_users.pkl"
 local_enkadb = ".local_enkadb.pkl"
+if os.path.isdir("/qiqi"):
+    local_enkadb = "/qiqi/.local_enkadb.pkl"
 log_file_name = "logs.txt"
 rss_dict_lock = asyncio.Lock()
 sudo_btn_lock = asyncio.Lock()

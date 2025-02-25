@@ -2,7 +2,7 @@
 FROM fedora:37
 
 # 1. Setup home directory, non interactive shell and timezone
-RUN mkdir -p /bot /qiqi && chmod 777 /bot
+RUN mkdir -p /bot /qiqi && chmod 777 /bot /qiqi
 WORKDIR /bot
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Africa/Lagos
