@@ -361,6 +361,7 @@ async def enka_button_handler(event, uid, client):
     button_dict2 = {}
     characters = profile.characters.character_name
     characters2 = []
+    user = event.from_user.id
     if len(characters) > 12:
         characters, characters2 = split_list_in_half(characters)
     for char_name in characters:

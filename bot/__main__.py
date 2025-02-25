@@ -80,7 +80,7 @@ async def _(client: NewAClient, message: Event):
 
 @bot.register("enka")
 async def _(client: NewAClient, message: Event):
-    await event_handler(message, enka_handler, require_args=True)
+    await event_handler(message, enka_handler, require_args=False)
 
 
 @bot.register("weapon")
