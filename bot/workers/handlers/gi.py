@@ -358,6 +358,7 @@ async def enka_button_handler(event, uid, args, client):
     profile, error = await get_enka_profile(uid)
     if error:
         return await event.reply(f"*Error:*\n{profile or error}")
+    args = f" {args}" if args else str()
     button_dict = {}
     button_dict2 = {}
     characters = profile.characters.character_name
@@ -378,7 +379,7 @@ async def enka_button_handler(event, uid, args, client):
         button_dict2.update({uuid.uuid4(): [char_name, char_name]})
     if button_dict2:
         button_dict2.update({uuid.uuid4(): ["Done", cfm_btn]})
-    title = "Select the characters you want to fetch cards for and click Next/Done."
+    title = f"{event.from_user.name} please select the characters you want to fetch cards for and click Next/Done."
     poll_msg_, msg_id = await create_sudo_button(
         title, button_dict, event.chat.jid, user, 2, cfm_btn_txt
     )
@@ -413,7 +414,7 @@ async def enka_button_handler(event, uid, args, client):
         return await event.reply(getdoc(enka_handler))
     else:
         sel_char = f'"{sel_char.rstrip(",")}"'
-    return await enka_handler(event, f"--characters {sel_char} {args}", client)
+    return await enka_handler(event, f"--characters {sel_char}{args}", client)
 
 
 async def weapon_handler(event, args, client):
