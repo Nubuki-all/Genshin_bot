@@ -256,7 +256,7 @@ async def fetch_artifact_detail(artifact: dict) -> tuple:
         "filename_goblet",
         "filename_circlet",
     ]
-    [images.get(x) for x in req_suf]
+    img_suf = [images.get(x) for x in req_suf]
     max_rarity = rarity_list[-1]
     img = await generate_artifact_image(img_suf, max_rarity, name)
 
