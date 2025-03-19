@@ -249,8 +249,14 @@ async def fetch_artifact_detail(artifact: dict) -> tuple:
     eff_two_pc = artifact.get("effect2Pc")
     eff_four_pc = artifact.get("effect4Pc")
     images = artifact.get("images")
-    req_suf = ['filename_flower', 'filename_plume', 'filename_sands', 'filename_goblet', 'filename_circlet']
-    image_suf = [images.get(x) for x in req_suf]
+    req_suf = [
+        "filename_flower",
+        "filename_plume",
+        "filename_sands",
+        "filename_goblet",
+        "filename_circlet",
+    ]
+    [images.get(x) for x in req_suf]
     max_rarity = rarity_list[-1]
     img = await generate_artifact_image(img_suf, max_rarity, name)
 
@@ -327,11 +333,10 @@ color = {
 }
 
 
-
 async def generate_artifact_image(images, rarity, name, background_size=(800, 600)):
     """
     Combine 5 transparent PNG images on a rectangular background with equal spacing
-    
+
     :param images: List of 5 artifact images
     :param rarity: Max artifact rarity
     :param name: Artifact's name
@@ -340,16 +345,16 @@ async def generate_artifact_image(images, rarity, name, background_size=(800, 60
     # Load and convert all images to RGBA
     images = [f"https://gi.yatta.moe/assets/UI/reliquary/{img}.png" for img in images]
     raws = [await async_dl(image_url) for image_url in images]
-    images = [Image.open(io.BytesIO(raw)).convert('RGBA') for raw in raws]
-    
+    images = [Image.open(io.BytesIO(raw)).convert("RGBA") for raw in raws]
+
     # Calculate maximum possible height for images (80% of background height)
     bg_width, bg_height = background_size
     max_img_height = int(bg_height * 0.8)
-    
+
     # First resize pass with target height
     resized_images = []
     total_width = 0
-    
+
     for img in images:
         # Maintain aspect ratio
         aspect_ratio = img.width / img.height
@@ -357,43 +362,45 @@ async def generate_artifact_image(images, rarity, name, background_size=(800, 60
         resized_img = img.resize((new_width, max_img_height), Image.Resampling.LANCZOS)
         resized_images.append(resized_img)
         total_width += new_width
-    
+
     # Calculate required spacing between images
     num_gaps = len(resized_images) + 1  # 6 gaps for 5 images
     spacing = (bg_width - total_width) / num_gaps
-    
+
     # If images don't fit, scale them down
     if spacing < 10:  # Minimum spacing of 10 pixels
         required_total_width = bg_width - (num_gaps * 10)
         scale_factor = required_total_width / total_width
         max_img_height = int(max_img_height * scale_factor)
-        
+
         # Resize images again with new scale factor
         resized_images = []
         total_width = 0
         for img in images:
             aspect_ratio = img.width / img.height
             new_width = int(max_img_height * aspect_ratio)
-            resized_img = img.resize((new_width, max_img_height), Image.Resampling.LANCZOS)
+            resized_img = img.resize(
+                (new_width, max_img_height), Image.Resampling.LANCZOS
+            )
             resized_images.append(resized_img)
             total_width += new_width
         spacing = 10  # Use minimum spacing
-    
+
     # Calculate vertical position (centered)
     y_position = (bg_height - max_img_height) // 2
-    
+
     # Create background
     background_color = color.get(rarity)
-    background = Image.new('RGB', background_size, background_color)
-    
+    background = Image.new("RGB", background_size, background_color)
+
     # Calculate horizontal start position (centered with spacing)
     x_position = spacing
-    
+
     # Paste images with calculated spacing
     for img in resized_images:
         background.paste(img, (int(x_position), y_position), img)
         x_position += img.width + spacing
-    
+
     # Save as PNG
     output = io.BytesIO()
     background.save(output, format="png")

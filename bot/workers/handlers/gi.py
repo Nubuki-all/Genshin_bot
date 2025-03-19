@@ -17,9 +17,9 @@ from bot.utils.bot_utils import (
 from bot.utils.db_utils import save2db2
 from bot.utils.gi_utils import (
     enka_update,
+    fetch_artifact_detail,
     fetch_random_boss,
     fetch_random_character,
-    fetch_artifact_detail,
     fetch_weapon_detail,
     get_challenge_image,
     get_character_image,
@@ -876,5 +876,6 @@ async def artifact_handler(event, args, client):
         if status:
             await asyncio.sleep(5)
             await status.delete()
+
 
 bot.add_handler(artifact_handler, "artifact", require_args=True)
