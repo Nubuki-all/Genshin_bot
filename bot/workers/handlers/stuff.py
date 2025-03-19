@@ -97,6 +97,7 @@ async def getcmds(event, args, client):
         msg = f"""{pre}start - *Hi!*
 {pre}enka - *Fetch enka cards*
 {pre}weapon - *Fetch weapon details*
+{pre}artifact - *Fetch artifact details*
 {pre}meme - *Get a random meme*
 {pre}codes - *Get lastest giftcodes*
 {pre}events - *Get current and upcoming events*

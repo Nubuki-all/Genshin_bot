@@ -19,6 +19,7 @@ from bot.utils.gi_utils import (
     enka_update,
     fetch_random_boss,
     fetch_random_character,
+    fetch_artifact_detail,
     fetch_weapon_detail,
     get_challenge_image,
     get_character_image,
@@ -840,3 +841,40 @@ async def random_challenge(event, args, client):
         if status:
             await asyncio.sleep(3)
             await status.delete()
+
+
+async def artifact_handler(event, args, client):
+    """
+    Fetch specified genshin artifact details;
+    Args:
+        Name of artifact.
+    """
+    status = None
+    user = event.from_user.id
+    if not user_is_privileged(user):
+        if not chat_is_allowed(event):
+            return
+        if not user_is_allowed(user):
+            return await event.react("⛔")
+    try:
+        reply = event.reply_to_message
+        status = await event.reply(f"*Fetching artifact details for {args}…*")
+        artifact = await get_gi_info("artifacts", args)
+        if not artifact:
+            await status.edit(f"*Artifact not found.*\nYou searched for *{args}*.")
+            status = None
+            return
+        await status.edit(f"*Building weapon card for {weapon.get('name')}…*")
+        pic, caption = await fetch_artifact_detail(artifact)
+        await clean_reply(event, reply, "reply_photo", photo=pic, caption=caption)
+    except Exception as e:
+        await logger(Exception)
+        await event.react("❌")
+        await status.edit(f"*Error:*\n{e}")
+        status = None
+    finally:
+        if status:
+            await asyncio.sleep(5)
+            await status.delete()
+
+bot.add_handler(artifact_handler, "artifact", require_args=True)
