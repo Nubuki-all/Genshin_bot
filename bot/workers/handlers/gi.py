@@ -864,7 +864,7 @@ async def artifact_handler(event, args, client):
             await status.edit(f"*Artifact not found.*\nYou searched for *{args}*.")
             status = None
             return
-        await status.edit(f"*Building weapon card for {weapon.get('name')}…*")
+        await status.edit(f"*Building artifact card for {artifact.get('name')}…*")
         pic, caption = await fetch_artifact_detail(artifact)
         await clean_reply(event, reply, "reply_photo", photo=pic, caption=caption)
     except Exception as e:
