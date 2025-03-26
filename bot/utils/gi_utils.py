@@ -72,8 +72,14 @@ async def async_dl(url, retries=5):
 
 
 async def enka_update():
-    await encbanner.update()
-    await update_namecard.update()
+    try:
+        await encbanner.update()
+    except Exception:
+        await logger(Exception)
+    try:
+        await update_namecard.update()
+    except Exception:
+        await logger(Exception)
 
 
 async def get_enka_profile(uid, card=False, template=1, huid=False):

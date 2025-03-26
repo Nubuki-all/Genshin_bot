@@ -35,12 +35,14 @@ async def create_sudo_button(
     user_id: str,
     selectable: int = 1,
     conf_btn: str | None = None,
+    quoted = None,
 ):
     async with sudo_btn_lock:
         poll_msg = await bot.client.build_poll_vote_creation(
             trunc_string(name, 255),
             [trunc_string(v[0], 100) for v in options.values()],
             selectable,
+            quoted,
         )
         msg = await bot.client.send_message(chat_jid, poll_msg)
         poll_info = {}
