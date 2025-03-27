@@ -66,7 +66,6 @@ rss_dict_lock = asyncio.Lock()
 sudo_btn_lock = asyncio.Lock()
 uptime = time.time()
 version_file = "version.txt"
-wa_db = "db.sqlite3"
 con_ind = ".CONNECTED"
 
 if os.path.exists(log_file_name):
@@ -118,5 +117,5 @@ bot.block_nsfw = conf.BLOCK_NSFW
 bot.tgp_client = TelegraphPoster(use_api=True, telegraph_api_url=conf.TELEGRAPH_API)
 
 bot.client = NewAClient(
-    wa_db, props=DeviceProps(os="Neonize_GI", platformType=DeviceProps.CHROME)
+    conf.WA_DB, props=DeviceProps(os="Neonize_GI", platformType=DeviceProps.CHROME)
 )
