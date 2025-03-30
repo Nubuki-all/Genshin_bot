@@ -130,7 +130,7 @@ def get_date(value, start=True):
         else:
             index = 10 if len(value.split()[1]) == 8 else 19
             return valve[index:]
-        
+
 
 def get_date_from_ts(timestamp):
     try:
