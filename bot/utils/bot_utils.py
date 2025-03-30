@@ -125,11 +125,21 @@ def get_date(value, start=True):
         return value[:index] if start else value[index:]
     else:
         if start:
-            index = 19 if len(value.split()[0]) == 10 else 10
-            return value[:index]
+            if len(value.split()[0]) == 10:
+                index = 19
+                add_v = str()
+            else:
+                index = 10
+                add_v = " 00:00:00"
+            return value[:index] + add_v
         else:
-            index = 10 if len(value.split()[1]) == 8 else 19
-            return valve[index:]
+            if len(value.split()[1]) == 8:
+                index = 10
+                add_v = str()
+           else:
+               index = 19
+               add_v = " 00:00:00"
+            return valve[index:] + add_v
 
 
 def get_date_from_ts(timestamp):
