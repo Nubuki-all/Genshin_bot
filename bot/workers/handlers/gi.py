@@ -566,7 +566,7 @@ async def send_event_menu(event_list, event, reply):
     if not (results := await wait_for_button_response(msg_id)):
         return await event.reply("yikes.")
     await poll_msg.delete()
-    sel_char = str()
+    str()
     selected_event_list = []
     for result in results:
         selected = button_dict.get(result)[1]
@@ -599,6 +599,7 @@ async def send_event_menu(event_list, event, reply):
     if not selected_event_list:
         return await event.reply(getdoc(get_events))
     return await send_verbose_event(selected_event_list, event, reply)
+
 
 async def send_verbose_event(event_list, event, reply):
     chain = event
@@ -650,7 +651,7 @@ async def get_events(event, args, client):
     Argument:
         None: Select desired events
         -v: Get all events with images
-        -l: list all events 
+        -l: list all events
     """
     status = None
     user = event.from_user.id
@@ -784,7 +785,11 @@ async def get_events(event, args, client):
             msg += f"\nEnd date: {get_date_from_ts(dict_['end_time'])}"
             if dict_.get("upcoming") or dict_["start_time"] > time.time():
                 strt = "Starts in:"
-                tl = (dict_["start_time"] - time.time()) if get_date_from_ts(dict_["start_time"]) else 0
+                tl = (
+                    (dict_["start_time"] - time.time())
+                    if get_date_from_ts(dict_["start_time"])
+                    else 0
+                )
             else:
                 strt = "Time left:"
                 tl = dict_["end_time"] - time.time()
