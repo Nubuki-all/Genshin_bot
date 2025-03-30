@@ -533,6 +533,73 @@ async def getgiftcodes(event, args, client):
         return await event.reply(f"*Error:*\n{e}")
 
 
+async def send_event_menu(event_list, event, reply):
+    button_dict = {}
+    button_dict2 = {}
+    events = event_list
+    events2 = []
+    user = event.from_user.id
+    if len(event_list) > 11:
+        events, events2 = split_list_in_half(events)
+    for event_ in events:
+        event_name = list(event_.keys())[0]
+        if not event_name:
+            continue
+        button_dict.update({uuid.uuid4(): [event_name, event_name]})
+    cfm_btn = "confirm_button"
+    cfm_btn_txt = "Next" if events2 else "Done"
+    button_dict.update({uuid.uuid4(): [cfm_btn_txt, cfm_btn]})
+    for event_ in events2:
+        event_name = list(event_.keys())[0]
+        if not event_name:
+            continue
+        button_dict2.update({uuid.uuid4(): [event_name, event_name]})
+    if button_dict2:
+        button_dict2.update({uuid.uuid4(): ["Done", cfm_btn]})
+    title = f"{event.from_user.name} please select the events you want to fetch info for and click Next/Done."
+    poll_msg_, msg_id = await create_sudo_button(
+        title, button_dict, event.chat.jid, user, 2, cfm_btn_txt, event.message
+    )
+    poll_msg = construct_msg_and_evt(
+        event.chat.id, bot.me.JID.User, msg_id, None, event.chat.server, poll_msg_
+    )
+    if not (results := await wait_for_button_response(msg_id)):
+        return await event.reply("yikes.")
+    await poll_msg.delete()
+    sel_char = str()
+    selected_event_list = []
+    for result in results:
+        selected = button_dict.get(result)[1]
+        if selected == cfm_btn:
+            continue
+        for event_ in events:
+            if not event_.get(selected):
+                continue
+            selected_event_list.append(event_)
+            break
+    if button_dict2:
+        poll_msg_, msg_id = await create_sudo_button(
+            title, button_dict2, event.chat.jid, user, 2, "Done", event.message
+        )
+        poll_msg = construct_msg_and_evt(
+            event.chat.id, bot.me.JID.User, msg_id, None, event.chat.server, poll_msg_
+        )
+        if not (results := await wait_for_button_response(msg_id)):
+            return await event.reply("yikes.")
+        await poll_msg.delete()
+        for result in results:
+            selected = button_dict2.get(result)[1]
+            if selected == cfm_btn:
+                continue
+            for event_ in events2:
+                if not event_.get(selected):
+                    continue
+                selected_event_list.append(event_)
+                break
+    if not selected_event_list:
+        return await event.reply(getdoc(get_events))
+    return await send_verbose_event(selected_event_list, event, reply)
+
 async def send_verbose_event(event_list, event, reply):
     chain = event
     for e in event_list:
@@ -581,7 +648,9 @@ async def get_events(event, args, client):
     """
     Get a list of current and upcoming genshin events
     Argument:
-        -v: Get events with images
+        None: Select desired events
+        -v: Get all events with images
+        -l: list all events 
     """
     status = None
     user = event.from_user.id
@@ -688,6 +757,10 @@ async def get_events(event, args, client):
 
         if args == "-v":
             return await send_verbose_event(event_list, event, event.reply_to_message)
+        if not args:
+            return await send_event_menu(event_list, event, event.reply_to_message)
+        if not args == "-l":
+            await event.reply(f"*Unknown arguments:* {args}\nListing events instead.")
 
         await event.send_typing_status()
         msg = "*List of Current & Upcoming Events:*"
@@ -711,7 +784,7 @@ async def get_events(event, args, client):
             msg += f"\nEnd date: {get_date_from_ts(dict_['end_time'])}"
             if dict_.get("upcoming") or dict_["start_time"] > time.time():
                 strt = "Starts in:"
-                tl = (dict_["start_time"] - time.time()) if dict_["start_time"] else 0
+                tl = (dict_["start_time"] - time.time()) if get_date_from_ts(dict_["start_time"]) else 0
             else:
                 strt = "Time left:"
                 tl = dict_["end_time"] - time.time()
