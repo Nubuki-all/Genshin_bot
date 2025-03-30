@@ -635,8 +635,11 @@ async def get_events(event, args, client):
         # Get Upcoming Events
         items = tables[1].find_all("td")
         for item in items:
-            if value := item.find("img"):
-                temp_dict.update({"name": value.get("alt")})
+            if value := item.find("a"):
+                if value.get("title"):
+                    temp_dict.update(name=value.getText())
+            elif value := item.find("img"):
+                temp_dict.update({"name": value.get("alt") or item.getText()})
                 link = value.get("src", str())
                 if link.startswith("data"):
                     link = value.get("data-src", str())
@@ -709,11 +712,11 @@ async def get_events(event, args, client):
             msg += f"\nEnd date: {get_date_from_ts(dict_['end_time'])}"
             if dict_.get("upcoming") or dict_["start_time"] > time.time():
                 strt = "Starts in:"
-                tl = dict_["start_time"] - time.time()
+                tl = (dict_["start_time"] - time.time()) if dict_["start_time"] else 0
             else:
                 strt = "Time left:"
                 tl = dict_["end_time"] - time.time()
-            msg += f"\n*{strt}* *{time_formatter(tl)}*"
+            msg += f"\n*{strt}* *{time_formatter(tl) if tl else 'UNAVAILABLE!'}*"
         await event.send_typing_status(False)
         await event.reply(msg)
     except Exception:
