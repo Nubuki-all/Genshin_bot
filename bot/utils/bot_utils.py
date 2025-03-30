@@ -119,6 +119,19 @@ def get_timestamp(date: str):
     )
 
 
+def get_date(value, start=True):
+    if len(value.split()) == 3:
+        index = len(value) // 2
+        return value[:index] if start else value[index:]
+    else:
+        if start:
+            index = 19 if len(value.split()[0]) == 10 else 10
+            return value[:index]
+        else:
+            index = 10 if len(value.split()[1]) == 8 else 19
+            return valve[index:]
+        
+
 def get_date_from_ts(timestamp):
     try:
         date = datetime.datetime.fromtimestamp(timestamp, tz)

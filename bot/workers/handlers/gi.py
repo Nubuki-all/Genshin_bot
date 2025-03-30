@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 
 from bot.config import bot
 from bot.utils.bot_utils import (
+    get_date,
     get_date_from_ts,
     get_json,
     get_text,
@@ -621,8 +622,8 @@ async def get_events(event, args, client):
                     link = link[: index + 4]
                 temp_dict.update({"link": link})
             elif value := item.get("data-sort-value"):
-                svalue = get_timestamp(value[:10])
-                evalue = get_timestamp(value[10:])
+                svalue = get_timestamp(get_date(value, True))
+                evalue = get_timestamp(get_date(value))
                 temp_dict.update({"start_time": svalue})
                 temp_dict.update({"end_time": evalue})
             else:
@@ -644,8 +645,8 @@ async def get_events(event, args, client):
                     link = link[: index + 4]
                 temp_dict.update({"link": link})
             elif value := item.get("data-sort-value"):
-                svalue = get_timestamp(value[:10])
-                evalue = get_timestamp(value[10:])
+                svalue = get_timestamp(get_date(value, True))
+                evalue = get_timestamp(get_date(value))
                 temp_dict.update({"start_time": svalue})
                 temp_dict.update({"end_time": evalue})
             else:
