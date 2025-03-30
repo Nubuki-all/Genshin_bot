@@ -635,10 +635,7 @@ async def get_events(event, args, client):
         # Get Upcoming Events
         items = tables[1].find_all("td")
         for item in items:
-            if value := item.find("a"):
-                if value.get("title"):
-                    temp_dict.update(name=value.getText())
-            elif value := item.find("img"):
+            if (value := item.find("img")) or ((value := item.find("a")) and value.get("title")):
                 temp_dict.update({"name": value.get("alt") or item.getText()})
                 link = value.get("src", str())
                 if link.startswith("data"):
