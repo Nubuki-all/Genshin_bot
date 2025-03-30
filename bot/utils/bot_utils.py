@@ -136,7 +136,7 @@ def get_date(value, start=True):
             if len(value.split()[1]) == 8:
                 index = 10
                 add_v = str()
-           else:
+            else:
                index = 19
                add_v = " 00:00:00"
             return valve[index:] + add_v
