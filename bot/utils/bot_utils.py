@@ -139,7 +139,7 @@ def get_date(value, start=False):
             else:
                 index = 19
                 add_v = " 00:00:00"
-            return valve[index:] + add_v
+            return value[index:] + add_v
 
 
 def get_date_from_ts(timestamp):
