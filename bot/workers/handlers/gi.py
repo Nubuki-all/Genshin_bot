@@ -656,6 +656,9 @@ async def get_events(event, args, client):
                 temp_dict = {}
 
         # Compare and combine events from different sources
+        # Debug:
+        await logger(e=current_list)
+        await logger(e=upcoming_list)
         for e in event_list:
             name = list(e.keys())[0]
             for l in upcoming_list:
