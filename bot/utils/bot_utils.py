@@ -119,7 +119,7 @@ def get_timestamp(date: str):
     )
 
 
-def get_date(value, start=True):
+def get_date(value, start=False):
     if len(value.split()) == 3:
         index = len(value) // 2
         return value[:index] if start else value[index:]
