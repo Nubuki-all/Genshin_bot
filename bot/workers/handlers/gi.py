@@ -621,8 +621,8 @@ async def get_events(event, args, client):
                     link = link[: index + 4]
                 temp_dict.update({"link": link})
             elif value := item.get("data-sort-value"):
-                svalue = get_timestamp(value[: len(value) // 2])
-                evalue = get_timestamp(value[len(value) // 2 :])
+                svalue = get_timestamp(value[:10])
+                evalue = get_timestamp(value[10:])
                 temp_dict.update({"start_time": svalue})
                 temp_dict.update({"end_time": evalue})
             else:
@@ -644,8 +644,8 @@ async def get_events(event, args, client):
                     link = link[: index + 4]
                 temp_dict.update({"link": link})
             elif value := item.get("data-sort-value"):
-                svalue = get_timestamp(value[: len(value) // 2])
-                evalue = get_timestamp(value[len(value) // 2 :])
+                svalue = get_timestamp(value[:10])
+                evalue = get_timestamp(value[10:])
                 temp_dict.update({"start_time": svalue})
                 temp_dict.update({"end_time": evalue})
             else:
