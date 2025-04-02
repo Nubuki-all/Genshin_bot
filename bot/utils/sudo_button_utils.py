@@ -1,4 +1,5 @@
 import asyncio
+import time
 
 from neonize.utils.message import get_poll_update_message
 
@@ -56,8 +57,11 @@ async def create_sudo_button(
 
 
 async def wait_for_button_response(msg_id: str, grace=0.1):
+    s_time = time.time()
     while True:
         await asyncio.sleep(grace)
+        if time.time() - s_time > 300:
+            return
         async with sudo_btn_lock:
             poll_info = active_poll_dict.get(msg_id)
             if not poll_info:
