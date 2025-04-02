@@ -383,7 +383,7 @@ async def enka_button_handler(event, uid, args, client):
         button_dict2.update({uuid.uuid4(): ["Done", cfm_btn]})
     title = f"{event.from_user.name} please select the characters you want to fetch cards for and click Next/Done."
     poll_msg_, msg_id = await create_sudo_button(
-        title, button_dict, event.chat.jid, user, 2, cfm_btn_txt, event.message
+        title, button_dict, event.chat.jid, user, 12, cfm_btn_txt, event.message
     )
     poll_msg = construct_msg_and_evt(
         event.chat.id, bot.me.JID.User, msg_id, None, event.chat.server, poll_msg_
@@ -399,7 +399,7 @@ async def enka_button_handler(event, uid, args, client):
         sel_char += char + ","
     if button_dict2:
         poll_msg_, msg_id = await create_sudo_button(
-            title, button_dict2, event.chat.jid, user, 2, "Done", event.message
+            title, button_dict2, event.chat.jid, user, 12, "Done", event.message
         )
         poll_msg = construct_msg_and_evt(
             event.chat.id, bot.me.JID.User, msg_id, None, event.chat.server, poll_msg_
@@ -566,7 +566,6 @@ async def send_event_menu(event_list, event, reply):
     if not (results := await wait_for_button_response(msg_id)):
         return await event.reply("yikes.")
     await poll_msg.delete()
-    str()
     selected_event_list = []
     for result in results:
         selected = button_dict.get(result)[1]
