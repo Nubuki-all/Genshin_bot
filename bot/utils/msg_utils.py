@@ -1,27 +1,14 @@
 import argparse
 import asyncio
-import copy
 import inspect
 import itertools
-import os
 import re
 from functools import partial
 
-import httpx
 from bs4 import BeautifulSoup
-from neonize.types import MessageWithContextInfo
-from neonize.utils.enum import ChatPresence, ChatPresenceMedia, MediaType, Presence
-from neonize.utils.message import extract_text, get_poll_update_message
+from neonize.utils.enum import MediaType, Presence
 
-from bot import (
-    Message,
-    MessageEv,
-    NewAClient,
-    base_msg,
-    base_msg_info,
-    base_msg_source,
-    jid,
-)
+from bot import jid
 from bot.config import bot, conf
 from bot.others.exceptions import ArgumentParserError
 
@@ -136,7 +123,6 @@ def user_is_sudoer(user: str | int):
 
 async def get_user_info(user_id):
     return await bot.client.contact.get_contact(jid.build_jid(user_id))
-
 
 
 def get_msg_from_codes(codes: list, auto: bool = False):
@@ -292,4 +278,3 @@ def get_args(*args, to_parse: str, get_unknown=False):
         unknown = " ".join(map(str, unknowns))
         return flag, unknown
     return flag
-
