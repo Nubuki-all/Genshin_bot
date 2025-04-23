@@ -174,11 +174,13 @@ async def enka_handler(event, args, client):
             else:
                 user_id = event.user.id if event.lid_address else event.alt_user.id
                 uid = bot.user_dict.get(user_id, {}).get("genshin_uid", None)
-                if not uid and (uid := bot.user_dict.get(user, {}).get("genshin_uid", None)):
+                if not uid and (
+                    uid := bot.user_dict.get(user, {}).get("genshin_uid", None)
+                ):
                     await event.reply("*Migrating to lid*")
                     bot.user_dict[user_id] = bot.user_dict.pop(user)
                     await save2db2(bot.user_dict, "users")
-                
+
         if delete:
             if not (saved_uid := bot.user_dict.get(user, {}).get("genshin_uid")):
                 await event.reply("*No saved uid was found to delete!*")

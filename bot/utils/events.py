@@ -47,11 +47,15 @@ class Event:
 
         def construct(self, message: MessageEv, alt=False):
             self.name = message.Info.Pushname
-            self.jid = message.Info.MessageSource.Sender if not alt else message.Info.MessageSource.SenderAlt
+            self.jid = (
+                message.Info.MessageSource.Sender
+                if not alt
+                else message.Info.MessageSource.SenderAlt
+            )
             self.id = self.jid.User
             self.is_empty = self.jid.IsEmpty
             self.server = self.jid.Server
-            self.is_hidden = (self.server == "lid")
+            self.is_hidden = self.server == "lid"
 
     class Chat:
         def __init__(self):
@@ -99,7 +103,7 @@ class Event:
         self.alt_user.construct(message, alt=True)
         self.user = self.User()
         self.user.construct(message)
-        
+
         self.message = message
 
         # To do support other message types
@@ -559,7 +563,13 @@ def construct_event(message: MessageEv, add_replied=True):
 
 
 def construct_message(
-    chat_id, user_id, msg_id, text, server="s.whatsapp.net", userver="s.whatsapp.net", Msg=None
+    chat_id,
+    user_id,
+    msg_id,
+    text,
+    server="s.whatsapp.net",
+    userver="s.whatsapp.net",
+    Msg=None,
 ):
     if text:
         message = Message(conversation=text)
