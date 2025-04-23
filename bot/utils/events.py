@@ -470,7 +470,7 @@ class Event:
             self.quoted.stanzaID,
             None,
             server,
-            self.quoted.participant.split("@"))[1],
+            (self.quoted.participant.split("@"))[1],
             self.quoted.quotedMessage,
         )
         return construct_event(msg, False)
