@@ -45,22 +45,23 @@ class Event:
         def __init__(self):
             self.name = None
 
-        def construct(self, message: MessageEv):
-            self.jid = message.Info.MessageSource.Sender
-            self.id = self.jid.User
-            self.is_empty = message.Info.MessageSource.Sender.IsEmpty
+        def construct(self, message: MessageEv, alt=False):
             self.name = message.Info.Pushname
+            self.jid = message.Info.MessageSource.Sender if not alt else message.Info.MessageSource.SenderAlt
+            self.id = self.jid.User
+            self.is_empty = self.jid.IsEmpty
             self.server = self.jid.Server
+            self.is_hidden = (self.server == "lid")
 
     class Chat:
         def __init__(self):
             self.name = None
 
-        def construct(self, message: MessageEv):
-            self.jid = message.Info.MessageSource.Chat
+        def construct(self, msg_source: base_msg_source):
+            self.jid = msg_source.Chat
             self.id = self.jid.User
-            self.is_empty = message.Info.MessageSource.Chat.IsEmpty
-            self.is_group = message.Info.MessageSource.IsGroup
+            self.is_empty = msg_source.Chat.IsEmpty
+            self.is_group = msg_source.IsGroup
             self.server = self.jid.Server
 
     def _construct_media(self):
@@ -86,16 +87,19 @@ class Event:
             "video",
             "sticker",
         ]
-        attrs.extend(["revoked_id"])
+        attrs.extend(["lid_address", "revoked_id"])
         attrs.extend(["pollUpdate", "senderKeyDistribution"])
         for a in attrs:
             setattr(self, a, None)
 
     def construct(self, message: MessageEv, add_replied: bool = True):
         self.chat = self.Chat()
-        self.chat.construct(message)
-        self.from_user = self.User()
-        self.from_user.construct(message)
+        self.chat.construct(message.Info.MessageSource)
+        self.alt_user = self.User()
+        self.alt_user.construct(message, alt=True)
+        self.user = self.User()
+        self.user.construct(message)
+        
         self.message = message
 
         # To do support other message types
@@ -120,6 +124,9 @@ class Event:
         if self.protocol and self.protocol.type == 0:
             self.is_revoke = True
             self.revoked_id = self.protocol.key.ID
+        if self.message.Info.MessageSource.AddressingMode == 2:
+            self.lid_address = True
+        self.from_user = self.alt_user if self.lid_address else self.user
         self.caption = (extract_text(self._message) or None) if not self.text else None
 
         self.quoted = (
@@ -463,6 +470,7 @@ class Event:
             self.quoted.stanzaID,
             None,
             server,
+            self.quoted.participant.split("@"))[1],
             self.quoted.quotedMessage,
         )
         return construct_event(msg, False)
@@ -551,7 +559,7 @@ def construct_event(message: MessageEv, add_replied=True):
 
 
 def construct_message(
-    chat_id, user_id, msg_id, text, server="s.whatsapp.net", Msg=None
+    chat_id, user_id, msg_id, text, server="s.whatsapp.net", userver="s.whatsapp.net", Msg=None
 ):
     if text:
         message = Message(conversation=text)
@@ -564,7 +572,7 @@ def construct_message(
             ID=msg_id,
             MessageSource=base_msg_source(
                 Chat=jid.build_jid(chat_id, server),
-                Sender=jid.build_jid(user_id),
+                Sender=jid.build_jid(user_id, userver),
             ),
         ),
     )
