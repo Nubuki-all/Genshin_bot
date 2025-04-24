@@ -408,7 +408,7 @@ async def enka_button_handler(event, uid, args, client):
         msg_id,
         None,
         event.chat.server,
-        me.User.Server,
+        me.Server,
         poll_msg_,
     )
     if not (results := await wait_for_button_response(msg_id)):
