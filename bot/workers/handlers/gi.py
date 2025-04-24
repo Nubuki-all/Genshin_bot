@@ -182,10 +182,11 @@ async def enka_handler(event, args, client):
                     await save2db2(bot.user_dict, "users")
 
         if delete:
-            if not (saved_uid := bot.user_dict.get(user, {}).get("genshin_uid")):
+            user_id = event.user.id if event.lid_address else event.alt_user.id
+            if not (saved_uid := bot.user_dict.get(user_id, {}).get("genshin_uid")):
                 await event.reply("*No saved uid was found to delete!*")
             else:
-                bot.user_dict.setdefault(user, {}).update(genshin_uid=None)
+                bot.user_dict.setdefault(user_id, {}).update(genshin_uid=None)
                 await save2db2(bot.user_dict, "users")
                 await event.reply(f"*Saved UID: {saved_uid} has been deleted!*")
             if not vital_args:
@@ -396,8 +397,13 @@ async def enka_button_handler(event, uid, args, client):
     poll_msg_, msg_id = await create_sudo_button(
         title, button_dict, event.chat.jid, user, 12, cfm_btn_txt, event.message
     )
+    if event.lid_address:
+        me = bot.me.LID
+    else:
+        me = bot.me.JID
+    
     poll_msg = construct_msg_and_evt(
-        event.chat.id, bot.me.JID.User, msg_id, None, event.chat.server, poll_msg_
+        event.chat.id, me.User, msg_id, None, event.chat.server, me.User.Server, poll_msg_
     )
     if not (results := await wait_for_button_response(msg_id)):
         return await event.reply("Yh, I'm done waiting.")
