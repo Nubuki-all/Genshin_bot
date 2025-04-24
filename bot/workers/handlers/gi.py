@@ -425,7 +425,13 @@ async def enka_button_handler(event, uid, args, client):
             title, button_dict2, event.chat.jid, user, 12, "Done", event.message
         )
         poll_msg = construct_msg_and_evt(
-            event.chat.id, me.User, msg_id, None, event.chat.server, me.Server, poll_msg_
+            event.chat.id,
+            me.User,
+            msg_id,
+            None,
+            event.chat.server,
+            me.Server,
+            poll_msg_,
         )
         if not (results := await wait_for_button_response(msg_id)):
             return await event.reply("Yh, I'm done waiting.")
