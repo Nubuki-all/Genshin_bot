@@ -614,16 +614,19 @@ def construct_msg_and_evt(*args, **kwargs):
 
 
 def patch_msg(msg: Message, new_msg: Message):
-    return msg.MergeFrom(
-        msg.__class__(
-            Message=new_msg,
-            Raw=new_msg,
-        )
+    temp_msg = msg.__class__(
+        Message=new_msg,
+        Raw=new_msg,
     )
-
+    set_fields = {field.name for field, _ in temp_msg.Message.ListFields()}
+    for field in msg.Message.DESCRIPTOR.fields:
+        if field.name not in set_fields:
+            msg.Message.ClearField(field.name)
+            msg.Raw.ClearField(field.name)
+    msg.MergeFrom(temp_msg)
 
 def patch_msg_sender(msg: Message, sender: JID, sender_alt: JID):
-    return msg.Info.MessageSource.MergeFrom(
+    msg.Info.MessageSource.MergeFrom(
         msg.Info.MessageSource.__class__(
             Sender=sender,
             SenderAlt=sender_alt,
