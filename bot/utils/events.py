@@ -621,6 +621,7 @@ def patch_msg(msg: Message, new_msg: Message):
         )
     )
 
+
 def patch_msg_sender(msg: Message, sender: JID, sender_alt: JID):
     return msg.Info.MessageSource.MergeFrom(
         msg.Info.MessageSource.__class__(
