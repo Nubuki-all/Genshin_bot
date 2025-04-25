@@ -455,6 +455,7 @@ class Event:
             msg.Info.MessageSource.Chat.User = self.from_user.id
             msg.Info.MessageSource.Chat.Server = self.from_user.server
         msg.Info.MessageSource.Sender.User = user_id or conf.PH_NUMBER
+        msg.Info.MessageSource.Sender.Server = "s.whatsapp.net"
         return msg
 
     def get_quoted_msg(self):
