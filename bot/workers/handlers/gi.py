@@ -824,7 +824,7 @@ async def get_events(event, args, client):
             msg += f"\n*{strt}* *{time_formatter(tl) if tl else 'UNAVAILABLE!'}*"
         await event.send_typing_status(False)
         await event.reply(msg)
-    except Exception:
+    except Exception as e:
         await logger(Exception)
         await event.react("❌")
         await status.edit(f"*Error:*\n{e}")

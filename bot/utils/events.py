@@ -132,6 +132,8 @@ class Event:
         if self.message.Info.MessageSource.AddressingMode == 2:
             self.lid_address = True
         self.from_user = self.alt_user if self.lid_address else self.user
+        self.from_user.hid = self.user.id if self.lid_address else self.alt_user.id
+        self.from_user.lid = self.user.jid if self.lid_address else self.alt_user.jid
         self.caption = (extract_text(self._message) or None) if not self.text else None
 
         self.quoted = (
@@ -201,6 +203,7 @@ class Event:
         message,
         link_preview: bool = True,
         ghost_mentions: str = None,
+        mentions_are_lids: bool = False,
         add_msg_secret: bool = False,
     ):
         await self.send_typing_status()
@@ -209,6 +212,7 @@ class Event:
             message=message,
             link_preview=link_preview,
             ghost_mentions=ghost_mentions,
+            mentions_are_lids=mentions_are_lids or self.lid_address,
             add_msg_secret=add_msg_secret,
         )
         await self.send_typing_status(False)
@@ -242,6 +246,7 @@ class Event:
         reply_privately: bool = False,
         ghost_mentions: str = None,
         message: MessageWithContextInfo = None,
+        mentions_are_lids: bool = False,
         add_msg_secret: bool = False,
     ):
         if not self.constructed:
@@ -271,6 +276,7 @@ class Event:
                 link_preview=link_preview,
                 reply_privately=reply_privately,
                 ghost_mentions=ghost_mentions,
+                mentions_are_lids=mentions_are_lids or self.lid_address,
                 add_msg_secret=add_msg_secret,
             )
         except httpx.HTTPStatusError:
@@ -281,6 +287,7 @@ class Event:
                 link_preview=False,
                 reply_privately=reply_privately,
                 ghost_mentions=ghost_mentions,
+                mentions_are_lids=mentions_are_lids or self.lid_address,
                 add_msg_secret=add_msg_secret,
             )
         # self.id = response.ID
@@ -316,6 +323,7 @@ class Event:
         caption: str = None,
         quote: bool = True,
         ghost_mentions: str = None,
+        mentions_are_lids: bool = False,
         add_msg_secret: bool = False,
     ):
         quoted = self.message if quote else None
@@ -331,6 +339,7 @@ class Event:
             filename=file_name,
             quoted=quoted,
             ghost_mentions=ghost_mentions,
+            mentions_are_lids=mentions_are_lids or self.lid_address,
             add_msg_secret=add_msg_secret,
         )
         msg = self.gen_new_msg(response.ID)
@@ -344,6 +353,7 @@ class Event:
         viewonce: bool = False,
         as_gif: bool = True,
         ghost_mentions: str = None,
+        mentions_are_lids: bool = False,
         add_msg_secret: bool = False,
     ):
         quoted = self.message if quote else None
@@ -356,6 +366,7 @@ class Event:
             gifplayback=as_gif,
             is_gif=True,
             ghost_mentions=ghost_mentions,
+            mentions_are_lids=mentions_are_lids or self.lid_address,
             add_msg_secret=add_msg_secret,
         )
         msg = self.gen_new_msg(response.ID)
@@ -368,6 +379,7 @@ class Event:
         quote: bool = True,
         viewonce: bool = False,
         ghost_mentions: str = None,
+        mentions_are_lids: bool = False,
         add_msg_secret: bool = False,
     ):
         quoted = self.message if quote else None
@@ -378,6 +390,7 @@ class Event:
             quoted=quoted,
             viewonce=viewonce,
             ghost_mentions=ghost_mentions,
+            mentions_are_lids=mentions_are_lids or self.lid_address,
             add_msg_secret=add_msg_secret,
         )
         msg = self.gen_new_msg(response.ID)
@@ -415,6 +428,7 @@ class Event:
         viewonce: bool = False,
         as_gif: bool = False,
         ghost_mentions: str = None,
+        mentions_are_lids: bool = False,
         add_msg_secret: bool = False,
     ):
         quoted = self.message if quote else None
@@ -426,6 +440,7 @@ class Event:
             viewonce=viewonce,
             gifplayback=as_gif,
             ghost_mentions=ghost_mentions,
+            mentions_are_lids=mentions_are_lids or self.lid_address,
             add_msg_secret=add_msg_secret,
         )
         msg = self.gen_new_msg(response.ID)
