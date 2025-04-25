@@ -618,11 +618,8 @@ def patch_msg(msg: Message, new_msg: Message):
         Message=new_msg,
         Raw=new_msg,
     )
-    set_fields = {field.name for field, _ in temp_msg.Message.ListFields()}
-    for field in msg.Message.DESCRIPTOR.fields:
-        if field.name not in set_fields:
-            msg.Message.ClearField(field.name)
-            msg.Raw.ClearField(field.name)
+    msg.Message.Clear()
+    msg.Raw.Clear()
     msg.MergeFrom(temp_msg)
 
 
