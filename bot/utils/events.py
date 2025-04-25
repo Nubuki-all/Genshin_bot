@@ -625,6 +625,7 @@ def patch_msg(msg: Message, new_msg: Message):
             msg.Raw.ClearField(field.name)
     msg.MergeFrom(temp_msg)
 
+
 def patch_msg_sender(msg: Message, sender: JID, sender_alt: JID):
     msg.Info.MessageSource.MergeFrom(
         msg.Info.MessageSource.__class__(
