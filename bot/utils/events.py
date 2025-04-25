@@ -14,6 +14,7 @@ from bot import (
     Message,
     MessageEv,
     NewAClient,
+    SendResponse,
     base_msg,
     base_msg_info,
     base_msg_source,
@@ -216,7 +217,7 @@ class Event:
             add_msg_secret=add_msg_secret,
         )
         await self.send_typing_status(False)
-        msg = self.gen_new_msg(response.ID)
+        msg = self.gen_new_msg(response)
         return construct_event(msg)
 
     async def delete(self):
@@ -226,7 +227,7 @@ class Event:
     async def edit(self, text: str):
         msg = Message(conversation=text)
         response = await self.client.edit_message(self.chat.jid, self.id, msg)
-        msg = self.gen_new_msg(response.ID)
+        msg = self.gen_new_msg(response)
         return construct_event(msg)
 
     async def react(self, emoji: str):
@@ -298,7 +299,7 @@ class Event:
 
         # self.user.name = None
         await self.send_typing_status(False)
-        msg = self.gen_new_msg(response.ID, private=reply_privately)
+        msg = self.gen_new_msg(response, private=reply_privately)
         return construct_event(msg)
 
     async def reply_audio(
@@ -313,7 +314,7 @@ class Event:
         response = await self.client.send_audio(
             self.chat.jid, audio, ptt, quoted=quoted, add_msg_secret=add_msg_secret
         )
-        msg = self.gen_new_msg(response.ID)
+        msg = self.gen_new_msg(response)
         return construct_event(msg)
 
     async def reply_document(
@@ -342,7 +343,7 @@ class Event:
             mentions_are_lids=mentions_are_lids or self.lid_address,
             add_msg_secret=add_msg_secret,
         )
-        msg = self.gen_new_msg(response.ID)
+        msg = self.gen_new_msg(response)
         return construct_event(msg)
 
     async def reply_gif(
@@ -369,7 +370,7 @@ class Event:
             mentions_are_lids=mentions_are_lids or self.lid_address,
             add_msg_secret=add_msg_secret,
         )
-        msg = self.gen_new_msg(response.ID)
+        msg = self.gen_new_msg(response)
         return construct_event(msg)
 
     async def reply_photo(
@@ -393,7 +394,7 @@ class Event:
             mentions_are_lids=mentions_are_lids or self.lid_address,
             add_msg_secret=add_msg_secret,
         )
-        msg = self.gen_new_msg(response.ID)
+        msg = self.gen_new_msg(response)
         return construct_event(msg)
 
     async def reply_sticker(
@@ -417,7 +418,7 @@ class Event:
             enforce_not_broken=enforce_not_broken,
             add_msg_secret=add_msg_secret,
         )
-        msg = self.gen_new_msg(response.ID)
+        msg = self.gen_new_msg(response)
         return construct_event(msg)
 
     async def reply_video(
@@ -443,7 +444,7 @@ class Event:
             mentions_are_lids=mentions_are_lids or self.lid_address,
             add_msg_secret=add_msg_secret,
         )
-        msg = self.gen_new_msg(response.ID)
+        msg = self.gen_new_msg(response)
         return construct_event(msg)
 
     async def send_typing_status(self, typing=True):
@@ -462,9 +463,12 @@ class Event:
         # return construct_event(msg)
         return response
 
-    def gen_new_msg(self, msg_id: str, private=False):
+    def gen_new_msg(self, response: SendResponse, private=False):
         msg = copy.deepcopy(self.message)
-        msg.Info.ID = msg_id
+        msg.Info.ID = response.ID
+        msg.Info.Pushname = bot.me.PushName
+        msg.Info.Timestamp = response.Timestamp
+        patch_msg(msg, response.Message)
         if private:
             msg.Info.MessageSource.Chat.User = self.from_user.id
             msg.Info.MessageSource.Chat.Server = self.from_user.server
@@ -608,6 +612,14 @@ def construct_message(
 def construct_msg_and_evt(*args, **kwargs):
     return construct_event(construct_message(*args, **kwargs))
 
+
+def patch_msg(msg: Message, new_msg: Message):
+    return msg.MergeFrom(
+        msg.__class__(
+            Message=new_msg,
+            Raw=new_msg,
+        )
+    )
 
 def patch_msg_sender(msg: Message, sender: JID, sender_alt: JID):
     return msg.Info.MessageSource.MergeFrom(
