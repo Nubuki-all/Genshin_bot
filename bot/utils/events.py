@@ -447,9 +447,7 @@ class Event:
         # return construct_event(msg)
         return response
 
-    def gen_new_msg(
-        self, msg_id: str, private=False
-    ):
+    def gen_new_msg(self, msg_id: str, private=False):
         msg = copy.deepcopy(self.message)
         msg.Info.ID = msg_id
         if private:
@@ -595,15 +593,15 @@ def construct_message(
 def construct_msg_and_evt(*args, **kwargs):
     return construct_event(construct_message(*args, **kwargs))
 
+
 def patch_msg_sender(msg: Message, sender: JID, sender_alt: JID):
-    return (
-        msg.Info.MessageSource.MergeFrom(
-            msg.Info.MessageSource.__class__(
-                Sender=sender,
-                SenderAlt=sender_alt,
-            )
+    return msg.Info.MessageSource.MergeFrom(
+        msg.Info.MessageSource.__class__(
+            Sender=sender,
+            SenderAlt=sender_alt,
         )
     )
+
 
 async def event_handler(
     event: Event,
