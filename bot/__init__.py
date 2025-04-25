@@ -41,6 +41,7 @@ from neonize.events import (
     ReceiptEv,
     event,
 )
+from neonize.proto.Neonize_pb2 import JID
 from neonize.proto.Neonize_pb2 import Message as base_msg
 from neonize.proto.Neonize_pb2 import MessageInfo as base_msg_info
 from neonize.proto.Neonize_pb2 import MessageSource as base_msg_source

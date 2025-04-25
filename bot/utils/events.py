@@ -10,6 +10,7 @@ from neonize.utils.enum import ChatPresence, ChatPresenceMedia
 from neonize.utils.message import extract_text
 
 from bot import (
+    JID,
     Message,
     MessageEv,
     NewAClient,
@@ -447,15 +448,17 @@ class Event:
         return response
 
     def gen_new_msg(
-        self, msg_id: str, user_id: str = None, chat_id: str = None, private=False
+        self, msg_id: str, private=False
     ):
         msg = copy.deepcopy(self.message)
         msg.Info.ID = msg_id
         if private:
             msg.Info.MessageSource.Chat.User = self.from_user.id
             msg.Info.MessageSource.Chat.Server = self.from_user.server
-        msg.Info.MessageSource.Sender.User = user_id or conf.PH_NUMBER
-        msg.Info.MessageSource.Sender.Server = "s.whatsapp.net"
+        if self.lid_address:
+            patch_msg_sender(msg, bot.me.LID, bot.me.JID)
+        else:
+            patch_msg_sender(msg, bot.me.JID, bot.me.LID)
         return msg
 
     def get_quoted_msg(self):
@@ -592,6 +595,15 @@ def construct_message(
 def construct_msg_and_evt(*args, **kwargs):
     return construct_event(construct_message(*args, **kwargs))
 
+def patch_msg_sender(msg: Message, sender: JID, sender_alt: JID):
+    return (
+        msg.Info.MessageSource.MergeFrom(
+            msg.Info.MessageSource.__class__(
+                Sender=sender,
+                SenderAlt=sender_alt,
+            )
+        )
+    )
 
 async def event_handler(
     event: Event,
