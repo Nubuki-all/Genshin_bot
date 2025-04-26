@@ -273,7 +273,7 @@ class Event:
         try:
             response = await self.client.reply_message(
                 text,
-                self.message,
+                copy.deepcopy(self.message),
                 link_preview=link_preview,
                 reply_privately=reply_privately,
                 ghost_mentions=ghost_mentions,
@@ -284,7 +284,7 @@ class Event:
             await logger(Exception)
             response = await self.client.reply_message(
                 text,
-                self.message,
+                copy.deepcopy(self.message),
                 link_preview=False,
                 reply_privately=reply_privately,
                 ghost_mentions=ghost_mentions,
@@ -309,7 +309,7 @@ class Event:
         quote: bool = True,
         add_msg_secret: bool = False,
     ):
-        quoted = self.message if quote else None
+        quoted = copy.deepcopy(self.message) if quote else None
 
         response = await self.client.send_audio(
             self.chat.jid, audio, ptt, quoted=quoted, add_msg_secret=add_msg_secret
@@ -327,7 +327,7 @@ class Event:
         mentions_are_lids: bool = False,
         add_msg_secret: bool = False,
     ):
-        quoted = self.message if quote else None
+        quoted = copy.deepcopy(self.message) if quote else None
         _, file_name = (
             os.path.split(document)
             if not file_name and isinstance(document, str)
@@ -357,7 +357,7 @@ class Event:
         mentions_are_lids: bool = False,
         add_msg_secret: bool = False,
     ):
-        quoted = self.message if quote else None
+        quoted = copy.deepcopy(self.message) if quote else None
         response = await self.client.send_video(
             self.chat.jid,
             gif,
@@ -383,7 +383,7 @@ class Event:
         mentions_are_lids: bool = False,
         add_msg_secret: bool = False,
     ):
-        quoted = self.message if quote else None
+        quoted = copy.deepcopy(self.message) if quote else None
         response = await self.client.send_image(
             self.chat.jid,
             photo,
@@ -407,7 +407,7 @@ class Event:
         enforce_not_broken: bool = False,
         add_msg_secret: bool = False,
     ):
-        quoted = self.message if quote else None
+        quoted = copy.deepcopy(self.message) if quote else None
         response = await self.client.send_sticker(
             self.chat.jid,
             file,
@@ -432,7 +432,7 @@ class Event:
         mentions_are_lids: bool = False,
         add_msg_secret: bool = False,
     ):
-        quoted = self.message if quote else None
+        quoted = copy.deepcopy(self.message) if quote else None
         response = await self.client.send_video(
             self.chat.jid,
             video,
