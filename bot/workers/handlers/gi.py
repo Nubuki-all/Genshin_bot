@@ -149,20 +149,22 @@ async def enka_handler(event, args, client):
         if mention and uid:
             await event.reply("Ignoring your mention…")
         elif mention:
-            mentioned = await get_user_info(mention[1:])
+            mentioned = await get_user_info(mention[1:], event.user.server)
             not_found_err = "*No idea who {} is.*"
             if not mentioned.Found:
                 return await event.reply(not_found_err.format(mention))
         if uid and save:
+            user_id = event.user.id if event.lid_address else event.alt_user.id
             will_save = True
-            if bot.user_dict.get(user, {}).get("genshin_uid") == uid:
+            if bot.user_dict.get(user_id, {}).get("genshin_uid") == uid:
                 await event.reply(f"*Warning:* This uid has already been saved")
                 will_save = False
-            elif prev_uid := bot.user_dict.get(user, {}).get("genshin_uid"):
+            elif prev_uid := bot.user_dict.get(user_id, {}).get("genshin_uid"):
                 await event.reply(
                     f"*Info:* Overwriting previously saved uid: {prev_uid} with: {uid}…"
                 )
             if will_save:
+                bot.user_dict.setdefault(user_id, {}).update(genshin_uid=uid)
                 bot.user_dict.setdefault(user, {}).update(genshin_uid=uid)
                 await save2db2(bot.user_dict, "users")
                 await event.reply("*Saved your uid successfully!*")
@@ -178,7 +180,7 @@ async def enka_handler(event, args, client):
                     uid := bot.user_dict.get(user, {}).get("genshin_uid", None)
                 ):
                     await event.reply("*Migrating to lid*")
-                    bot.user_dict[user_id] = bot.user_dict.pop(user)
+                    bot.user_dict[user_id] = bot.user_dict[user]
                     await save2db2(bot.user_dict, "users")
 
         if delete:
@@ -187,6 +189,7 @@ async def enka_handler(event, args, client):
                 await event.reply("*No saved uid was found to delete!*")
             else:
                 bot.user_dict.setdefault(user_id, {}).update(genshin_uid=None)
+                bot.user_dict.setdefault(user, {}).update(genshin_uid=None)
                 await save2db2(bot.user_dict, "users")
                 await event.reply(f"*Saved UID: {saved_uid} has been deleted!*")
             if not vital_args:
