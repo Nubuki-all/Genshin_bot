@@ -28,7 +28,7 @@ from .events import (
 from .log_utils import logger
 
 
-async def download_replied_media(event) -> bytes:
+async def download_replied_media(event: Event) -> bytes:
     if item := event.quoted_image:
         mtype = "image"
         media_type = MediaType.MediaImage
@@ -41,6 +41,9 @@ async def download_replied_media(event) -> bytes:
     elif item := event.quoted_document:
         mtype = "document"
         media_type = MediaType.MediaDocument
+    elif item := event.reply_to_message.sticker:
+        mtype = "image"
+        media_type = MediaType.MediaImage
     else:
         raise Exception(
             inspect.cleandoc(
@@ -82,7 +85,7 @@ def chat_is_allowed(event: Event):
 
 def user_is_admin(user: str, members: list):
     for member in members:
-        if user == member.JID.User:
+        if user == member.JID.User or user == member.PhoneNumber.User:
             return member.IsAdmin
 
 
@@ -121,8 +124,8 @@ def user_is_sudoer(user: str | int):
     return bot.user_dict.get(user, {}).get("sudoer", False)
 
 
-async def get_user_info(user_id):
-    return await bot.client.contact.get_contact(jid.build_jid(user_id))
+async def get_user_info(user_id: str, server: str = "s.whatsapp.net"):
+    return await bot.client.contact.get_contact(jid.build_jid(user_id, server))
 
 
 def get_msg_from_codes(codes: list, auto: bool = False):
@@ -159,7 +162,7 @@ async def parse_and_send_rss(data: dict, chat_ids: list = None):
         url = data.get("link")
         # auth_text = f" by {author}" if author else str()
         caption = f"*{title}*"
-        caption += f"\n> {summary}" if summary else str()
+        caption += f"\n> {summary}" if summary else ""
         if content:
             if len(content) > 65536:
                 content = (
