@@ -10,7 +10,7 @@ from encard.src.tools import pill
 from enka_card.generator import generate_image
 from enkacard import enc_error, encbanner
 from enkanetwork import EnkaNetworkAPI, Language
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont, UnidentifiedImageError
 
 from bot import bot
 
@@ -116,6 +116,16 @@ async def get_enka_card(uid, char_id, akasha=True, huid=False, template=1, retry
             return
         await logger(e="Updating enka assets and trying again…")
         await enka_update()
+        result, error = await get_enka_card(
+            uid, char_id, akasha=True, huid=False, template=1, retry=True
+        )
+    except UnidentifiedImageError as e:
+        await logger(Exception)
+        if retry:
+            error = True
+            result = e
+            return
+        await logger(e="Retrying…")
         result, error = await get_enka_card(
             uid, char_id, akasha=True, huid=False, template=1, retry=True
         )
