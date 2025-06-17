@@ -1,4 +1,4 @@
-from bot.utils.os_utils import re_x, s_remove
+from bot.utils.os_utils import re_x
 
 from . import (
     LOGS,
@@ -10,14 +10,13 @@ from . import (
     PairStatusEv,
     asyncio,
     bot,
-    con_ind,
     conf,
     time,
     traceback,
 )
 from .startup.after import on_startup
 from .utils.events import POLL, Event, event_handler, on_message
-from .utils.os_utils import file_exists, re_x, s_remove
+from .utils.os_utils import re_x
 from .utils.sudo_button_utils import poll_as_button_handler
 from .workers.handlers.dev import bash, eval_message, get_logs
 from .workers.handlers.gi import (
@@ -189,6 +188,7 @@ async def _(client: NewAClient, message: MessageEv):
 
 
 ########### Start ############
+
 
 async def start_bot():
     try:

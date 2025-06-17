@@ -2,7 +2,7 @@ import pickle
 
 from pymongo import MongoClient
 
-from bot import LOGS, bot, con_ind, conf, os, sys, version_file
+from bot import LOGS, bot, conf, os, sys, version_file
 from bot.utils.bot_utils import create_api_token
 from bot.utils.local_db_utils import load_enka_db, load_local_db
 from bot.utils.os_utils import file_exists
