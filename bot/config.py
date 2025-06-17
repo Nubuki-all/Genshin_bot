@@ -62,7 +62,6 @@ class Config:
 
 class Runtime_Config:
     def __init__(self):
-        self.initialized_client = False
         self.author = None
         self.author_url = None
         self.block_nsfw = False
@@ -71,6 +70,7 @@ class Runtime_Config:
         self.enka_dict = {}
         self.group_dict = {}
         self.ignore_pm = False
+        self.is_connected = False
         self.max_message_length = 4096
         self.me = None
         self.offline = False

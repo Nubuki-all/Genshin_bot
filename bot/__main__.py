@@ -7,6 +7,7 @@ from . import (
     LoggedOutEv,
     MessageEv,
     NewAClient,
+    PairStatusEv,
     asyncio,
     bot,
     con_ind,
@@ -43,12 +44,16 @@ from .workers.handlers.wa import sanitize_url
 
 @bot.client.event(ConnectedEv)
 async def on_connected(_: NewAClient, __: ConnectedEv):
-    LOGS.info("Bot has started.")
+    bot.is_connected = True
+
+
+@bot.client.event(PairStatusEv)
+async def on_paired(_: NewAClient, __: PairStatusEv):
+    LOGS.info(PairStatusEv)
 
 
 @bot.client.event(LoggedOutEv)
 async def on_logout(_: NewAClient, __: LoggedOutEv):
-    s_remove(con_ind)
     LOGS.info("Bot has been logged out.")
     LOGS.info("Restarting…")
     time.sleep(10)
@@ -57,7 +62,7 @@ async def on_logout(_: NewAClient, __: LoggedOutEv):
 
 @bot.client.event(DisconnectedEv)
 async def _(_: NewAClient, __: DisconnectedEv):
-    if not file_exists(con_ind):
+    if not bot.is_connected:
         LOGS.info("Restarting…")
         time.sleep(1)
         re_x()
@@ -185,16 +190,14 @@ async def _(client: NewAClient, message: MessageEv):
 
 ########### Start ############
 
-try:
-    bot.loop = asyncio.get_event_loop()
-    bot.loop.create_task(on_startup())
-    if not bot.initialized_client:
-        bot.loop.run_until_complete(
-            bot.client.PairPhone(conf.PH_NUMBER, show_push_notification=True)
-        )
-    else:
-        bot.loop.run_until_complete(bot.client.connect())
-except Exception:
-    LOGS.critical(traceback.format_exc())
-    LOGS.critical("Cannot recover from error, exiting…")
-    exit()
+async def start_bot():
+    try:
+        asyncio.create_task(on_startup())
+        await bot.client.PairPhone(conf.PH_NUMBER, show_push_notification=True)
+    except Exception:
+        LOGS.critical(traceback.format_exc())
+        LOGS.critical("Cannot recover from error, exiting…")
+        exit()
+
+
+bot.client.loop.run_until_complete(start_bot())
