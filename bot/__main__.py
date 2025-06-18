@@ -189,6 +189,7 @@ async def _(client: NewAClient, message: MessageEv):
 
 ########### Start ############
 
+
 async def start_bot():
     try:
         asyncio.create_task(on_startup())
