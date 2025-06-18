@@ -33,6 +33,7 @@ class Config:
 
             self.CMD_PREFIX = config("CMD_PREFIX", default="")
             self.DATABASE_URL = config("DATABASE_URL", default=None)
+            self.DB_ID = config("DB_ID", default="0000")
             self.DBNAME = config("DBNAME", default="Qiqi")
             self.DEBUG = config("DEBUG", default=False, cast=bool)
             self.DEV = config("DEV", default=0, cast=str)

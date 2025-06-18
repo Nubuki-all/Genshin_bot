@@ -33,7 +33,7 @@ bot.gift_dict.update({"codes": [], "chats": []})
 
 
 def load_db(_db, _key, var, var_type=None):
-    queries = _db.find({"_id": conf.PH_NUMBER})
+    queries = _db.find({"_id": conf.PH_NUMBER or conf.DB_ID})
     raw = None
     for query in queries:
         raw = query.get(_key)

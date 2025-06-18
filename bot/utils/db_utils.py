@@ -12,7 +12,7 @@ from .local_db_utils import save2db_lcl2
 # wanna fix this?
 # PRs are welcome
 
-_filter = {"_id": conf.PH_NUMBER}
+_filter = {"_id": conf.PH_NUMBER or conf.DB_ID}
 
 database = conf.DATABASE_URL
 db_cluster = {
