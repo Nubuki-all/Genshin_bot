@@ -54,6 +54,7 @@ async def on_paired(_: NewAClient, message: PairStatusEv):
 
 @bot.client.event(LoggedOutEv)
 async def on_logout(_: NewAClient, __: LoggedOutEv):
+    bot.is_connected = False
     LOGS.info("Bot has been logged out.")
     LOGS.info("Restarting…")
     time.sleep(10)
