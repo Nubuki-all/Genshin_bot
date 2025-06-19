@@ -1,12 +1,11 @@
 import argparse
 import asyncio
-import inspect
 import itertools
 import re
 from functools import partial
 
 from bs4 import BeautifulSoup
-from neonize.utils.enum import MediaType, Presence
+from neonize.utils.enum import Presence
 
 from bot import jid
 from bot.config import bot, conf
@@ -27,7 +26,6 @@ from .events import (
 # isort: on
 
 from .log_utils import logger
-
 
 
 def chat_is_allowed(event: Event):
