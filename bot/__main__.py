@@ -48,7 +48,6 @@ async def on_connected(_: NewAClient, __: ConnectedEv):
 
 @bot.client.event(PairStatusEv)
 async def on_paired(_: NewAClient, message: PairStatusEv):
-    bot.is_connected = True
     LOGS.info(message)
 
 
@@ -194,12 +193,12 @@ async def _(client: NewAClient, message: MessageEv):
 
 async def start_bot():
     try:
-        asyncio.create_task(on_startup())
         (
             await bot.client.PairPhone(conf.PH_NUMBER, show_push_notification=True)
             if conf.PH_NUMBER
             else await bot.client.connect()
         )
+        await on_startup()
         await bot.client.idle()
     except Exception:
         LOGS.critical(traceback.format_exc())
