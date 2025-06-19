@@ -82,7 +82,7 @@ async def update_presence():
 async def on_startup():
     try:
         loop = asyncio.get_running_loop()
-        bot.requests = aiohttp.ClientSession(loop=loop)
+        bot.requests = aiohttp.ClientSession(loop=bot.client.event_loop)
         for signame in {"SIGINT", "SIGTERM", "SIGABRT"}:
             loop.add_signal_handler(
                 getattr(signal, signame),
