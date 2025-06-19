@@ -89,14 +89,14 @@ async def on_startup():
                 lambda: asyncio.create_task(on_termination()),
             )
         while not bot.is_connected:
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.5)
+        bot.me = await bot.client.get_me()
         await update_enka_assets()
         scheduler.start()
         if len(sys.argv) == 3:
             await onrestart()
         else:
             await onstart(f"*I'm {enquip()} {enmoji()}*")
-        bot.me = await bot.client.get_me()
         asyncio.create_task(update_presence())
         await logger(e="Bot has started.")
     except Exception:
