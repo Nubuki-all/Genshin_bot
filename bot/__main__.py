@@ -47,8 +47,9 @@ async def on_connected(_: NewAClient, __: ConnectedEv):
 
 
 @bot.client.event(PairStatusEv)
-async def on_paired(_: NewAClient, __: PairStatusEv):
-    LOGS.info(PairStatusEv)
+async def on_paired(_: NewAClient, message: PairStatusEv):
+    bot.is_connected = True
+    LOGS.info(message)
 
 
 @bot.client.event(LoggedOutEv)
