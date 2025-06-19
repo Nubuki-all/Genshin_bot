@@ -20,6 +20,7 @@ from .events import (
     construct_event,
     construct_message,
     construct_msg_and_evt,
+    download_media,
     event_handler,
 )
 
@@ -27,51 +28,6 @@ from .events import (
 
 from .log_utils import logger
 
-
-async def download_replied_media(event: Event) -> bytes:
-    if item := event.quoted_image:
-        mtype = "image"
-        media_type = MediaType.MediaImage
-    elif item := event.quoted_video:
-        mtype = "video"
-        media_type = MediaType.MediaVideo
-    elif item := event.quoted_audio:
-        mtype = "audio"
-        media_type = MediaType.MediaAudio
-    elif item := event.quoted_document:
-        mtype = "document"
-        media_type = MediaType.MediaDocument
-    elif item := event.reply_to_message.sticker:
-        mtype = "image"
-        media_type = MediaType.MediaImage
-    else:
-        raise Exception(
-            inspect.cleandoc(
-                f"""Expected either:
-                ImageMessage
-                VideoMessage
-                AudioMessage
-                DocumentMessage
-                not {type(event.quoted_msg).__name__}
-                """
-            )
-        )
-
-    direct_path = item.directPath
-    enc_file_hash = item.fileEncSHA256
-    file_hash = item.fileSHA256
-    media_key = item.mediaKey
-    file_length = item.fileLength
-    mms_type = mtype
-    return await bot.client.download_media_with_path(
-        direct_path,
-        enc_file_hash,
-        file_hash,
-        media_key,
-        file_length,
-        media_type,
-        mms_type,
-    )
 
 
 def chat_is_allowed(event: Event):
@@ -214,7 +170,7 @@ async def send_rss(caption, chat, pics, server):
                 caption,
             )
             message = construct_message(
-                chat, bot.me.JID.User, rep.ID, "image", server=server
+                chat, bot.client.me.JID.User, rep.ID, "image", server=server
             )
             msg = construct_event(message)
             for img in pics[1:]:

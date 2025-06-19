@@ -198,11 +198,11 @@ async def start_bot():
             if conf.PH_NUMBER
             else await bot.client.connect()
         )
-        await bot.client.connect_task
+        await bot.client.idle()
     except Exception:
         LOGS.critical(traceback.format_exc())
         LOGS.critical("Cannot recover from error, exiting…")
         exit()
 
 
-bot.client.event_loop.run_until_complete(start_bot())
+bot.client.loop.run_until_complete(start_bot())

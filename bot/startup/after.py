@@ -82,7 +82,7 @@ async def update_presence():
 async def on_startup():
     try:
         loop = asyncio.get_running_loop()
-        bot.requests = aiohttp.ClientSession(loop=bot.client.event_loop)
+        bot.requests = aiohttp.ClientSession(loop=loop)
         for signame in {"SIGINT", "SIGTERM", "SIGABRT"}:
             loop.add_signal_handler(
                 getattr(signal, signame),
@@ -90,7 +90,6 @@ async def on_startup():
             )
         while not bot.is_connected:
             await asyncio.sleep(0.5)
-        bot.me = await bot.client.get_me()
         await update_enka_assets()
         scheduler.start()
         if len(sys.argv) == 3:

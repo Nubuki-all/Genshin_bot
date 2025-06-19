@@ -401,9 +401,9 @@ async def enka_button_handler(event, uid, args, client):
         title, button_dict, event.chat.jid, user, 12, cfm_btn_txt, event.message
     )
     if event.lid_address:
-        me = bot.me.LID
+        me = bot.client.me.LID
     else:
-        me = bot.me.JID
+        me = bot.client.me.JID
 
     poll_msg = construct_msg_and_evt(
         event.chat.id,
@@ -593,7 +593,7 @@ async def send_event_menu(event_list, event, reply):
         title, button_dict, event.chat.jid, user, 12, cfm_btn_txt, event.message
     )
     poll_msg = construct_msg_and_evt(
-        event.chat.id, bot.me.JID.User, msg_id, None, event.chat.server, poll_msg_
+        event.chat.id, bot.client.me.JID.User, msg_id, None, event.chat.server, poll_msg_
     )
     if not (results := await wait_for_button_response(msg_id)):
         return await event.reply("Yh, I'm done waiting.")
@@ -613,7 +613,7 @@ async def send_event_menu(event_list, event, reply):
             title, button_dict2, event.chat.jid, user, 12, "Done", event.message
         )
         poll_msg = construct_msg_and_evt(
-            event.chat.id, bot.me.JID.User, msg_id, None, event.chat.server, poll_msg_
+            event.chat.id, bot.client.me.JID.User, msg_id, None, event.chat.server, poll_msg_
         )
         if not (results := await wait_for_button_response(msg_id)):
             return await event.reply("Yh, I'm done waiting.")
