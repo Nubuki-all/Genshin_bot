@@ -8,7 +8,6 @@ from . import (
     MessageEv,
     NewAClient,
     PairStatusEv,
-    asyncio,
     bot,
     conf,
     time,
