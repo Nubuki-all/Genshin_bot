@@ -4,7 +4,7 @@ import aiohttp
 
 from bot import Message, asyncio, bot, conf, jid, sys, version_file
 from bot.fun.emojis import enmoji, enmoji2
-from bot.fun.quips import enquip2
+from bot.fun.quips import enquip, enquip2
 from bot.utils.gi_utils import enka_update
 from bot.utils.local_db_utils import save_enka_db
 from bot.utils.log_utils import logger
@@ -45,8 +45,7 @@ async def onrestart():
         await logger(Exception)
 
 
-async def onstart():
-    text = "*Please restart me.*"
+async def onstart(text="*Please restart me.*"):
     i = conf.OWNER.split()[0]
     await bot.client.send_message(
         jid.build_jid(i),
