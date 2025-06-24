@@ -6,6 +6,7 @@ from inspect import getdoc
 from bs4 import BeautifulSoup
 
 from bot.config import bot
+from bot.others.exceptions import CreateSudoBtnError
 from bot.utils.bot_utils import (
     get_date,
     get_date_from_ts,
@@ -170,6 +171,8 @@ async def enka_handler(event, args, client):
                 await event.reply("*Saved your uid successfully!*")
             if not vital_args:
                 return
+        if save and not uid:
+            return await event.reply("No UID found to save!")
         if not uid:
             if mention:
                 uid = bot.user_dict.get(mention[1:], {}).get("genshin_uid", None)
@@ -338,6 +341,10 @@ async def enka_handler(event, args, client):
             if error:
                 return
             return await send_multi_cards(event, reply, result, profile)
+    except CreateSudoBtnError as e:
+        await logger(Exception)
+        await event.reply(f"*Poll messages cannot be sent at the moment, due to:*\n{e}")
+        await event.reply(getdoc(enka_handler))
     except Exception:
         await logger(Exception)
         await event.react("❌")
