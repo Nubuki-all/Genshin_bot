@@ -5,7 +5,7 @@ from neonize.utils.message import get_poll_update_message
 
 from bot import sudo_btn_lock
 from bot.config import bot
-from bot.others.exceptions CreateSudoBtnError
+from bot.others.exceptions import CreateSudoBtnError
 
 from .bot_utils import get_sha256, trunc_string
 
