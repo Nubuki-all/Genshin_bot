@@ -601,7 +601,7 @@ async def send_event_menu(event_list, event, reply):
     )
     if not (results := await wait_for_button_response(msg_id)):
         return await event.reply("Yh, I'm done waiting.")
-    await bot.client.revoke_message(event.chat.jid, bot.client.me.JID.User, msg_id)
+    await bot.client.revoke_message(event.chat.jid, bot.client.me.JID, msg_id)
     selected_event_list = []
     for result in results:
         selected = button_dict.get(result)[1]
@@ -618,7 +618,7 @@ async def send_event_menu(event_list, event, reply):
         )
         if not (results := await wait_for_button_response(msg_id)):
             return await event.reply("Yh, I'm done waiting.")
-        await bot.client.revoke_message(event.chat.jid, bot.client.me.JID.User, msg_id)
+        await bot.client.revoke_message(event.chat.jid, bot.client.me.JID, msg_id)
         for result in results:
             selected = button_dict2.get(result)[1]
             if selected == cfm_btn:
