@@ -37,7 +37,6 @@ from bot.utils.log_utils import logger
 from bot.utils.msg_utils import (
     chat_is_allowed,
     clean_reply,
-    construct_msg_and_evt,
     get_args,
     get_msg_from_codes,
     get_user_info,
