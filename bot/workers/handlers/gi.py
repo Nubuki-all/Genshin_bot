@@ -404,26 +404,16 @@ async def enka_button_handler(event, uid, args, client):
     if button_dict2:
         button_dict2.update({uuid.uuid4(): ["Done", cfm_btn]})
     title = f"{event.from_user.name} please select the characters you want to fetch cards for and click Next/Done."
-    poll_msg_, msg_id = await create_sudo_button(
+    poll_msg = await create_sudo_button(
         title, button_dict, event.chat.jid, user, 12, cfm_btn_txt, event.message
     )
-    if event.lid_address:
-        me = bot.client.me.LID
-    else:
-        me = bot.client.me.JID
+    me = bot.client.me.JID
 
-    poll_msg = construct_msg_and_evt(
-        event.chat.id,
-        me.User,
-        msg_id,
-        None,
-        event.chat.server,
-        me.Server,
-        poll_msg_,
-    )
-    if not (results := await wait_for_button_response(msg_id)):
+    del_poll_msg = bot.client.revoke_message(event.chat.jid, me, poll_msg.ID)
+    if not (results := await wait_for_button_response(poll_msg.ID)):
+        await del_poll_msg
         return await event.reply("Yh, I'm done waiting.")
-    await poll_msg.delete()
+    await del_poll_msg
     sel_char = str()
     for result in results:
         char = button_dict.get(result)[1]
@@ -431,21 +421,14 @@ async def enka_button_handler(event, uid, args, client):
             continue
         sel_char += char + ","
     if button_dict2:
-        poll_msg_, msg_id = await create_sudo_button(
+        poll_msg = await create_sudo_button(
             title, button_dict2, event.chat.jid, user, 12, "Done", event.message
         )
-        poll_msg = construct_msg_and_evt(
-            event.chat.id,
-            me.User,
-            msg_id,
-            None,
-            event.chat.server,
-            me.Server,
-            poll_msg_,
-        )
-        if not (results := await wait_for_button_response(msg_id)):
+        del_poll_msg = bot.client.revoke_message(event.chat.jid, me, poll_msg.ID)
+        if not (results := await wait_for_button_response(poll_msg.ID)):
+            await del_poll_msg
             return await event.reply("Yh, I'm done waiting.")
-        await poll_msg.delete()
+        await del_poll_msg
         for result in results:
             char = button_dict2.get(result)[1]
             if char == cfm_btn:
@@ -596,12 +579,15 @@ async def send_event_menu(event_list, event, reply):
     if button_dict2:
         button_dict2.update({uuid.uuid4(): ["Done", cfm_btn]})
     title = f"{event.from_user.name} please select the events you want to fetch info for and click Next/Done."
-    poll_msg, msg_id = await create_sudo_button(
+    me = bot.client.me.JID
+    poll_msg = await create_sudo_button(
         title, button_dict, event.chat.jid, user, 12, cfm_btn_txt, event.message
     )
-    if not (results := await wait_for_button_response(msg_id)):
+    del_poll_msg = bot.client.revoke_message(event.chat.jid, me, poll_msg.ID)
+    if not (results := await wait_for_button_response(poll_msg.ID)):
+        await del_poll_msg
         return await event.reply("Yh, I'm done waiting.")
-    await bot.client.revoke_message(event.chat.jid, bot.client.me.JID, msg_id)
+    await del_poll_msg
     selected_event_list = []
     for result in results:
         selected = button_dict.get(result)[1]
@@ -613,12 +599,14 @@ async def send_event_menu(event_list, event, reply):
             selected_event_list.append(event_)
             break
     if button_dict2:
-        poll_msg, msg_id = await create_sudo_button(
+        poll_msg = await create_sudo_button(
             title, button_dict2, event.chat.jid, user, 12, "Done", event.message
         )
-        if not (results := await wait_for_button_response(msg_id)):
+        del_poll_msg = bot.client.revoke_message(event.chat.jid, me, poll_msg.ID)
+        if not (results := await wait_for_button_response(poll_msg.ID)):
+            await del_poll_msg
             return await event.reply("Yh, I'm done waiting.")
-        await bot.client.revoke_message(event.chat.jid, bot.client.me.JID, msg_id)
+        await del_poll_msg
         for result in results:
             selected = button_dict2.get(result)[1]
             if selected == cfm_btn:
