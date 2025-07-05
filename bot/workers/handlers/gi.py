@@ -596,20 +596,12 @@ async def send_event_menu(event_list, event, reply):
     if button_dict2:
         button_dict2.update({uuid.uuid4(): ["Done", cfm_btn]})
     title = f"{event.from_user.name} please select the events you want to fetch info for and click Next/Done."
-    poll_msg_, msg_id = await create_sudo_button(
+    poll_msg, msg_id = await create_sudo_button(
         title, button_dict, event.chat.jid, user, 12, cfm_btn_txt, event.message
-    )
-    poll_msg = construct_msg_and_evt(
-        event.chat.id,
-        bot.client.me.JID.User,
-        msg_id,
-        None,
-        event.chat.server,
-        poll_msg_,
     )
     if not (results := await wait_for_button_response(msg_id)):
         return await event.reply("Yh, I'm done waiting.")
-    await poll_msg.delete()
+    await bot.client.revoke_message(event.chat.jid, bot.client.me.JID.User, msg_id)
     selected_event_list = []
     for result in results:
         selected = button_dict.get(result)[1]
@@ -621,20 +613,12 @@ async def send_event_menu(event_list, event, reply):
             selected_event_list.append(event_)
             break
     if button_dict2:
-        poll_msg_, msg_id = await create_sudo_button(
+        poll_msg, msg_id = await create_sudo_button(
             title, button_dict2, event.chat.jid, user, 12, "Done", event.message
-        )
-        poll_msg = construct_msg_and_evt(
-            event.chat.id,
-            bot.client.me.JID.User,
-            msg_id,
-            None,
-            event.chat.server,
-            poll_msg_,
         )
         if not (results := await wait_for_button_response(msg_id)):
             return await event.reply("Yh, I'm done waiting.")
-        await poll_msg.delete()
+        await bot.client.revoke_message(event.chat.jid, bot.client.me.JID.User, msg_id)
         for result in results:
             selected = button_dict2.get(result)[1]
             if selected == cfm_btn:
