@@ -4,6 +4,7 @@ import inspect
 import os
 import warnings
 from collections import deque
+from collections.abc import Callable
 
 import httpx
 from neonize.types import MessageWithContextInfo
@@ -637,10 +638,12 @@ class Event:
 
 POLL = 1
 function_dict = {None: []}
-anti_duplicate = deque(maxlen=10)
+anti_duplicate = deque(maxlen=10000)
 
 
 def register(key: str | None = None):
+    """A decorator to register event handlers"""
+
     def dec(fn):
         nonlocal key
         if isinstance(key, int):
@@ -655,6 +658,7 @@ def register(key: str | None = None):
 
 
 def add_handler(function, command: str | None = None, **kwargs):
+    """Adds an handler using the register decorator"""
     if command:
 
         async def _(client: NewAClient, event: Event):
@@ -666,11 +670,16 @@ def add_handler(function, command: str | None = None, **kwargs):
             await function(event, None, client)
 
     register(command)(_)
+    return _
 
 
-def unregister(key: str):
-    key = conf.CMD_PREFIX + key
-    function_dict.pop(key)
+def unregister(key: str | Callable):
+    """Unregisters an event handler"""
+    if isinstance(key, str):
+        key = conf.CMD_PREFIX + key
+        function_dict.pop(key)
+    else:
+        function_dict[None].remove(key)
 
 
 bot.add_handler = add_handler
@@ -705,10 +714,10 @@ async def on_message(client: NewAClient, message: MessageEv):
                 await func(client, event)
         if not function_dict[None]:
             return
-        # funcs = [func(client, event) for func in function_dict[None]]
-        # await asyncio.gather(*funcs)
+        funcs = [func(client, event) for func in function_dict[None]]
+        await asyncio.gather(*funcs)
     except Exception:
-        await logger(e="Unhandled Exception:")
+        await logger(e="Unhandled Exception(s):", error=True)
         await logger(Exception)
 
 

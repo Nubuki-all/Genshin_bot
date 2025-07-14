@@ -32,7 +32,7 @@ def save2db_lcl2(db):
         with open(local_gdb, "wb") as file:
             pickle.dump(bot.gift_dict, file)
     elif db == "groups":
-        with open(local_rdb, "wb") as file:
+        with open(local_gcdb, "wb") as file:
             pickle.dump(bot.group_dict, file)
     elif db == "rss":
         with open(local_rdb, "wb") as file:

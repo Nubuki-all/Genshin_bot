@@ -1,7 +1,7 @@
 from datetime import datetime as dt
 
 from bot.config import bot, conf
-from bot.utils.bot_utils import get_json
+from bot.utils.bot_utils import get_json, png_to_jpg
 from bot.utils.log_utils import logger
 from bot.utils.msg_utils import chat_is_allowed, user_is_allowed, user_is_privileged
 
@@ -31,7 +31,7 @@ async def gen_meme(link, pm=False):
         meme_list.append(pl)
         sb = result.get("subreddit")
         nsfw_text = "*🔞 NSFW*\n"
-        caption = f"{nsfw_text if nsfw else str()}*{title.strip()}*\n{pl}\n\nBy u/{author} in r/{sb}"
+        caption = f"{nsfw_text if nsfw else ''}*{title.strip()}*\n{pl}\n\nBy u/{author} in r/{sb}"
         url = result.get("url")
         filename = f"{_id}.{url.split('.')[-1]}"
         nsfw = False if pm else nsfw
@@ -55,25 +55,30 @@ async def getmeme(event, args, client):
             return await event.react("⛔")
     link = "https://meme-api.com/gimme"
     try:
-        if args:
-            link += f"/{args}" if not args.isdigit() else str()
-        caption, url, filename, nsfw = await gen_meme(link, not (event.chat.is_group))
-        if not url:
-            if nsfw:
-                return await event.reply("*NSFW is blocked!*")
-            return await event.reply("*Request Failed!*")
-        if url.endswith(".gif"):
-            return await event.reply_gif(
-                caption=caption,
-                gif=url,
-                viewonce=nsfw,
-                as_gif=True,
+        async with event.react("🌐"):
+            if args:
+                link += f"/{args}" if not args.isdigit() else ""
+            caption, url, filename, nsfw = await gen_meme(
+                link, not (event.chat.is_group)
             )
-        await event.reply_photo(
-            caption=caption,
-            photo=url,
-            viewonce=nsfw,
-        )
+            if not url:
+                if nsfw:
+                    return await event.reply("*NSFW is blocked!*")
+                return await event.reply("*Request Failed!*")
+            if url.endswith(".gif"):
+                return await event.reply_gif(
+                    caption=caption,
+                    gif=url,
+                    viewonce=nsfw,
+                    as_gif=True,
+                )
+            if url.endswith(".png"):
+                url = await png_to_jpg(url)
+            await event.reply_photo(
+                caption=caption,
+                photo=url,
+                viewonce=nsfw,
+            )
     except Exception as e:
         await logger(Exception)
         return await event.reply(f"*Error:*\n{e}")
