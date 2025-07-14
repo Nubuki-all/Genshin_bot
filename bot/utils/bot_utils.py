@@ -164,17 +164,19 @@ def time_formatter(seconds: float) -> str:
     return tmp[:-2]
 
 
-async def png_to_jpg(png: bytes):
+async def png_to_jpg(png: bytes | str):
+    raw = False if isinstance(png, str) else True
     ffmpeg = (
         FFmpeg()
         .option("y")
-        .input("pipe:0")
+        .input("pipe:0" if raw else png)
         .output(
             "pipe:1",
             f="mjpeg",
         )
     )
-    return await ffmpeg.execute(png)
+    input_ = png if raw else None
+    return await ffmpeg.execute(input_)
 
 
 def turn(turn_id: str = None):
