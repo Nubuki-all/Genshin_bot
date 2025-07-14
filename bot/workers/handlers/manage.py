@@ -680,4 +680,3 @@ async def sudoers(event, args, client):
     except Exception:
         await logger(Exception)
         await event.react("❌")
-
