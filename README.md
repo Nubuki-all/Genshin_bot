@@ -21,6 +21,7 @@ The sample also contains a brief explanation of what each environmental variable
 **Without Docker:**
 - Install required dependencies check the [Dockerfile](Dockerfile) for inspiration.
 - python3.10, ffmpeg are required
+- Install additional python dependencies with `pip3 install requirements.txt` (Possibly after setting up a venv)
 - Run:
   - `bash run.sh` _To start bot normally_
   - `bash srun.sh` _To start bot silently_

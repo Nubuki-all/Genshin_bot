@@ -1,10 +1,43 @@
+import inspect
+import logging
 import traceback
 
-from bot import LOGS, bot, conf, jid
+from bot import bot, conf, jid
+
+_log_ = logging.getLogger(__name__)
+
+
+def get_logger_from_caller():
+    """
+    Walk up the call stack until you find a frame whose module name
+    isn’t this one, and return a Logger for that module.
+    """
+    current_module = __name__
+    frame = inspect.currentframe()
+    # skip our own get_logger_from_caller frame
+    frame = frame.f_back
+    max_look_backs = 4
+
+    while frame and max_look_backs:
+        module = inspect.getmodule(frame)
+        name = module.__name__ if module else None
+        # first frame not in this module → the caller
+        if name and name != current_module:
+            return logging.getLogger(name)
+        frame = frame.f_back
+        max_look_backs -= 1
+
+    # fallback if all else fails
+    return logging.getLogger(current_module)
 
 
 async def group_logger(
-    Exception: Exception, e: str, error: bool, critical: bool, warning: bool
+    Exception: Exception = None,
+    e: str = None,
+    critical: bool = False,
+    debug: bool = False,
+    error: bool = False,
+    warning: bool = False,
 ):
     if not conf.LOG_GROUP:
         return
@@ -14,6 +47,8 @@ async def group_logger(
         chat, server = map(str, gc) if len(gc) > 1 else (str(gc[0]), "g.us")
         if critical:
             pre = "CRITICAL ERROR"
+        elif debug:
+            pre = "DEBUG"
         elif warning:
             pre = "WARNING"
         elif error or not e:
@@ -22,38 +57,45 @@ async def group_logger(
             pre = "INFO"
         msg = await bot.client.send_message(
             jid.build_jid(chat, server),
-            f"*#{pre}*\n\n*Summary of what happened:*\n> {trace}\n\n*To restict error messages to logs unset the* `conf.LOG_GROUP` *env var*.",
+            f"*#{pre}*\n\n*Summary of what happened:*\n> {trace}\n\n*To restrict error messages to logs unset the* `conf.LOG_GROUP` *env var*.",
         )
         return msg
     except Exception:
-        LOGS.error(traceback.format_exc())
+        _log_.error(traceback.format_exc())
 
 
 def log(
     Exception: Exception = None,
     e: str = None,
-    critical=False,
-    error=False,
-    warning=False,
+    critical: bool = False,
+    debug: bool = False,
+    error: bool = False,
+    warning: bool = False,
+    logger=None,
 ):
     trace = e or traceback.format_exc()
+    logger = logger or get_logger_from_caller()
+
     if critical:
-        _log = LOGS.critical
+        logger.critical(trace)
+    elif debug:
+        logger.debug(trace)
     elif warning:
-        _log = LOGS.warning
+        logger.warning(trace)
     elif error or not e:
-        _log = LOGS.error
+        logger.error(trace)
     else:
-        _log = LOGS.info
-    _log(trace)
+        logger.info(trace)
 
 
 async def logger(
     Exception: Exception = None,
     e: str = None,
-    critical=False,
-    error=False,
-    warning=False,
+    critical: bool = False,
+    debug: bool = False,
+    error: bool = False,
+    warning: bool = False,
 ):
-    log(Exception, e, error, critical, warning)
-    await group_logger(Exception, e, error, critical, warning)
+    logger = get_logger_from_caller()
+    log(Exception, e, critical, debug, error, warning, logger)
+    await group_logger(Exception, e, critical, debug, error, warning)

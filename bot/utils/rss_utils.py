@@ -113,11 +113,11 @@ async def rss_monitor():
 
 
 def get_pic_url(feed: dict) -> list | None:
+    pics = []
     if feed.get("content"):
         content = feed["content"][0]["value"]
     else:
-        return
-    pics = []
+        return pics
     soups = BeautifulSoup(content, "html.parser")
     for soup in soups.find_all("img"):
         pic = soup["src"]

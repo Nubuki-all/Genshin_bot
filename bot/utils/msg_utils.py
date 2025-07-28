@@ -6,6 +6,8 @@ from functools import partial
 
 from bs4 import BeautifulSoup
 from neonize.utils.enum import Presence
+from neonize.utils.ffmpeg import AFFmpeg
+from neonize.utils.iofile import get_bytes_from_name_or_url_async
 
 from bot import jid
 from bot.config import bot, conf
@@ -104,6 +106,14 @@ def sanitize_text(text: str, truncate=True) -> str:
     return (text[:900] + "…") if len(text) > 900 and truncate else text
 
 
+async def download_media_to_memory(media):
+    if media.endswith("gif"):
+        async with AFFmpeg(media) as ffmpeg:
+            return await ffmpeg.gif_to_mp4()
+    else:
+        return await get_bytes_from_name_or_url_async(media)
+
+
 async def parse_and_send_rss(data: dict, chat_ids: list = None):
     try:
         author = data.get("author")
@@ -128,6 +138,9 @@ async def parse_and_send_rss(data: dict, chat_ids: list = None):
             except Exception:
                 await logger(Exception)
             caption += f"\n\n- *Telegraph:* {tgh_link}\n- *Hoyolab:* {url}"
+        medias = await asyncio.gather(
+            *[download_media_to_memory(pic) for pic in pics]
+        )
         expanded_chat = []
         for chat in chats:
             (
@@ -143,14 +156,45 @@ async def parse_and_send_rss(data: dict, chat_ids: list = None):
                 if len(top_chat) > 1
                 else (str(top_chat[0]), "s.whatsapp.net")
             )
-            func = send_rss(caption, chat, pics, server)
+            func = send_rss(caption, chat, medias, server, pics[:2])
             func_list.append(func)
         await asyncio.gather(*func_list)
     except Exception:
         await logger(Exception)
 
 
-async def send_rss(caption, chat, pics, server):
+async def send_rss(caption, chat, medias, server, f_media):
+    try:
+        total_media = len(medias)
+        if medias:
+            send_media = bot.client.send_image
+            if f_media[0].endswith(".gif"):
+                send_media = bot.client.send_video
+            rep = await send_media(
+                jid.build_jid(chat, server=server),
+                medias[0],
+                caption,
+            )
+            if total_media == 1:
+                return
+            message = construct_msg_and_evt(chat, bot.client.me.JID.User, rep.ID, None, server=server, Msg=rep.Message)
+            if total_media > 2:
+                await message.reply_album(medias[1:], quote=True)
+            else:
+                reply_media = message.reply_photo
+                if f_media[1].endswith(".gif"):
+                    reply_media = message.reply_gif
+                await reply_media(medias[1], quote=True)
+        else:
+            await bot.client.send_message(
+                jid.build_jid(chat, server),
+                caption,
+                link_preview=True,
+            )
+    except Exception:
+        await logger(Exception)
+
+async def _send_rss(caption, chat, pics, server):
     try:
         len_pic = len(pics)
         if len_pic > 1:
@@ -168,7 +212,7 @@ async def send_rss(caption, chat, pics, server):
                 caption,
             )
             message = construct_message(
-                chat, bot.client.me.JID.User, rep.ID, "image", server=server
+                chat, bot.client.me.JID.User, rep.ID, None, server=server, Msg=rep.Message
             )
             msg = construct_event(message)
             for img in pics[1:]:
