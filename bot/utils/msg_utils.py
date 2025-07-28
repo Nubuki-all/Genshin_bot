@@ -138,9 +138,7 @@ async def parse_and_send_rss(data: dict, chat_ids: list = None):
             except Exception:
                 await logger(Exception)
             caption += f"\n\n- *Telegraph:* {tgh_link}\n- *Hoyolab:* {url}"
-        medias = await asyncio.gather(
-            *[download_media_to_memory(pic) for pic in pics]
-        )
+        medias = await asyncio.gather(*[download_media_to_memory(pic) for pic in pics])
         expanded_chat = []
         for chat in chats:
             (
@@ -177,7 +175,14 @@ async def send_rss(caption, chat, medias, server, f_media):
             )
             if total_media == 1:
                 return
-            message = construct_msg_and_evt(chat, bot.client.me.JID.User, rep.ID, None, server=server, Msg=rep.Message)
+            message = construct_msg_and_evt(
+                chat,
+                bot.client.me.JID.User,
+                rep.ID,
+                None,
+                server=server,
+                Msg=rep.Message,
+            )
             if total_media > 2:
                 await message.reply_album(medias[1:], quote=True)
             else:
@@ -193,6 +198,7 @@ async def send_rss(caption, chat, medias, server, f_media):
             )
     except Exception:
         await logger(Exception)
+
 
 async def _send_rss(caption, chat, pics, server):
     try:
@@ -212,7 +218,12 @@ async def _send_rss(caption, chat, pics, server):
                 caption,
             )
             message = construct_message(
-                chat, bot.client.me.JID.User, rep.ID, None, server=server, Msg=rep.Message
+                chat,
+                bot.client.me.JID.User,
+                rep.ID,
+                None,
+                server=server,
+                Msg=rep.Message,
             )
             msg = construct_event(message)
             for img in pics[1:]:
