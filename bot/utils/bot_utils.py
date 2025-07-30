@@ -206,3 +206,18 @@ def trunc_string(string: str, limit: int):
 
 def split_list_in_half(list_: list):
     return (list_[: len(list_) // 2], list_[len(list_) // 2 :])
+
+async def read_binary(file):
+    def stdlib_read(file):
+        with open(file, "rb") as f:
+            return f.read()
+
+    return await sync_to_async(stdlib_read, file)
+
+
+async def write_binary(file, bytes_):
+    def stdlib_write(file, bytes_):
+        with open(file, "wb") as f:
+            f.write(bytes_)
+
+    return await sync_to_async(stdlib_write, file, bytes_)
