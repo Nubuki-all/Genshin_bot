@@ -29,7 +29,7 @@ async def sanitize_url(event, args, client):
         status_msg = await event.reply("Please wait…")
         extractor = URLExtract()
         if rep:
-            msg = (rep.text or rep.caption)
+            msg = rep.text or rep.caption
             urls = extractor.find_urls(msg)
             if not urls:
                 return await event.reply(
