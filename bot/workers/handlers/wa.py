@@ -24,16 +24,16 @@ async def sanitize_url(event, args, client):
         if not user_is_allowed(user):
             return
     try:
-        if not (event.quoted_text or args):
+        if not ((rep := event.reply_to_message) or args):
             return await event.reply(f"{sanitize_url.__doc__}")
         status_msg = await event.reply("Please wait…")
         extractor = URLExtract()
-        if event.quoted_text:
-            msg = event.quoted_text
+        if rep:
+            msg = (rep.text or rep.caption)
             urls = extractor.find_urls(msg)
             if not urls:
                 return await event.reply(
-                    f"*No link found in @{event.reply_to_message.from_user.id}'s message to sanitize*"
+                    f"*No link(s) found in @{event.reply_to_message.from_user.id}'s message to sanitize*"
                 )
             new_msg = msg
             sanitized_links = []
