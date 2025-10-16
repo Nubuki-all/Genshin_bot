@@ -43,7 +43,7 @@ async def gift_code_monitor():
             )
             try:
 
-                await send_rss(msg, chat, [], server)
+                await send_rss(msg, chat, [], server, [])
                 await asyncio.sleep(5)
             except Exception:
                 log(Exception)
